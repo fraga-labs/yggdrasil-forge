@@ -14,9 +14,11 @@ export {
   createEditorDocument,
 } from './document/EditorDocument.js'
 export type {
+  ThemeEdgeSpec,
   ThemeNodeState,
   ThemeRegionTint,
   ThemeSpec,
+  ThemeTypographySpec,
 } from './document/ThemeSpec.js'
 // 7.19: presets de tema con nome (o tema como dato reutilizable).
 export type { ThemePreset } from './document/themePresets.js'
@@ -39,16 +41,21 @@ export {
   type AutoLayoutAlgo,
   applyAutoLayout,
 } from './layout/applyAutoLayout.js'
-export { themeOverridesFromSpec } from './theme/themeOverridesFromSpec.js'
+export {
+  themeOverridesFromSpec,
+  themeTypographyFromSpec,
+} from './theme/themeOverridesFromSpec.js'
 export { type StandaloneSvgOptions, standaloneSvg } from './svg/standaloneSvg.js'
 export {
   backgroundRefSchema,
   boundsSchema,
   documentMetaSchema,
   type InferredDocumentMeta,
+  themeEdgeSpecSchema,
   themeNodeStateSchema,
   themeRegionTintSchema,
   themeSpecSchema,
+  themeTypographySpecSchema,
 } from './document/documentMetaSchema.js'
 
 // Sesión (efímera, estendida con selection+fsm+activeOperation en 7.3)

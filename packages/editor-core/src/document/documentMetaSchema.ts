@@ -35,6 +35,36 @@ export const themeRegionTintSchema = z
   })
   .describe('Background tint for one region (membership is by node tag).')
 
+/** Espella `ThemeEdgeSpec` (ThemeSpec.ts). */
+export const themeEdgeSpecSchema = z
+  .object({
+    color: z.string().optional().describe('Base edge line color (CSS color string).'),
+    active: z
+      .string()
+      .optional()
+      .describe('Color for lit edges (those leaving an unlocked/maxed node). Falls back to color.'),
+  })
+  .describe('Edge colors as document data.')
+
+/** Espella `ThemeTypographySpec` (ThemeSpec.ts). */
+export const themeTypographySpecSchema = z
+  .object({
+    fontFamily: z
+      .string()
+      .optional()
+      .describe("Full CSS font stack, generic fallback included (e.g. 'Cinzel, serif')."),
+    fontWeight: z
+      .union([z.number(), z.string()])
+      .optional()
+      .describe("Label font weight (400/600/700, or 'bold')."),
+    letterSpacing: z.string().optional().describe("Label tracking (e.g. '0.08em')."),
+    textTransform: z
+      .enum(['none', 'uppercase', 'lowercase', 'capitalize'])
+      .optional()
+      .describe('Label letter case.'),
+  })
+  .describe('Label typography as document data.')
+
 /** Espella `ThemeSpec` (ThemeSpec.ts). */
 export const themeSpecSchema = z
   .object({
@@ -54,6 +84,16 @@ export const themeSpecSchema = z
       .array(themeRegionTintSchema)
       .optional()
       .describe('Region tints. Region membership is by node tag.'),
+    nodeRings: z
+      .record(themeNodeStateSchema, z.string())
+      .optional()
+      .describe(
+        'Node ring (outline) color per visual state — the sibling of nodeFills, which paints the body. Partial: missing states fall back to the base theme.',
+      ),
+    edges: themeEdgeSpecSchema.optional().describe('Edge colors. Omit to fall back to the base.'),
+    typography: themeTypographySpecSchema
+      .optional()
+      .describe('Label typography. Omit to fall back to the base.'),
     preset: z
       .string()
       .optional()

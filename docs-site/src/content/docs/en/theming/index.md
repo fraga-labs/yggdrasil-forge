@@ -73,16 +73,26 @@ colors: {
   "theme": {
     "preset": "bosque",
     "nodeFills": { "locked": "#4a5340", "unlockable": "#7d8f5a", "unlocked": "#3e7a4c", "maxed": "#b08d3e", "inProgress": "#96a86c" },
+    "nodeRings": { "locked": "#2e3528", "maxed": "#d8b15a" },
+    "edges": { "color": "#3c4636", "active": "#b08d3e" },
+    "typography": { "fontFamily": "Cinzel, serif", "fontWeight": 600, "letterSpacing": "0.08em", "textTransform": "uppercase" },
     "textColor": "#f4efdf",
     "regions": [{ "id": "r1", "label": "Breath", "tag": "breath", "color": "#c8875f" }]
   }
 }
 ```
 
-- `nodeFills` — per-state fill (partial: anything missing falls back to the base theme).
+- `nodeFills` — per-state fill of the node **body** (partial: anything missing falls back to the base theme).
+- `nodeRings` — per-state color of the node **ring** (outline). The exact sibling of `nodeFills`: the renderer paints a node in two layers, and this is the outer one. It is what separates blackened iron from a thin neon hexagon without touching the fill.
+- `edges` — `color` for the lines and `active` for **lit** ones (those leaving an `unlocked`/`maxed` node). Without `active`, lit edges fall back to `color`.
+- `typography` — `fontFamily` (always with a generic fallback), `fontWeight`, `letterSpacing`, `textTransform`. **Type is identity, not decoration**: a gothic document and a sci-fi one are not told apart by color alone.
 - `textColor` — node text and icons, and region labels. Without it, the editor picks a legible one for its chrome.
 - `regions` — **tints by tag**: nodes carrying that `tag` get a colored background (low opacity) and a region label.
 - `preset` — **informational**: which preset it started from (the UI marks the active chip). It does not affect rendering by itself: applying a preset means copying its full spec.
+
+:::note[Two layers, two axes]
+Body (`nodeFills`) and ring (`nodeRings`) are independent on purpose. A theme can keep the body neutral and let only the ring move with progression (the "flat-adaptive" model of the `minimal` theme), or move both. Both accept the five states: `locked`, `unlockable`, `unlocked`, `maxed`, `inProgress`.
+:::
 
 ### Named presets
 

@@ -143,4 +143,64 @@ describe('★ F7.9 — base do tema segundo o chrome (texto + arestas, non só c
     expect(label.style.fill).toBe('#ff00aa')
   })
 })
+
+// ── 19.0: o tema do documento chega ao lenzo tamén nos eixes novos ──
+// O funil (themeOverridesFromSpec / themeTypographyFromSpec) xa ten os
+// seus tests en @editor-core; isto verifica a costura do EditorCanvas,
+// que é o único código que non comparte co `ygg render`.
+describe('EditorCanvas — 19.0: aneis, arestas e tipografía do documento', () => {
+  function withTheme(theme: Record<string, unknown>): EditorEngine {
+    const engine = buildFixtureEngine()
+    engine.dispatch(setMetaField('theme', theme, { en: 'Update theme', gl: 'Actualizar tema' }))
+    return engine
+  }
+
+  it('★ a tipografía do documento aplícase aos rótulos', () => {
+    render(
+      <EditorCanvas
+        editorEngine={withTheme({
+          typography: {
+            fontFamily: 'Cinzel, serif',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          },
+        })}
+      />,
+    )
+    const label = screen.getByText('A')
+    expect(label.style.fontFamily).toContain('Cinzel')
+    expect(label.style.letterSpacing).toBe('0.08em')
+    expect(label.style.textTransform).toBe('uppercase')
+  })
+
+  it('★ sen tipografía no documento non se impón ningunha (cero regresión)', () => {
+    // As bases (`minimal`/`minimalDark`) NON declaran tipografía: o SVG
+    // herda a fonte do DOM. Un documento sen `typography` debe seguir
+    // exactamente igual — nada de plantar unha fonte por defecto.
+    render(<EditorCanvas editorEngine={withTheme({ textColor: '#ff00aa' })} />)
+    expect(screen.getByText('A').style.fontFamily).toBe('')
+  })
+
+  // O anel e as arestas aplícanse por `style` inline (F10.3.fix), non
+  // como atributo SVG — por iso a busca vai polo style computado.
+  function strokesOf(container: HTMLElement): readonly string[] {
+    return Array.from(container.querySelectorAll<SVGElement>('svg *'))
+      .map((el) => el.style.stroke)
+      .filter((s) => s !== '')
+  }
+
+  it('nodeRings.locked pinta o anel dos nodos (todos locked na fixture)', () => {
+    const { container } = render(
+      <EditorCanvas editorEngine={withTheme({ nodeRings: { locked: '#c1272d' } })} />,
+    )
+    expect(strokesOf(container)).toContain('#c1272d')
+  })
+
+  it('edges.color pinta as liñas', () => {
+    const { container } = render(
+      <EditorCanvas editorEngine={withTheme({ edges: { color: '#4a2418' } })} />,
+    )
+    expect(strokesOf(container)).toContain('#4a2418')
+  })
+})
 // ── FIN: tests EditorCanvas ──

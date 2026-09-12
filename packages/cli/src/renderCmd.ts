@@ -22,6 +22,7 @@ import {
   deserializeDocument,
   standaloneSvg,
   themeOverridesFromSpec,
+  themeTypographyFromSpec,
 } from '@yggdrasil-forge/editor-core'
 import { FORGE_ICONS, LOGIC_ICONS, NORSE_ICONS, registerIcons } from '@yggdrasil-forge/react'
 import {
@@ -78,12 +79,16 @@ export function renderDocumentText(
 
   // Tema: mesma composición que EditorCanvas (base + overrides do doc).
   const base = dark ? minimalDark : minimal
+  const typography = themeTypographyFromSpec(doc.meta.theme) as Theme['typography'] | undefined
   const theme: Theme = {
     ...base,
     colors: {
       ...base.colors,
       ...(themeOverridesFromSpec(doc.meta.theme, dark) as Partial<Theme['colors']>),
     },
+    ...(typography !== undefined && {
+      typography: { ...base.typography, ...typography },
+    }),
   }
 
   const engine = new TreeEngine(localizeTree(doc.tree, locale), { locale })

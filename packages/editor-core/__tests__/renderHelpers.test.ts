@@ -1,7 +1,10 @@
 // ── INICIO: tests helpers de render (7.17, Cambios 0 e utilidade SVG) ──
 import { describe, expect, it } from 'vitest'
 import { standaloneSvg } from '../src/svg/standaloneSvg.js'
-import { themeOverridesFromSpec } from '../src/theme/themeOverridesFromSpec.js'
+import {
+  themeOverridesFromSpec,
+  themeTypographyFromSpec,
+} from '../src/theme/themeOverridesFromSpec.js'
 
 describe('7.17-C0 — themeOverridesFromSpec', () => {
   it('nodeFills parciais mapean aos campos nodeFill<Estado>', () => {
@@ -24,6 +27,86 @@ describe('7.17-C0 — themeOverridesFromSpec', () => {
   it('base escura: os overrides do documento son os MESMOS (gañan sempre)', () => {
     const spec = { textColor: '#fff', nodeFills: { unlocked: '#c9a24b' } }
     expect(themeOverridesFromSpec(spec, true)).toEqual(themeOverridesFromSpec(spec, false))
+  })
+})
+
+describe('19.0 — aneis e arestas viaxan no documento', () => {
+  it('nodeRings mapea aos tokens node<Estado> (os que o renderer le)', () => {
+    const overrides = themeOverridesFromSpec(
+      { nodeRings: { locked: '#1a1a1a', maxed: '#c1272d' } },
+      false,
+    )
+    expect(overrides).toEqual({ nodeLocked: '#1a1a1a', nodeMaxed: '#c1272d' })
+  })
+
+  it('★ nodeRings NON escribe en `nodeStroke` (token morto da base)', () => {
+    const overrides = themeOverridesFromSpec({ nodeRings: { locked: '#1a1a1a' } }, false)
+    expect(overrides.nodeStroke).toBeUndefined()
+  })
+
+  it('corpo e anel son eixes independentes: nodeFills e nodeRings conviven', () => {
+    const overrides = themeOverridesFromSpec(
+      { nodeFills: { maxed: '#2a0d10' }, nodeRings: { maxed: '#c1272d' } },
+      false,
+    )
+    expect(overrides).toEqual({ nodeFillMaxed: '#2a0d10', nodeMaxed: '#c1272d' })
+  })
+
+  it('edges mapean a edge/edgeActive', () => {
+    const overrides = themeOverridesFromSpec(
+      { edges: { color: '#5a1f1f', active: '#c1272d' } },
+      false,
+    )
+    expect(overrides).toEqual({ edge: '#5a1f1f', edgeActive: '#c1272d' })
+  })
+
+  it('edges parcial: só `color` non inventa `edgeActive` (o renderer xa cae a edge)', () => {
+    expect(themeOverridesFromSpec({ edges: { color: '#5a1f1f' } }, false)).toEqual({
+      edge: '#5a1f1f',
+    })
+  })
+
+  it('★ non regresión: un spec previo ao 19.0 dá exactamente os mesmos overrides', () => {
+    const antigo = { textColor: '#e8dcc0', nodeFills: { maxed: '#e6c96d' } }
+    expect(themeOverridesFromSpec(antigo, false)).toEqual({
+      text: '#e8dcc0',
+      nodeFillMaxed: '#e6c96d',
+    })
+  })
+})
+
+describe('19.0 — themeTypographyFromSpec', () => {
+  it('mapea os catro tokens tal cal', () => {
+    expect(
+      themeTypographyFromSpec({
+        typography: {
+          fontFamily: 'Cinzel, serif',
+          fontWeight: 600,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+        },
+      }),
+    ).toEqual({
+      fontFamily: 'Cinzel, serif',
+      fontWeight: 600,
+      letterSpacing: '0.08em',
+      textTransform: 'uppercase',
+    })
+  })
+
+  it('★ sen tipografía → undefined, para NON tapar a da base', () => {
+    expect(themeTypographyFromSpec(undefined)).toBeUndefined()
+    expect(themeTypographyFromSpec({ textColor: '#fff' })).toBeUndefined()
+    // Obxecto presente pero baleiro: tampouco hai nada que impoñer.
+    expect(themeTypographyFromSpec({ typography: {} })).toBeUndefined()
+  })
+
+  it('parcial: só viaxa o declarado', () => {
+    expect(themeTypographyFromSpec({ typography: { fontFamily: 'Orbitron, sans-serif' } })).toEqual(
+      {
+        fontFamily: 'Orbitron, sans-serif',
+      },
+    )
   })
 })
 

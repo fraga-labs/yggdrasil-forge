@@ -1354,6 +1354,55 @@
               },
               "description": "Region tints. Region membership is by node tag."
             },
+            "nodeRings": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "enum": ["locked", "unlockable", "unlocked", "maxed", "inProgress"]
+              },
+              "description": "Node ring (outline) color per visual state — the sibling of nodeFills, which paints the body. Partial: missing states fall back to the base theme."
+            },
+            "edges": {
+              "type": "object",
+              "properties": {
+                "color": {
+                  "type": "string",
+                  "description": "Base edge line color (CSS color string)."
+                },
+                "active": {
+                  "type": "string",
+                  "description": "Color for lit edges (those leaving an unlocked/maxed node). Falls back to color."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Edge colors. Omit to fall back to the base."
+            },
+            "typography": {
+              "type": "object",
+              "properties": {
+                "fontFamily": {
+                  "type": "string",
+                  "description": "Full CSS font stack, generic fallback included (e.g. 'Cinzel, serif')."
+                },
+                "fontWeight": {
+                  "type": ["number", "string"],
+                  "description": "Label font weight (400/600/700, or 'bold')."
+                },
+                "letterSpacing": {
+                  "type": "string",
+                  "description": "Label tracking (e.g. '0.08em')."
+                },
+                "textTransform": {
+                  "type": "string",
+                  "enum": ["none", "uppercase", "lowercase", "capitalize"],
+                  "description": "Label letter case."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Label typography. Omit to fall back to the base."
+            },
             "preset": {
               "type": "string",
               "description": "Id of the preset this theme started from (informative, for UIs)."

@@ -43,6 +43,7 @@ import {
   buildRemoveCascade,
   createMoveOperation,
   themeOverridesFromSpec,
+  themeTypographyFromSpec,
 } from '@yggdrasil-forge/editor-core'
 import {
   type RegionSpec,
@@ -770,12 +771,19 @@ export function EditorCanvas({
     // overrides do documento gañan sempre.
     const dark = chromeTheme === 'dark'
     const base = dark ? minimalDark : minimal
+    // 19.0: a tipografía é a OUTRA rama do Theme (irmá de `colors`), co
+    // seu propio funil. Sen tipografía no documento non se toca a base
+    // — por iso o spread condicional en vez de `typography: undefined`.
+    const typography = themeTypographyFromSpec(themeSpec) as Theme['typography'] | undefined
     return {
       ...base,
       colors: {
         ...base.colors,
         ...(themeOverridesFromSpec(themeSpec, dark) as Partial<Theme['colors']>),
       },
+      ...(typography !== undefined && {
+        typography: { ...base.typography, ...typography },
+      }),
     }
   }, [themeSpec, chromeTheme])
 

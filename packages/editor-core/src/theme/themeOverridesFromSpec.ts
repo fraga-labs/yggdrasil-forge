@@ -25,6 +25,8 @@ export function themeOverridesFromSpec(
   _dark: boolean,
 ): Record<string, string> {
   const fills = spec?.nodeFills ?? {}
+  const rings = spec?.nodeRings ?? {}
+  const edges = spec?.edges
   return {
     ...(spec?.textColor !== undefined && { text: spec.textColor }),
     ...(fills.locked !== undefined && { nodeFillLocked: fills.locked }),
@@ -32,6 +34,46 @@ export function themeOverridesFromSpec(
     ...(fills.unlocked !== undefined && { nodeFillUnlocked: fills.unlocked }),
     ...(fills.maxed !== undefined && { nodeFillMaxed: fills.maxed }),
     ...(fills.inProgress !== undefined && { nodeFillInProgress: fills.inProgress }),
+    // 19.0 — aneis e arestas. Mesmo contrato: o documento gaña sobre a base.
+    //
+    // Os aneis mapean aos tokens `node<Estado>`, que son os que
+    // `ringColorForState` (@react) le de verdade. NON se mapea a
+    // `nodeStroke`: ese token da base está morto (ningún compoñente o
+    // consulta), e o documento non debe poder declarar cousas inertes.
+    ...(rings.locked !== undefined && { nodeLocked: rings.locked }),
+    ...(rings.unlockable !== undefined && { nodeUnlockable: rings.unlockable }),
+    ...(rings.unlocked !== undefined && { nodeUnlocked: rings.unlocked }),
+    ...(rings.maxed !== undefined && { nodeMaxed: rings.maxed }),
+    ...(rings.inProgress !== undefined && { nodeInProgress: rings.inProgress }),
+    ...(edges?.color !== undefined && { edge: edges.color }),
+    ...(edges?.active !== undefined && { edgeActive: edges.active }),
   }
+}
+
+/**
+ * Overrides de tipografía derivados do tema do documento (19.0).
+ *
+ * Irmán de `themeOverridesFromSpec` para a **outra rama** do `Theme`
+ * de @react: `colors` e `typography` son campos distintos, así que
+ * cada un ten o seu funil e a sinatura do primeiro non cambia.
+ *
+ * Devolve `undefined` cando o documento non declara tipografía, para
+ * que o consumidor poida deixar intacta a da base (`{...base}`) en vez
+ * de plantarlle un obxecto baleiro que tape a herdada.
+ *
+ * @param spec - O `meta.theme` do documento (ou undefined).
+ */
+export function themeTypographyFromSpec(
+  spec: ThemeSpec | undefined,
+): Record<string, string | number> | undefined {
+  const t = spec?.typography
+  if (t === undefined) return undefined
+  const out: Record<string, string | number> = {
+    ...(t.fontFamily !== undefined && { fontFamily: t.fontFamily }),
+    ...(t.fontWeight !== undefined && { fontWeight: t.fontWeight }),
+    ...(t.letterSpacing !== undefined && { letterSpacing: t.letterSpacing }),
+    ...(t.textTransform !== undefined && { textTransform: t.textTransform }),
+  }
+  return Object.keys(out).length > 0 ? out : undefined
 }
 // ── FIN: themeOverridesFromSpec ──

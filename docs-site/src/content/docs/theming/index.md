@@ -73,16 +73,26 @@ colors: {
   "theme": {
     "preset": "bosque",
     "nodeFills": { "locked": "#4a5340", "unlockable": "#7d8f5a", "unlocked": "#3e7a4c", "maxed": "#b08d3e", "inProgress": "#96a86c" },
+    "nodeRings": { "locked": "#2e3528", "maxed": "#d8b15a" },
+    "edges": { "color": "#3c4636", "active": "#b08d3e" },
+    "typography": { "fontFamily": "Cinzel, serif", "fontWeight": 600, "letterSpacing": "0.08em", "textTransform": "uppercase" },
     "textColor": "#f4efdf",
     "regions": [{ "id": "r1", "label": "Sopro", "tag": "sopro", "color": "#c8875f" }]
   }
 }
 ```
 
-- `nodeFills` — recheo por estado (parcial: o que falte cae ao tema base).
+- `nodeFills` — **corpo** do nodo por estado (parcial: o que falte cae ao tema base).
+- `nodeRings` — **anel** (contorno) do nodo por estado. Irmán exacto de `nodeFills`: o renderer pinta o nodo en dúas capas, e esta é a de fóra. É o que distingue un ferro negro dun hexágono de neon fino sen tocar o recheo.
+- `edges` — `color` para as liñas e `active` para as **acesas** (as que saen dun nodo `unlocked`/`maxed`). Sen `active`, as acesas caen a `color`.
+- `typography` — `fontFamily` (con fallback xenérico sempre), `fontWeight`, `letterSpacing`, `textTransform`. **A fonte é identidade, non adorno**: un documento gótico e un sci-fi non se distinguen só polas cores.
 - `textColor` — texto e iconas dos nodos e etiquetas de rexión. Sen el, o editor escolle un lexible segundo o seu chrome.
 - `regions` — **tintes por tag**: os nodos con ese `tag` levan un fondo de cor (con opacidade baixa) e unha etiqueta de rexión.
 - `preset` — **informativo**: de que preset partiu (a UI marca a ficha activa). Non afecta ao render por si só: aplicar un preset é copiar o seu spec completo.
+
+:::note[Dúas capas, dous eixes]
+O corpo (`nodeFills`) e o anel (`nodeRings`) son independentes a propósito. Un tema pode deixar o corpo neutro e mover só o anel coa progresión (o modelo «plano-adaptativo» do tema `minimal`), ou mover os dous. Ambos aceptan os cinco estados: `locked`, `unlockable`, `unlocked`, `maxed`, `inProgress`.
+:::
 
 ### Presets con nome
 

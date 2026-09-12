@@ -73,7 +73,7 @@ describe('7.16 — menú Dispor', () => {
     expect(positions(engine)).toEqual(before)
   })
 
-  it('o menú lista os cinco algoritmos, cada un coa súa axuda (7.18)', () => {
+  it('o menú lista TODOS os algoritmos, cada un coa súa axuda (7.18)', () => {
     render(<EditorCanvas editorEngine={buildEngine()} />)
     act(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Dispor' }))
@@ -87,6 +87,9 @@ describe('7.16 — menú Dispor', () => {
       [/^Capas \(para DAGs\)/, 'Para nodos con varios pais ou requisitos múltiples.'],
       [/^Radial por grupos/, 'Precisa grupos definidos'],
       [/^Constelación/, 'Para grafos soltos sen xerarquía clara.'],
+      // 19.6: o layout de malla. Se se engade outro motor, este test
+      // esixe que traia a súa condición de uso escrita.
+      [/^Malla \(tea de araña\)/, 'Para grafos densos con lazos'],
     ]
     const items = screen.getAllByRole('menuitem')
     expect(items).toHaveLength(expected.length)

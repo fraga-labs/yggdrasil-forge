@@ -17,6 +17,7 @@ Un **layout** decide onde vai cada nodo. En Yggdrasil Forge hai dúas formas de 
 | **Capas (para DAGs)** | `layered` | hai **nodos con varios pais** ou requisitos múltiples (currículos, tech trees). Capa = camiño máis longo; orde por baricentro. | o grafo ten ciclos: devolve erro (non coloca lixo). |
 | **Radial por grupos** | `clustered-radial` | tes **grupos** definidos; cada grupo é un cúmulo nun anel, os soltos van a un oco propio. | non hai grupos. |
 | **Constelación** | `constellation` | o grafo é solto, sen xerarquía clara (Skyrim). | queres ler a progresión. |
+| **Malla** | `mesh` | o grafo é **denso e con lazos** e queres o aspecto de tea de araña: un blob orgánico por grupo, colocado para que as arestas saian CURTAS. É o único motor que le as arestas. | o grafo é unha árbore: as forzas non teñen nada que tensar e sae peor ca `tree`. |
 | **Custom** | `custom` | as posicións veñen no dato (`node.position`). É o que deixa Dispor. | — |
 
 As condicións de uso son exactamente as liñas de axuda que mostra o menú **Dispor** do editor.
@@ -33,6 +34,7 @@ Cada motor acepta parámetros en `tree.layout` (todos opcionais; o editor deriva
 "layout": { "type": "layered", "nodeSpacing": 90, "levelSpacing": 130 }
 "layout": { "type": "radial", "radius": 200 }
 "layout": { "type": "clustered-radial", "groupRadius": 220, "orbitRadius": 90 }
+"layout": { "type": "mesh", "spacing": 66, "seed": 1, "curve": "arc" }
 ```
 
 `tree` e `layered` comparten `nodeSpacing`, `levelSpacing`, `direction` (`top-down`, `bottom-up`, `left-right`, `right-left`) e `centerX/centerY`.

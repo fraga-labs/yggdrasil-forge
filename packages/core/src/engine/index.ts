@@ -103,6 +103,12 @@ export { LayeredLayout } from './layouts/LayeredLayout.js'
 export type { LayeredLayoutConfig } from './layouts/LayeredLayoutConfig.js'
 export { parseLayeredConfig } from './layouts/LayeredLayoutConfig.js'
 export { ClusteredRadialLayout } from './layouts/ClusteredRadialLayout.js'
+// 19.6: o primeiro layout que le as arestas (estilo «tela de araña»).
+export { MeshLayout } from './layouts/MeshLayout.js'
+export {
+  type MeshLayoutConfig,
+  parseMeshLayoutConfig,
+} from './layouts/MeshLayoutConfig.js'
 export type {
   ClusteredRadialConfig,
   ClusteredMeshType,

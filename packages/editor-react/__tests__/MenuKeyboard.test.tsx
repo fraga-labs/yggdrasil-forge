@@ -102,14 +102,17 @@ describe('PanelsMenu — teclado (menuitemcheckbox tamén navega)', () => {
 })
 
 describe('DisporMenu — teclado', () => {
-  it('abrir enfoca «Radial»; End vai a «Constelación»; Escape volve ao trigger', () => {
+  it('abrir enfoca «Radial»; End vai ao ÚLTIMO; Escape volve ao trigger', () => {
     render(<EditorCanvas editorEngine={buildEngine()} />)
     act(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Dispor' }))
     })
     expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: /^Radial Aneis/ }))
     act(() => key('End'))
-    expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: /^Constelación/ }))
+    // 19.6: o último pasou a ser «Malla»; o que este test fixa é que
+    // End vai ao final da lista, non un nome concreto.
+    const items = screen.getAllByRole('menuitem')
+    expect(document.activeElement).toBe(items[items.length - 1])
     act(() => key('Escape'))
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Dispor' }))
   })

@@ -32,7 +32,8 @@ Uso:
   ygg layout <ficheiro|-> --algo <a>   Coloca TODOS os nodos co algoritmo indicado e emite o
        [--out ficheiro]                documento resultante (stdout ou --out). Algoritmos:
                                        radial | tree | layered | clustered-radial |
-                                       constellation (layered: para DAGs con multi-pai).
+                                       constellation | mesh (layered: DAGs con multi-pai;
+                                       mesh: o único que le as arestas — grafos densos).
   ygg render <ficheiro|-> --out <f.svg>  Renderiza a árbore a un SVG autocontido.
        [--dark] [--locale gl] [--width N]  Sen --unlock pinta o día cero (todo bloqueado).
        [--grant recurso=N,...]             Concede recursos antes de xogar.

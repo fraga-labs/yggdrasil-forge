@@ -18,6 +18,7 @@ export const ALGO_LABELS: Readonly<Record<AutoLayoutAlgo, string>> = {
   layered: 'Capas (para DAGs)',
   'clustered-radial': 'Radial por grupos',
   constellation: 'Constelación',
+  mesh: 'Malla (tea de araña)',
 }
 
 /**
@@ -31,6 +32,7 @@ export const ALGO_HELP: Readonly<Record<AutoLayoutAlgo, string>> = {
   layered: 'Para nodos con varios pais ou requisitos múltiples.',
   'clustered-radial': 'Precisa grupos definidos; os soltos van a un oco propio.',
   constellation: 'Para grafos soltos sen xerarquía clara.',
+  mesh: 'Para grafos densos con lazos: un blob por grupo e arestas curtas.',
 }
 
 export interface DisporMenuProps {

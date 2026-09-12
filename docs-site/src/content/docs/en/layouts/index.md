@@ -17,6 +17,7 @@ A **layout** decides where each node goes. In Yggdrasil Forge there are two ways
 | **Layered (for DAGs)** | `layered` | there are **nodes with several parents** or multiple requirements (curricula, tech trees). Layer = longest path; order by barycenter. | the graph has cycles: it returns an error (never places garbage). |
 | **Clustered radial** | `clustered-radial` | you have **groups**; each group is a cluster on a ring, loose nodes get their own slot. | there are no groups. |
 | **Constellation** | `constellation` | the graph is loose, with no clear hierarchy (Skyrim). | you want to read the progression. |
+| **Mesh** | `mesh` | the graph is **dense and looped** and you want the spider-web look: one organic blob per group, placed so edges come out SHORT. The only engine that reads the edges. | the graph is a tree: the forces have nothing to tension and `tree` does better. |
 | **Custom** | `custom` | positions come in the data (`node.position`). It is what *Dispor* leaves behind. | — |
 
 The usage conditions are exactly the help lines shown by the editor's **Dispor** menu.
@@ -33,6 +34,7 @@ Each engine accepts parameters in `tree.layout` (all optional; the editor derive
 "layout": { "type": "layered", "nodeSpacing": 90, "levelSpacing": 130 }
 "layout": { "type": "radial", "radius": 200 }
 "layout": { "type": "clustered-radial", "groupRadius": 220, "orbitRadius": 90 }
+"layout": { "type": "mesh", "spacing": 66, "seed": 1, "curve": "arc" }
 ```
 
 `tree` and `layered` share `nodeSpacing`, `levelSpacing`, `direction` (`top-down`, `bottom-up`, `left-right`, `right-left`) and `centerX/centerY`.

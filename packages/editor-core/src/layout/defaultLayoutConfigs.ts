@@ -12,7 +12,13 @@
 import type { TreeDef } from '@yggdrasil-forge/core'
 
 /** Algoritmos expostos por «Dispor» (identity/custom quedan fóra: non colocan). */
-export type AutoLayoutAlgo = 'radial' | 'tree' | 'layered' | 'clustered-radial' | 'constellation'
+export type AutoLayoutAlgo =
+  | 'radial'
+  | 'tree'
+  | 'layered'
+  | 'clustered-radial'
+  | 'constellation'
+  | 'mesh'
 
 export const AUTO_LAYOUT_ALGOS: readonly AutoLayoutAlgo[] = [
   'radial',
@@ -20,6 +26,7 @@ export const AUTO_LAYOUT_ALGOS: readonly AutoLayoutAlgo[] = [
   'layered',
   'clustered-radial',
   'constellation',
+  'mesh',
 ]
 
 /** Config de layout por defecto para `algo`, derivada da forma da árbore. */
@@ -55,6 +62,12 @@ export function defaultLayoutConfig(algo: AutoLayoutAlgo, tree: TreeDef): TreeDe
       // Mesmos espazados ca tree (briefing 7.18): a diferenza é o
       // algoritmo (capas para DAGs), non a densidade do debuxo.
       return { type: 'layered', nodeSpacing: 90, levelSpacing: 130 }
+    case 'mesh':
+      // 19.6: o espazado goberna a densidade da tea. ~66px deixa ver a
+      // icona de cada nodo sen que a malla se abra en canle; a partir de
+      // ~90 deixa de parecer unha tea e parece un diagrama de rede.
+      // `seed` fixa para que «Dispor» sexa reproducible entre sesións.
+      return { type: 'mesh', spacing: 66, seed: 1 }
     case 'clustered-radial':
       // Anel de grupos: ~110px de arco por grupo. Chan 120 (afinado
       // 7.16c: con 2 grupos o chan vello de 240 poñíaos a 480px de

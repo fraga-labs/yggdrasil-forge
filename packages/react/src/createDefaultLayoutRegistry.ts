@@ -12,6 +12,7 @@ import {
   IdentityLayout,
   LayeredLayout,
   LayoutEngineRegistry,
+  MeshLayout,
   RadialLayout,
   TreeLayout,
 } from '@yggdrasil-forge/core'
@@ -27,6 +28,7 @@ export function createDefaultLayoutRegistry(): LayoutEngineRegistry {
     .register(new TreeLayout())
     .register(new LayeredLayout())
     .register(new ClusteredRadialLayout())
+    .register(new MeshLayout())
     .register(new ConstellationLayout())
 }
 // ── FIN: createDefaultLayoutRegistry ──

@@ -18,6 +18,7 @@ import {
   ErrorCode,
   LayeredLayout,
   LayoutEngineRegistry,
+  MeshLayout,
   RadialLayout,
   type Result,
   type TreeDef,
@@ -40,7 +41,7 @@ export interface ApplyAutoLayoutOptions {
 }
 
 /**
- * Registry local cos 4 motores que «Dispor» expón. NON se depende do
+ * Registry local cos motores que «Dispor» expón. NON se depende do
  * `createDefaultLayoutRegistry` de @react (editor-core é headless);
  * os motores son clases públicas de @core.
  */
@@ -51,6 +52,7 @@ function createEditorLayoutRegistry(): LayoutEngineRegistry {
     .register(new LayeredLayout())
     .register(new ClusteredRadialLayout())
     .register(new ConstellationLayout())
+    .register(new MeshLayout())
 }
 
 /**

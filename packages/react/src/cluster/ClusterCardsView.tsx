@@ -188,6 +188,45 @@ const CROWN_H = 104
 const CARD_HEAD = 46
 const CARD_ROW = 26
 const CARD_GAP = 24
+/**
+ * Filas VISIBLES como moito nunha tarxeta; o resto vese rolando dentro
+ * dela.
+ *
+ * **Por que hai tope (19.10).** Unha comarca de dezaseis membros dá unha
+ * tarxeta de ~486 px de alto, e sete delas nun anel piden 2.070 px: non
+ * caben nin no panel do editor (439) nin maximizado. O que non cabe é o
+ * ALTO da tarxeta, non o anel. Con seis filas a tarxeta queda en 226 e o
+ * taboleiro enteiro cabe a zoom 0,46, onde aínda se le. Non se agocha
+ * nada: a lista rola.
+ */
+const MAX_FILAS_VISIBLES = 6
+
+/**
+ * ¿Debe a roda ROLAR unha lista en vez de facer zoom no lenzo?
+ *
+ * Devolve o elemento que rola, ou `null` para que mande o zoom. A regra
+ * é a de calquera scroll aniñado: rola se hai algo por rolar NESA
+ * dirección; se xa se chegou ao final, o xesto pasa ao lenzo e non se
+ * queda trabado.
+ *
+ * Exportado para poder probalo sen navegador: é a peza onde un erro se
+ * nota moito (ou non rolas, ou non fas zoom).
+ */
+export function listaQueRola(alvo: EventTarget | null, deltaY: number): HTMLElement | null {
+  if (alvo === null || !(alvo instanceof Element)) return null
+  const lista = alvo.closest<HTMLElement>('[data-yf-scroll]')
+  if (lista === null) return null
+  const máximo = lista.scrollHeight - lista.clientHeight
+  if (máximo <= 1) return null
+  if (deltaY > 0) return lista.scrollTop < máximo - 1 ? lista : null
+  if (deltaY < 0) return lista.scrollTop > 1 ? lista : null
+  return null
+}
+
+/** Alto REAL dunha tarxeta de `filas` membros, co tope aplicado. */
+function cardHeight(filas: number): number {
+  return CARD_HEAD + Math.min(filas, MAX_FILAS_VISIBLES) * CARD_ROW + CARD_GAP
+}
 
 /**
  * Semi-eixes (en PÍXELES) do anel automático para `n` tarxetas de ata
@@ -207,7 +246,7 @@ const CARD_GAP = 24
  * É dicir: as caixas nunca se solapan, veña o ángulo que veña.
  */
 function ringRadii(n: number, filas: number): { rx: number; ry: number } {
-  const h = CARD_HEAD + filas * CARD_ROW + CARD_GAP
+  const h = cardHeight(filas)
   if (n <= 1) return { rx: 0, ry: 0 }
   const paso = Math.sin(Math.PI / n)
   const k = Math.SQRT2 / (2 * paso)
@@ -215,6 +254,12 @@ function ringRadii(n: number, filas: number): { rx: number; ry: number } {
   // ten que despexala. Sen este chan, con dous grupos o anel sae máis
   // apertado que o de antes e as tarxetas rózana — vísteo na captura
   // 10 da guía, co panadeiro.
+  //
+  // A cota do √2 vale para calquera ángulo, así que cos ángulos
+  // concretos dun anel de `n` sobra sitio. Probei a apertala buscando o
+  // límite real par a par, e o encadre só subía de 0,46 a 0,48: o que
+  // manda é o ALTO DO PANEL, non o anel. Vinte liñas por un 5% non
+  // pagan, así que queda a fórmula pechada.
   return {
     rx: Math.max(k * CARD_W, CROWN_W / 2 + CARD_W / 2 + CARD_GAP),
     ry: Math.max(k * h, CROWN_H / 2 + h / 2 + CARD_GAP),
@@ -299,7 +344,7 @@ export function ClusterCardsView({
     if (width <= 0 || height <= 0) return
     encadradoRef.current = anelKey
     const anchoAnel = 2 * radii.rx + CARD_W
-    const altoAnel = 2 * radii.ry + CARD_HEAD + filasMax * CARD_ROW + CARD_GAP
+    const altoAnel = 2 * radii.ry + cardHeight(filasMax)
     const cabe = Math.min(width / anchoAnel, height / altoAnel)
     const z = Math.max(minZoom, Math.min(1, cabe))
     setZoom(z)
@@ -313,6 +358,11 @@ export function ClusterCardsView({
     const el = containerRef.current
     if (el === null) return undefined
     const onWheel = (e: WheelEvent): void => {
+      // Se o punteiro está nunha lista que aínda pode rolar, o xesto é
+      // dela: nin `preventDefault` nin zoom. Sen isto, unha tarxeta con
+      // máis de seis membros sería un cul-de-sac — vese que hai máis e
+      // non hai como chegar.
+      if (listaQueRola(e.target, e.deltaY) !== null) return
       e.preventDefault()
       const rect = el.getBoundingClientRect()
       const cursorX = e.clientX - rect.left
@@ -485,7 +535,18 @@ export function ClusterCardsView({
               </div>
               <ul
                 className="yf-cluster-card__rows"
-                style={{ listStyle: 'none', margin: 0, padding: '4px 0' }}
+                // `data-yf-scroll` é o que a roda do rato busca para
+                // decidir se rola a lista ou fai zoom no lenzo.
+                {...(g.members.length > MAX_FILAS_VISIBLES && { 'data-yf-scroll': '' })}
+                style={{
+                  listStyle: 'none',
+                  margin: 0,
+                  padding: '4px 0',
+                  ...(g.members.length > MAX_FILAS_VISIBLES && {
+                    maxHeight: MAX_FILAS_VISIBLES * CARD_ROW,
+                    overflowY: 'auto',
+                  }),
+                }}
               >
                 {g.members.map((m) => {
                   const state = rowState(m.currentTier, m.maxTier)

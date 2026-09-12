@@ -1,7 +1,11 @@
 // ── INICIO: tests ClusterCardsView (render + interaccións) ──
 import { fireEvent, render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { ClusterCardsView, type ClusterGroup } from '../../src/cluster/ClusterCardsView.js'
+import {
+  ClusterCardsView,
+  type ClusterGroup,
+  listaQueRola,
+} from '../../src/cluster/ClusterCardsView.js'
 
 function makeGroups(): ClusterGroup[] {
   return [
@@ -154,7 +158,8 @@ function centros(container: HTMLElement): { x: number; y: number }[] {
 
 describe('★ ClusterCardsView — o anel automático NON solapa', () => {
   const W = 280 + 24
-  const alto = (filas: number): number => 46 + filas * 26 + 24
+  // Alto REAL: a lista tope en seis filas e o resto rola dentro (19.10).
+  const alto = (filas: number): number => 46 + Math.min(filas, 6) * 26 + 24
 
   it('★★ sete grupos de dezaseis membros: cero pares solapados', () => {
     // O caso real: o atlas da galería no editor.
@@ -195,6 +200,26 @@ describe('★ ClusterCardsView — o anel automático NON solapa', () => {
     }
   })
 
+  it('★★ unha tarxeta longa TOPA en seis filas e a lista rola: nada se agocha', () => {
+    // O tope é o que fai que o taboleiro caiba. Sen el, sete comarcas de
+    // dezaseis membros piden 2.070 px de alto e non caben nin no panel
+    // do editor nin maximizado.
+    const { container } = render(<ClusterCardsView groups={aneis(3, 16)} onRowClick={vi.fn()} />)
+    const lista = container.querySelector<HTMLElement>('.yf-cluster-card__rows')
+    expect(lista?.style.maxHeight).toBe(`${6 * 26}px`)
+    expect(lista?.style.overflowY).toBe('auto')
+    expect(lista?.hasAttribute('data-yf-scroll')).toBe(true)
+    // E seguen estando as dezaseis filas: o tope é de vista, non de dato.
+    expect(container.querySelectorAll('.yf-cluster-row')).toHaveLength(3 * 16)
+  })
+
+  it('★ unha tarxeta curta non leva tope nin scroll (markup de máis é markup de máis)', () => {
+    const { container } = render(<ClusterCardsView groups={aneis(3, 4)} onRowClick={vi.fn()} />)
+    const lista = container.querySelector<HTMLElement>('.yf-cluster-card__rows')
+    expect(lista?.style.maxHeight).toBe('')
+    expect(lista?.hasAttribute('data-yf-scroll')).toBe(false)
+  })
+
   it('★ con `autoRadiusPercent` explícito consérvase o comportamento vello (en %)', () => {
     // Compatibilidade: quen o pasaba segue mandando, aínda que solape.
     const { container } = render(
@@ -215,6 +240,61 @@ describe('★ ClusterCardsView — o anel automático NON solapa', () => {
     const primeira = container.querySelector<HTMLElement>('.yf-cluster-card')
     expect(primeira?.style.left).toBe('10%')
     expect(primeira?.style.top).toBe('20%')
+  })
+})
+// ── 19.10: a roda do rato entre a lista e o lenzo ──
+//
+// Unha tarxeta con máis de seis membros rola por dentro. Se a roda fixese
+// zoom sempre, esa lista sería un cul-de-sac: ves que hai máis e non hai
+// como chegar. E se rolase sempre, o zoom do lenzo morrería enriba das
+// tarxetas. A regra é a de calquera scroll aniñado.
+
+describe('★ listaQueRola — a roda decide ben', () => {
+  /** Lista falsa cun estado de scroll concreto. */
+  function lista(scrollTop: number, scrollHeight: number, clientHeight = 156): HTMLElement {
+    const el = document.createElement('ul')
+    el.setAttribute('data-yf-scroll', '')
+    Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true })
+    Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true })
+    el.scrollTop = scrollTop
+    document.body.appendChild(el)
+    return el
+  }
+
+  it('★★ no medio da lista, a roda é da LISTA (nos dous sentidos)', () => {
+    const el = lista(60, 416)
+    expect(listaQueRola(el, 100)).toBe(el)
+    expect(listaQueRola(el, -100)).toBe(el)
+  })
+
+  it('★★ ao final da lista, a roda cara abaixo pasa ao LENZO (non queda trabada)', () => {
+    const el = lista(260, 416)
+    expect(listaQueRola(el, 100)).toBeNull()
+    // pero cara arriba aínda hai onde rolar
+    expect(listaQueRola(el, -100)).toBe(el)
+  })
+
+  it('★ no principio, a roda cara arriba pasa ao lenzo', () => {
+    const el = lista(0, 416)
+    expect(listaQueRola(el, -100)).toBeNull()
+    expect(listaQueRola(el, 100)).toBe(el)
+  })
+
+  it('unha lista que NON desborda nunca colle a roda', () => {
+    const el = lista(0, 100, 156)
+    expect(listaQueRola(el, 100)).toBeNull()
+  })
+
+  it('fóra dunha lista (ou sen alvo) manda o lenzo', () => {
+    expect(listaQueRola(document.createElement('div'), 100)).toBeNull()
+    expect(listaQueRola(null, 100)).toBeNull()
+  })
+
+  it('funciona desde un fillo: o botón da fila está DENTRO da lista', () => {
+    const el = lista(60, 416)
+    const boton = document.createElement('button')
+    el.appendChild(boton)
+    expect(listaQueRola(boton, 100)).toBe(el)
   })
 })
 // ── FIN: tests ClusterCardsView ──

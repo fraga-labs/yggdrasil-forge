@@ -49,6 +49,11 @@ export interface RenderTextOptions {
   readonly dark?: boolean
   readonly locale?: Locale
   readonly width?: number
+  /**
+   * Minimapa na esquina (19.9). **Non é dato do documento**: é
+   * mobiliario do visor, así que decídeo quen renderiza, non o ficheiro.
+   */
+  readonly minimap?: boolean
 }
 
 /**
@@ -169,6 +174,7 @@ function pintar(p: Preparado, options: RenderTextOptions): RenderTextResult {
           ...(p.backgroundImage !== undefined && { backgroundImage: p.backgroundImage }),
           ...(p.regionShape !== undefined && { regionShape: p.regionShape }),
           ...(p.regionLabel !== undefined && { regionLabel: p.regionLabel }),
+          ...(options.minimap === true && { minimap: true }),
         }),
       ),
     )

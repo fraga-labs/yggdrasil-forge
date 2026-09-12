@@ -30,6 +30,8 @@ export { SVGRenderer } from './SVGRenderer.js'
 export type { SVGRendererProps } from './SVGRenderer.js'
 
 // Tema infra (só dispoñible desde root entry).
+export { Minimap } from './Minimap.js'
+export type { MinimapProps, ViewBoxRect } from './Minimap.js'
 export { ThemeProvider } from './ThemeProvider.js'
 export type { ThemeProviderProps } from './ThemeProvider.js'
 export type { Theme, ThemeColors, ThemeEffects, ThemeSizes } from './theme-types.js'

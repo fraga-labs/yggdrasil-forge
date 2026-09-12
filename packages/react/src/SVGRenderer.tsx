@@ -43,6 +43,15 @@ export interface SVGRendererProps {
   readonly ariaLabel?: string
   readonly children?: ReactNode
   /**
+   * Contido que vai FÓRA do grupo de pan/zoom (19.9), pintado por riba
+   * de todo. Para chrome ancorado ao lenzo — hoxe o minimapa — que non
+   * debe moverse ao arrastrar nin estirarse ao ampliar.
+   *
+   * Vai en unidades do viewBox, non en píxeles: así escala co SVG e non
+   * precisa medir nada do DOM (o `SkillTree` non ten envoltorio HTML).
+   */
+  readonly overlay?: ReactNode
+  /**
    * Transform SVG aplicado ao `<g>` que envolve os children (F10.6).
    * Default: identidade (sen pan/zoom). O `<defs>` queda **fóra** do
    * transform para que os markers non escalen co contido.
@@ -91,6 +100,7 @@ export const SVGRenderer = forwardRef<SVGSVGElement, SVGRendererProps>(function 
     errorMessage,
     ariaLabel,
     children,
+    overlay,
     transform,
     onPointerDown,
     onPointerMove,
@@ -305,6 +315,7 @@ export const SVGRenderer = forwardRef<SVGSVGElement, SVGRendererProps>(function 
         )}
         {children}
       </g>
+      {overlay}
     </svg>
   )
 })

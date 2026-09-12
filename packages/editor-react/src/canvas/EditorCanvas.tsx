@@ -84,6 +84,12 @@ import {
 } from './internals/pointerState.js'
 import { docToScreen, findCanvasCtmElement, screenToDoc } from './internals/screenDocCTM.js'
 
+/**
+ * Nodos a partir dos cales o canvas amosa minimapa (19.9). Por baixo
+ * disto o mapa cabe na pantalla e o minimapa só quitaría sitio.
+ */
+const MINIMAP_DESDE = 40
+
 export interface EditorCanvasProps {
   readonly editorEngine: EditorEngine
   /**
@@ -842,6 +848,7 @@ export function EditorCanvas({
               {...(themeSpec?.regionLabel !== undefined && {
                 regionLabel: themeSpec.regionLabel,
               })}
+              {...(doc.tree.nodes.length >= MINIMAP_DESDE && { minimap: true })}
             />
           </ThemeProvider>
           <CanvasOverlay

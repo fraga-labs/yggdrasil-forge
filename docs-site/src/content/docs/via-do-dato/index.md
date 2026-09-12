@@ -16,6 +16,7 @@ pnpm add -D @yggdrasil-forge/cli
 | `ygg validate [f \| -] [--json]` | Schema + validadores duros — **a mesma validación que importar no editor**. Sen ficheiro ou con `-` le stdin. `--json` emite `{ ok, issues[] }`. | 0 ok · 1 inválido · 2 uso |
 | `ygg layout <f \| -> --algo <a> [--out f]` | Coloca **todos** os nodos co motor (`radial`, `tree`, `layered`, `clustered-radial`, `constellation`) e coce o encadre. | documento ao stdout ou a `--out` |
 | `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | SVG **autocontido** (sen CSS externo nin variables), co tema do documento. `--dark` usa a base escura. | ficheiro SVG |
+| `ygg render … [--minimap]` | Debuxa o **minimapa** na esquina. Non é dato do documento: é mobiliario do visor. | ficheiro SVG |
 | `ygg render … [--grant r=N,…] [--unlock id[:N],…]` | **Xoga antes de pintar**: concede recursos e desbloquea nodos para que a foto amose varios estados á vez. `id:N` sobe N rangos. | ficheiro SVG |
 | `ygg schema [--out f]` | O JSON Schema publicado. | JSON Schema |
 | `ygg new [--id x] [--label "…"]` | Un documento baleiro válido. | documento |

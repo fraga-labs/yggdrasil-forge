@@ -15,6 +15,7 @@ import {
 } from '@yggdrasil-forge/core'
 import { forwardRef, useImperativeHandle, useMemo, useRef, useSyncExternalStore } from 'react'
 import { MeshOverlay } from './MeshOverlay.js'
+import { Minimap } from './Minimap.js'
 import { SVGRenderer } from './SVGRenderer.js'
 import { SkillEdge, edgeStateFor } from './SkillEdge.js'
 import { SkillNode } from './SkillNode.js'
@@ -95,6 +96,14 @@ export interface SkillTreeProps {
    * (F10.6).
    */
   readonly onViewportChange?: (state: ViewportState) => void
+  /**
+   * Minimapa na esquina inferior esquerda (19.9). Opt-in: sen isto non
+   * se renderiza nada. Clic nel leva alí.
+   *
+   * A esa densidade non é adorno: cun atlas de centos de nodos, sen
+   * minimapa non se sabe onde estás.
+   */
+  readonly minimap?: boolean
 
   /**
    * ID do nodo actualmente seleccionado (F10.7). Controlado polo
@@ -234,6 +243,7 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
     regions,
     regionShape = 'box',
     regionLabel = 'top',
+    minimap = false,
     coordinateBounds,
     backgroundImage,
   },
@@ -454,6 +464,33 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
       onPointerDown={viewport.onPointerDown}
       onPointerMove={viewport.onPointerMove}
       onPointerUp={viewport.onPointerUp}
+      {...(minimap && {
+        overlay: (
+          <Minimap
+            nodes={treeDef.nodes}
+            nodePositions={nodePositions}
+            bounds={coordinateBounds ?? bounds}
+            viewBox={{
+              // Mesmo viewBox que o SVGRenderer compón a partir de
+              // bounds+padding: se se derivase doutra maneira, o
+              // rectángulo do viewport mentiría.
+              x: (coordinateBounds ?? bounds).minX - effectivePadding,
+              y: (coordinateBounds ?? bounds).minY - effectivePadding,
+              w:
+                (coordinateBounds ?? bounds).maxX -
+                (coordinateBounds ?? bounds).minX +
+                effectivePadding * 2,
+              h:
+                (coordinateBounds ?? bounds).maxY -
+                (coordinateBounds ?? bounds).minY +
+                effectivePadding * 2,
+            }}
+            viewport={viewport.state}
+            {...(regions !== undefined && regions.length > 0 && { regions })}
+            onNavigate={(x, y) => viewport.centerOn(x, y)}
+          />
+        ),
+      })}
     >
       <MeshOverlay {...(mesh !== undefined && { mesh })} />
       {regions !== undefined && regions.length > 0 && (

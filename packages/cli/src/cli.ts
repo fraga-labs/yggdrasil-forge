@@ -39,6 +39,7 @@ Uso:
        [--grant recurso=N,...]             Concede recursos antes de xogar.
        [--unlock id[:N],...]               Desbloquea eses nodos (N rangos) para que a foto
                                            amose varios estados á vez. Falla se o motor di que non.
+       [--minimap]                         Debuxa o minimapa na esquina inferior esquerda.
   ygg schema [--out ficheiro]          Emite o JSON Schema do documento.
   ygg new [--id x] [--label "..."]     Emite un documento baleiro válido polo stdout.
 
@@ -158,6 +159,7 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
   const [grantRaw, rest4] = takeOption(rest3, '--grant')
   const [unlockRaw, rest5] = takeOption(rest4, '--unlock')
   const dark = rest5.includes('--dark')
+  const minimap = rest5.includes('--minimap')
   const positional = rest5.filter((a) => !a.startsWith('--'))
   // `takeOption` quita a bandeira SÓ se atopou valor; se segue aquí é que
   // se escribiu baleira (p.ex. `--unlock --dark`). Sen este control, o
@@ -214,6 +216,7 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
   }
   const result = await renderPlayedDocumentText(text, {
     dark,
+    ...(minimap && { minimap: true }),
     ...(locale !== undefined && { locale: locale as never }),
     ...(parsedWidth !== undefined && Number.isFinite(parsedWidth) && { width: parsedWidth }),
     ...(play !== undefined && { play }),

@@ -87,6 +87,7 @@ The **status bar** at the bottom shows nodes, edges, mode and world size (`World
 
 - **Drag a node** → it moves (with several selected, they all move together, and a single *undo* brings them back).
 - **Drag the background** → pan. **Mouse wheel** → zoom towards the cursor. The **− +** buttons in the top bar do the same.
+- On **large** trees (40 nodes or more) a **minimap** appears in the bottom-left corner: it shows the whole tree, a rectangle for what you are looking at, and **clicking it takes you there**. Small trees do not get one — the tree already fits on screen and it would only take up room.
 - **Estrutura → click a node** → the view centers on it (handy in large trees).
 
 ### Dispor — place every node automatically

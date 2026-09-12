@@ -6,6 +6,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { deserializeDocument } from '@yggdrasil-forge/editor-core'
+import { BUILTIN_ICONS, FORGE_ICONS, LOGIC_ICONS, NORSE_ICONS } from '@yggdrasil-forge/react'
 import { describe, expect, it } from 'vitest'
 
 const GALLERY = join(__dirname, '..', '..', '..', 'examples', 'gallery')
@@ -48,3 +49,37 @@ describe('7.15-C3 — galería de ouro: todo ficheiro é importable', () => {
   })
 })
 // ── FIN: anti-podrecemento ──
+
+// ── 19.3: as iconas da galería teñen que EXISTIR ──
+// Un id que non está no rexistro non falla: o nodo pinta o texto do id
+// como fallback. Cazouse así un `norse-sowilo` (o real é
+// `norse-rune-sowilo`) que levaba sen detectar nun render novo. Como a
+// galería é o corpus de few-shot, unha icona inventada aquí ensínalle a
+// un xerador a inventalas.
+describe('★ 19.3 — toda icona de rexistro usada na galería existe', () => {
+  const REXISTRADAS = new Set<string>([
+    ...Object.keys(BUILTIN_ICONS),
+    ...Object.keys(NORSE_ICONS),
+    ...Object.keys(LOGIC_ICONS),
+    ...Object.keys(FORGE_ICONS),
+  ])
+  // Só se comproban os ids con prefixo de set: `icon` tamén acepta emoji,
+  // URL e data-URI, e eses non pasan por aquí.
+  const ehIdDeSet = (v: unknown): v is string =>
+    typeof v === 'string' && /^(builtin|norse|logic|forge)-/.test(v)
+
+  for (const file of readdirSync(GALLERY).filter((f) => f.endsWith('.json'))) {
+    it(`${file} non usa ningunha icona inventada`, () => {
+      const result = deserializeDocument(readFileSync(join(GALLERY, file), 'utf8'))
+      expect(result.ok).toBe(true)
+      if (!result.ok) return
+      const tree = result.value.tree
+      const usadas = [
+        ...tree.nodes.map((n) => n.icon),
+        ...(tree.resources ?? []).map((r) => r.icon),
+      ].filter(ehIdDeSet)
+      const inventadas = [...new Set(usadas)].filter((id) => !REXISTRADAS.has(id))
+      expect(inventadas, `(${file}) iconas que non están en ningún set`).toEqual([])
+    })
+  }
+})

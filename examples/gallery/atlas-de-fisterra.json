@@ -1,0 +1,3669 @@
+{
+  "tree": {
+    "id": "atlas-de-fisterra",
+    "schemaVersion": "1.0.0",
+    "version": "1.0.0",
+    "label": {
+      "gl": "O Atlas de Fisterra",
+      "en": "The Finisterre Atlas"
+    },
+    "description": {
+      "gl": "Seis comarcas arredor do cabo do mundo, con 97 nodos: o exemplo de ESCALA da galería.",
+      "en": "Six shires around the cape at the world's end, 97 nodes: the gallery's SCALE example."
+    },
+    "groups": [
+      {
+        "id": "costa",
+        "label": {
+          "gl": "A Costa",
+          "en": "The Coast"
+        },
+        "color": "#3a6a7c"
+      },
+      {
+        "id": "monte",
+        "label": {
+          "gl": "O Monte",
+          "en": "The Hill"
+        },
+        "color": "#6b5a3a"
+      },
+      {
+        "id": "fraga",
+        "label": {
+          "gl": "A Fraga",
+          "en": "The Deep Wood"
+        },
+        "color": "#3f6b46"
+      },
+      {
+        "id": "mar",
+        "label": {
+          "gl": "O Mar Aberto",
+          "en": "The Open Sea"
+        },
+        "color": "#2f4f7a"
+      },
+      {
+        "id": "vila",
+        "label": {
+          "gl": "A Vila",
+          "en": "The Town"
+        },
+        "color": "#7a5a2f"
+      },
+      {
+        "id": "alen",
+        "label": {
+          "gl": "O Alén",
+          "en": "The Beyond"
+        },
+        "color": "#5a3a6b"
+      }
+    ],
+    "resources": [
+      {
+        "id": "xornadas",
+        "label": {
+          "gl": "Xornadas",
+          "en": "Days"
+        },
+        "icon": "norse-sun",
+        "color": "#d8b15a",
+        "initial": 30
+      },
+      {
+        "id": "sona",
+        "label": {
+          "gl": "Sona",
+          "en": "Renown"
+        },
+        "icon": "logic-crown",
+        "color": "#3ec6c6",
+        "initial": 6
+      }
+    ],
+    "nodes": [
+      {
+        "id": "fisterra",
+        "type": "root",
+        "label": {
+          "gl": "Fisterra",
+          "en": "Finisterre"
+        },
+        "description": {
+          "gl": "Onde remata a terra coñecida. Todo o demais é elección.",
+          "en": "Where the known land ends. Everything else is a choice."
+        },
+        "icon": "norse-world-tree",
+        "size": 44,
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ]
+      },
+      {
+        "id": "praia",
+        "type": "notable",
+        "label": {
+          "gl": "A Praia",
+          "en": "The Shore"
+        },
+        "icon": "norse-drakkar",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "fisterra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "redes",
+        "type": "small",
+        "label": {
+          "gl": "Redes",
+          "en": "Nets"
+        },
+        "icon": "logic-intersect",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "no",
+        "type": "small",
+        "label": {
+          "gl": "Nó Mariñeiro",
+          "en": "Sailor's Knot"
+        },
+        "icon": "logic-fork",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "remendo",
+        "type": "small",
+        "label": {
+          "gl": "O Remendo",
+          "en": "The Mending"
+        },
+        "icon": "forge-weld",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "marisqueo",
+        "type": "small",
+        "label": {
+          "gl": "Marisqueo",
+          "en": "Shellfishing"
+        },
+        "icon": "forge-cart",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "mareas",
+        "type": "small",
+        "label": {
+          "gl": "Ler as Mareas",
+          "en": "Reading Tides"
+        },
+        "icon": "norse-moon",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "berberecho",
+        "type": "small",
+        "label": {
+          "gl": "O Berberecho",
+          "en": "The Cockle"
+        },
+        "icon": "forge-plate",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "dorna",
+        "type": "small",
+        "label": {
+          "gl": "A Dorna",
+          "en": "The Dorna"
+        },
+        "icon": "norse-drakkar",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "calafate",
+        "type": "small",
+        "label": {
+          "gl": "Calafate",
+          "en": "Caulking"
+        },
+        "icon": "forge-weld",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "vela",
+        "type": "small",
+        "label": {
+          "gl": "Vela Latina",
+          "en": "Lateen Sail"
+        },
+        "icon": "norse-rune-sowilo",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "faro",
+        "type": "small",
+        "label": {
+          "gl": "O Faro",
+          "en": "The Lighthouse"
+        },
+        "icon": "norse-fire",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "sal",
+        "type": "small",
+        "label": {
+          "gl": "Sal Mariña",
+          "en": "Sea Salt"
+        },
+        "icon": "norse-ice-crystal",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "percebe",
+        "type": "small",
+        "label": {
+          "gl": "O Percebe",
+          "en": "The Barnacle"
+        },
+        "icon": "forge-rivet",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "praia"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ribeira",
+        "type": "keystone",
+        "label": {
+          "gl": "Mestre de Ribeira",
+          "en": "Shipwright"
+        },
+        "icon": "forge-wrench",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "remendo"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "berberecho"
+            }
+          ]
+        }
+      },
+      {
+        "id": "patron",
+        "type": "keystone",
+        "label": {
+          "gl": "Patrón de Baixura",
+          "en": "Inshore Skipper"
+        },
+        "icon": "logic-compass",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "vela"
+            }
+          ]
+        }
+      },
+      {
+        "id": "senor-costa",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Señor da Costa",
+          "en": "Lord of the Coast"
+        },
+        "icon": "norse-mead-horn",
+        "tags": ["costa"],
+        "group": "costa",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 5
+            },
+            {
+              "resourceId": "sona",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "ribeira"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "patron"
+            }
+          ]
+        },
+        "description": {
+          "gl": "Quen sabe onde rompe cada onda desta ribeira.",
+          "en": "Who knows where every wave breaks on this shore."
+        }
+      },
+      {
+        "id": "carreiro",
+        "type": "notable",
+        "label": {
+          "gl": "O Carreiro",
+          "en": "The Path"
+        },
+        "icon": "logic-map-marker",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "fisterra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "pastoreo",
+        "type": "small",
+        "label": {
+          "gl": "Pastoreo",
+          "en": "Herding"
+        },
+        "icon": "norse-leaf",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "curro",
+        "type": "small",
+        "label": {
+          "gl": "O Curro",
+          "en": "The Roundup"
+        },
+        "icon": "forge-guard",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "bestas",
+        "type": "small",
+        "label": {
+          "gl": "As Bestas",
+          "en": "The Wild Mares"
+        },
+        "icon": "norse-wolf",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "pedra-seca",
+        "type": "small",
+        "label": {
+          "gl": "Pedra Seca",
+          "en": "Drystone"
+        },
+        "icon": "forge-wall",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "muro",
+        "type": "small",
+        "label": {
+          "gl": "O Muro",
+          "en": "The Wall"
+        },
+        "icon": "forge-wall",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cortello",
+        "type": "small",
+        "label": {
+          "gl": "O Cortello",
+          "en": "The Fold"
+        },
+        "icon": "forge-shelf",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "toxo",
+        "type": "small",
+        "label": {
+          "gl": "Uz e Toxo",
+          "en": "Heath and Gorse"
+        },
+        "icon": "norse-sprout",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "rozar",
+        "type": "small",
+        "label": {
+          "gl": "Rozar",
+          "en": "Clearing"
+        },
+        "icon": "norse-axe",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cinza",
+        "type": "small",
+        "label": {
+          "gl": "A Cinza",
+          "en": "The Ash"
+        },
+        "icon": "norse-fire",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "mamoa",
+        "type": "small",
+        "label": {
+          "gl": "A Mámoa",
+          "en": "The Barrow"
+        },
+        "icon": "norse-rune-algiz",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "neboa",
+        "type": "small",
+        "label": {
+          "gl": "A Néboa",
+          "en": "The Fog"
+        },
+        "icon": "logic-eye-closed",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aguia",
+        "type": "small",
+        "label": {
+          "gl": "A Aguia",
+          "en": "The Eagle"
+        },
+        "icon": "norse-raven",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carreiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "saber-monte",
+        "type": "keystone",
+        "label": {
+          "gl": "Coñecer o Monte",
+          "en": "Knowing the Hill"
+        },
+        "icon": "logic-scroll",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "bestas"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "cortello"
+            }
+          ]
+        }
+      },
+      {
+        "id": "home-pedra",
+        "type": "keystone",
+        "label": {
+          "gl": "Home de Pedra",
+          "en": "Stone Wright"
+        },
+        "icon": "forge-mortar",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cinza"
+            }
+          ]
+        }
+      },
+      {
+        "id": "senora-monte",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Señora do Monte",
+          "en": "Lady of the Hill"
+        },
+        "icon": "norse-horned-helmet",
+        "tags": ["monte"],
+        "group": "monte",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 5
+            },
+            {
+              "resourceId": "sona",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "saber-monte"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "home-pedra"
+            }
+          ]
+        },
+        "description": {
+          "gl": "O monte non se conquista: cómprase con anos.",
+          "en": "The hill is not conquered: it is bought with years."
+        }
+      },
+      {
+        "id": "souto",
+        "type": "notable",
+        "label": {
+          "gl": "O Souto",
+          "en": "The Grove"
+        },
+        "icon": "norse-leaf",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "fisterra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "carballo",
+        "type": "small",
+        "label": {
+          "gl": "O Carballo",
+          "en": "The Oak"
+        },
+        "icon": "norse-world-tree",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "landra",
+        "type": "small",
+        "label": {
+          "gl": "A Landra",
+          "en": "The Acorn"
+        },
+        "icon": "norse-sprout",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "vara",
+        "type": "small",
+        "label": {
+          "gl": "A Vara",
+          "en": "The Switch"
+        },
+        "icon": "logic-rune",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cogomelos",
+        "type": "small",
+        "label": {
+          "gl": "Cogomelos",
+          "en": "Mushrooms"
+        },
+        "icon": "norse-sparkle",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "herbas",
+        "type": "small",
+        "label": {
+          "gl": "Herbas",
+          "en": "Herbs"
+        },
+        "icon": "norse-leaf",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "unguento",
+        "type": "small",
+        "label": {
+          "gl": "O Ungüento",
+          "en": "The Salve"
+        },
+        "icon": "forge-plate",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "corza",
+        "type": "small",
+        "label": {
+          "gl": "A Corza",
+          "en": "The Roe Deer"
+        },
+        "icon": "norse-wolf",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "rastro",
+        "type": "small",
+        "label": {
+          "gl": "O Rastro",
+          "en": "The Trail"
+        },
+        "icon": "logic-map-marker",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "trampa",
+        "type": "small",
+        "label": {
+          "gl": "A Trampa",
+          "en": "The Snare"
+        },
+        "icon": "forge-hook",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fento",
+        "type": "small",
+        "label": {
+          "gl": "O Fento",
+          "en": "The Fern"
+        },
+        "icon": "norse-sprout",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "musgo",
+        "type": "small",
+        "label": {
+          "gl": "O Musgo",
+          "en": "The Moss"
+        },
+        "icon": "norse-leaf",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "regato",
+        "type": "small",
+        "label": {
+          "gl": "O Regato",
+          "en": "The Brook"
+        },
+        "icon": "norse-ice-crystal",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "souto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "bosque-vello",
+        "type": "keystone",
+        "label": {
+          "gl": "Bosque Vello",
+          "en": "The Old Wood"
+        },
+        "icon": "norse-world-tree",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "vara"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "unguento"
+            }
+          ]
+        }
+      },
+      {
+        "id": "man-herbas",
+        "type": "keystone",
+        "label": {
+          "gl": "Man de Herbas",
+          "en": "Herb Hand"
+        },
+        "icon": "logic-seedling",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "trampa"
+            }
+          ]
+        }
+      },
+      {
+        "id": "espirito-fraga",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Espírito da Fraga",
+          "en": "Spirit of the Wood"
+        },
+        "icon": "norse-world-tree",
+        "tags": ["fraga"],
+        "group": "fraga",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 5
+            },
+            {
+              "resourceId": "sona",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "bosque-vello"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "man-herbas"
+            }
+          ]
+        },
+        "description": {
+          "gl": "A fraga non che responde: deixa de esconderche cousas.",
+          "en": "The wood does not answer you: it stops hiding things from you."
+        }
+      },
+      {
+        "id": "barra",
+        "type": "notable",
+        "label": {
+          "gl": "A Barra",
+          "en": "The Bar"
+        },
+        "icon": "norse-serpent",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "fisterra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "polar",
+        "type": "small",
+        "label": {
+          "gl": "A Estrela Polar",
+          "en": "The Pole Star"
+        },
+        "icon": "logic-star",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "sonda",
+        "type": "small",
+        "label": {
+          "gl": "A Sonda",
+          "en": "The Sounding"
+        },
+        "icon": "forge-weight",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "carta",
+        "type": "small",
+        "label": {
+          "gl": "A Carta",
+          "en": "The Chart"
+        },
+        "icon": "logic-scroll",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "temporal",
+        "type": "small",
+        "label": {
+          "gl": "O Temporal",
+          "en": "The Gale"
+        },
+        "icon": "norse-lightning",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ancorar",
+        "type": "small",
+        "label": {
+          "gl": "Ancorar",
+          "en": "Anchoring"
+        },
+        "icon": "forge-hook",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "capear",
+        "type": "small",
+        "label": {
+          "gl": "Capear",
+          "en": "Riding it Out"
+        },
+        "icon": "forge-guard",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cardume",
+        "type": "small",
+        "label": {
+          "gl": "O Cardume",
+          "en": "The Shoal"
+        },
+        "icon": "logic-intersect",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cerco",
+        "type": "small",
+        "label": {
+          "gl": "O Cerco",
+          "en": "The Purse Seine"
+        },
+        "icon": "logic-gate",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "salgar",
+        "type": "small",
+        "label": {
+          "gl": "Salgar",
+          "en": "Salting"
+        },
+        "icon": "norse-ice-crystal",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "illa",
+        "type": "small",
+        "label": {
+          "gl": "A Illa",
+          "en": "The Island"
+        },
+        "icon": "norse-mountain",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "bruma",
+        "type": "small",
+        "label": {
+          "gl": "A Bruma",
+          "en": "The Haze"
+        },
+        "icon": "logic-eye-closed",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "golfino",
+        "type": "small",
+        "label": {
+          "gl": "O Golfiño",
+          "en": "The Dolphin"
+        },
+        "icon": "norse-serpent",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "barra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "navegante",
+        "type": "keystone",
+        "label": {
+          "gl": "Navegante",
+          "en": "The Navigator"
+        },
+        "icon": "logic-compass",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "carta"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "capear"
+            }
+          ]
+        }
+      },
+      {
+        "id": "mestre-temporais",
+        "type": "keystone",
+        "label": {
+          "gl": "Mestre de Temporais",
+          "en": "Storm Master"
+        },
+        "icon": "norse-lightning",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "salgar"
+            }
+          ]
+        }
+      },
+      {
+        "id": "dono-mar",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Dono do Mar Aberto",
+          "en": "Master of Open Sea"
+        },
+        "icon": "norse-triquetra",
+        "tags": ["mar"],
+        "group": "mar",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 5
+            },
+            {
+              "resourceId": "sona",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "navegante"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "mestre-temporais"
+            }
+          ]
+        },
+        "description": {
+          "gl": "Saír sen carta e volver igual.",
+          "en": "To sail without a chart and come back all the same."
+        }
+      },
+      {
+        "id": "feira",
+        "type": "notable",
+        "label": {
+          "gl": "A Feira",
+          "en": "The Fair"
+        },
+        "icon": "forge-cart",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "fisterra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "trocar",
+        "type": "small",
+        "label": {
+          "gl": "Trocar",
+          "en": "Bartering"
+        },
+        "icon": "forge-link",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "peso",
+        "type": "small",
+        "label": {
+          "gl": "Peso e Medida",
+          "en": "Weight and Measure"
+        },
+        "icon": "forge-weight",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fiado",
+        "type": "small",
+        "label": {
+          "gl": "O Fiado",
+          "en": "On Credit"
+        },
+        "icon": "forge-barcode",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "forxa",
+        "type": "small",
+        "label": {
+          "gl": "A Forxa",
+          "en": "The Forge"
+        },
+        "icon": "norse-fire",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ferradura",
+        "type": "small",
+        "label": {
+          "gl": "A Ferradura",
+          "en": "The Horseshoe"
+        },
+        "icon": "forge-arc",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aceiro",
+        "type": "small",
+        "label": {
+          "gl": "O Aceiro",
+          "en": "The Steel"
+        },
+        "icon": "norse-sword",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "muino",
+        "type": "small",
+        "label": {
+          "gl": "O Muíño",
+          "en": "The Mill"
+        },
+        "icon": "forge-nut",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "farina",
+        "type": "small",
+        "label": {
+          "gl": "A Fariña",
+          "en": "The Flour"
+        },
+        "icon": "forge-plate",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "forno",
+        "type": "small",
+        "label": {
+          "gl": "O Forno",
+          "en": "The Oven"
+        },
+        "icon": "norse-fire",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "taberna",
+        "type": "small",
+        "label": {
+          "gl": "A Taberna",
+          "en": "The Tavern"
+        },
+        "icon": "norse-mead-horn",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "gaita",
+        "type": "small",
+        "label": {
+          "gl": "A Gaita",
+          "en": "The Bagpipe"
+        },
+        "icon": "norse-mead-horn",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "romaria",
+        "type": "small",
+        "label": {
+          "gl": "A Romaría",
+          "en": "The Pilgrimage"
+        },
+        "icon": "logic-map-marker",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "feira"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ferreiro",
+        "type": "keystone",
+        "label": {
+          "gl": "O Ferreiro",
+          "en": "The Smith"
+        },
+        "icon": "forge-wrench",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "fiado"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "aceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "tratante",
+        "type": "keystone",
+        "label": {
+          "gl": "O Tratante",
+          "en": "The Dealer"
+        },
+        "icon": "forge-nameplate",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "forno"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cabeza-vila",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Cabeza da Vila",
+          "en": "Head of the Town"
+        },
+        "icon": "forge-nameplate",
+        "tags": ["vila"],
+        "group": "vila",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 5
+            },
+            {
+              "resourceId": "sona",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "ferreiro"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "tratante"
+            }
+          ]
+        },
+        "description": {
+          "gl": "Non manda quen grita: manda a quen se lle debe.",
+          "en": "It is not the loudest who rules, but the one who is owed."
+        }
+      },
+      {
+        "id": "cruceiro",
+        "type": "notable",
+        "label": {
+          "gl": "O Cruceiro",
+          "en": "The Wayside Cross"
+        },
+        "icon": "logic-cross",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "fisterra"
+            }
+          ]
+        }
+      },
+      {
+        "id": "compana",
+        "type": "small",
+        "label": {
+          "gl": "A Santa Compaña",
+          "en": "The Holy Company"
+        },
+        "icon": "logic-forbidden",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "luz-animas",
+        "type": "small",
+        "label": {
+          "gl": "Luz de Ánimas",
+          "en": "Corpse Light"
+        },
+        "icon": "norse-fire",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "non-mirar",
+        "type": "small",
+        "label": {
+          "gl": "Non Mirar",
+          "en": "Not Looking"
+        },
+        "icon": "logic-eye-closed",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "meigallo",
+        "type": "small",
+        "label": {
+          "gl": "O Meigallo",
+          "en": "The Hex"
+        },
+        "icon": "norse-rune-fehu",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "nomes",
+        "type": "small",
+        "label": {
+          "gl": "Coñecer Nomes",
+          "en": "Knowing Names"
+        },
+        "icon": "logic-rune",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "desfacer",
+        "type": "small",
+        "label": {
+          "gl": "Desfacer",
+          "en": "Undoing"
+        },
+        "icon": "logic-cross",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fonte",
+        "type": "small",
+        "label": {
+          "gl": "A Fonte Santa",
+          "en": "The Holy Spring"
+        },
+        "icon": "norse-ice-crystal",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "auga-marzo",
+        "type": "small",
+        "label": {
+          "gl": "Auga de Marzo",
+          "en": "March Water"
+        },
+        "icon": "norse-moon",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "sinal",
+        "type": "small",
+        "label": {
+          "gl": "O Sinal",
+          "en": "The Sign"
+        },
+        "icon": "norse-rune-tiwaz",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "corredoira",
+        "type": "small",
+        "label": {
+          "gl": "A Corredoira",
+          "en": "The Hollow Way"
+        },
+        "icon": "logic-map-marker",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "medianoite",
+        "type": "small",
+        "label": {
+          "gl": "Media Noite",
+          "en": "Midnight"
+        },
+        "icon": "norse-moon",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "silencio",
+        "type": "small",
+        "label": {
+          "gl": "O Silencio",
+          "en": "Silence"
+        },
+        "icon": "logic-eye-closed",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruceiro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "sabia",
+        "type": "keystone",
+        "label": {
+          "gl": "A Sabia",
+          "en": "The Wise Woman"
+        },
+        "icon": "logic-crown",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "non-mirar"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "desfacer"
+            }
+          ]
+        }
+      },
+      {
+        "id": "camino-torto",
+        "type": "keystone",
+        "label": {
+          "gl": "Camiño Torto",
+          "en": "The Crooked Road"
+        },
+        "icon": "logic-fork",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 3
+            },
+            {
+              "resourceId": "sona",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "sinal"
+            }
+          ]
+        }
+      },
+      {
+        "id": "voz-alen",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Voz do Alén",
+          "en": "Voice of the Beyond"
+        },
+        "icon": "norse-odin-eye",
+        "tags": ["alen"],
+        "group": "alen",
+        "costPerTier": [
+          [
+            {
+              "resourceId": "xornadas",
+              "amount": 5
+            },
+            {
+              "resourceId": "sona",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "sabia"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "camino-torto"
+            }
+          ]
+        },
+        "description": {
+          "gl": "Fala pouco. O que di, cúmprese.",
+          "en": "She speaks little. What she says, happens."
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-fisterra-praia",
+        "source": "fisterra",
+        "target": "praia",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-redes",
+        "source": "praia",
+        "target": "redes",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-no",
+        "source": "praia",
+        "target": "no",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-remendo",
+        "source": "praia",
+        "target": "remendo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-marisqueo",
+        "source": "praia",
+        "target": "marisqueo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-mareas",
+        "source": "praia",
+        "target": "mareas",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-berberecho",
+        "source": "praia",
+        "target": "berberecho",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-dorna",
+        "source": "praia",
+        "target": "dorna",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-calafate",
+        "source": "praia",
+        "target": "calafate",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-vela",
+        "source": "praia",
+        "target": "vela",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-faro",
+        "source": "praia",
+        "target": "faro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-sal",
+        "source": "praia",
+        "target": "sal",
+        "type": "dependency"
+      },
+      {
+        "id": "e-praia-percebe",
+        "source": "praia",
+        "target": "percebe",
+        "type": "dependency"
+      },
+      {
+        "id": "e-remendo-ribeira",
+        "source": "remendo",
+        "target": "ribeira",
+        "type": "dependency"
+      },
+      {
+        "id": "e-berberecho-ribeira",
+        "source": "berberecho",
+        "target": "ribeira",
+        "type": "dependency"
+      },
+      {
+        "id": "e-vela-patron",
+        "source": "vela",
+        "target": "patron",
+        "type": "dependency"
+      },
+      {
+        "id": "e-ribeira-senor-costa",
+        "source": "ribeira",
+        "target": "senor-costa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-patron-senor-costa",
+        "source": "patron",
+        "target": "senor-costa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-fisterra-carreiro",
+        "source": "fisterra",
+        "target": "carreiro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-pastoreo",
+        "source": "carreiro",
+        "target": "pastoreo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-curro",
+        "source": "carreiro",
+        "target": "curro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-bestas",
+        "source": "carreiro",
+        "target": "bestas",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-pedra-seca",
+        "source": "carreiro",
+        "target": "pedra-seca",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-muro",
+        "source": "carreiro",
+        "target": "muro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-cortello",
+        "source": "carreiro",
+        "target": "cortello",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-toxo",
+        "source": "carreiro",
+        "target": "toxo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-rozar",
+        "source": "carreiro",
+        "target": "rozar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-cinza",
+        "source": "carreiro",
+        "target": "cinza",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-mamoa",
+        "source": "carreiro",
+        "target": "mamoa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-neboa",
+        "source": "carreiro",
+        "target": "neboa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carreiro-aguia",
+        "source": "carreiro",
+        "target": "aguia",
+        "type": "dependency"
+      },
+      {
+        "id": "e-bestas-saber-monte",
+        "source": "bestas",
+        "target": "saber-monte",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cortello-saber-monte",
+        "source": "cortello",
+        "target": "saber-monte",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cinza-home-pedra",
+        "source": "cinza",
+        "target": "home-pedra",
+        "type": "dependency"
+      },
+      {
+        "id": "e-saber-monte-senora-monte",
+        "source": "saber-monte",
+        "target": "senora-monte",
+        "type": "dependency"
+      },
+      {
+        "id": "e-home-pedra-senora-monte",
+        "source": "home-pedra",
+        "target": "senora-monte",
+        "type": "dependency"
+      },
+      {
+        "id": "e-fisterra-souto",
+        "source": "fisterra",
+        "target": "souto",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-carballo",
+        "source": "souto",
+        "target": "carballo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-landra",
+        "source": "souto",
+        "target": "landra",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-vara",
+        "source": "souto",
+        "target": "vara",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-cogomelos",
+        "source": "souto",
+        "target": "cogomelos",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-herbas",
+        "source": "souto",
+        "target": "herbas",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-unguento",
+        "source": "souto",
+        "target": "unguento",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-corza",
+        "source": "souto",
+        "target": "corza",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-rastro",
+        "source": "souto",
+        "target": "rastro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-trampa",
+        "source": "souto",
+        "target": "trampa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-fento",
+        "source": "souto",
+        "target": "fento",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-musgo",
+        "source": "souto",
+        "target": "musgo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-souto-regato",
+        "source": "souto",
+        "target": "regato",
+        "type": "dependency"
+      },
+      {
+        "id": "e-vara-bosque-vello",
+        "source": "vara",
+        "target": "bosque-vello",
+        "type": "dependency"
+      },
+      {
+        "id": "e-unguento-bosque-vello",
+        "source": "unguento",
+        "target": "bosque-vello",
+        "type": "dependency"
+      },
+      {
+        "id": "e-trampa-man-herbas",
+        "source": "trampa",
+        "target": "man-herbas",
+        "type": "dependency"
+      },
+      {
+        "id": "e-bosque-vello-espirito-fraga",
+        "source": "bosque-vello",
+        "target": "espirito-fraga",
+        "type": "dependency"
+      },
+      {
+        "id": "e-man-herbas-espirito-fraga",
+        "source": "man-herbas",
+        "target": "espirito-fraga",
+        "type": "dependency"
+      },
+      {
+        "id": "e-fisterra-barra",
+        "source": "fisterra",
+        "target": "barra",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-polar",
+        "source": "barra",
+        "target": "polar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-sonda",
+        "source": "barra",
+        "target": "sonda",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-carta",
+        "source": "barra",
+        "target": "carta",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-temporal",
+        "source": "barra",
+        "target": "temporal",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-ancorar",
+        "source": "barra",
+        "target": "ancorar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-capear",
+        "source": "barra",
+        "target": "capear",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-cardume",
+        "source": "barra",
+        "target": "cardume",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-cerco",
+        "source": "barra",
+        "target": "cerco",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-salgar",
+        "source": "barra",
+        "target": "salgar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-illa",
+        "source": "barra",
+        "target": "illa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-bruma",
+        "source": "barra",
+        "target": "bruma",
+        "type": "dependency"
+      },
+      {
+        "id": "e-barra-golfino",
+        "source": "barra",
+        "target": "golfino",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carta-navegante",
+        "source": "carta",
+        "target": "navegante",
+        "type": "dependency"
+      },
+      {
+        "id": "e-capear-navegante",
+        "source": "capear",
+        "target": "navegante",
+        "type": "dependency"
+      },
+      {
+        "id": "e-salgar-mestre-temporais",
+        "source": "salgar",
+        "target": "mestre-temporais",
+        "type": "dependency"
+      },
+      {
+        "id": "e-navegante-dono-mar",
+        "source": "navegante",
+        "target": "dono-mar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-mestre-temporais-dono-mar",
+        "source": "mestre-temporais",
+        "target": "dono-mar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-fisterra-feira",
+        "source": "fisterra",
+        "target": "feira",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-trocar",
+        "source": "feira",
+        "target": "trocar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-peso",
+        "source": "feira",
+        "target": "peso",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-fiado",
+        "source": "feira",
+        "target": "fiado",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-forxa",
+        "source": "feira",
+        "target": "forxa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-ferradura",
+        "source": "feira",
+        "target": "ferradura",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-aceiro",
+        "source": "feira",
+        "target": "aceiro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-muino",
+        "source": "feira",
+        "target": "muino",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-farina",
+        "source": "feira",
+        "target": "farina",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-forno",
+        "source": "feira",
+        "target": "forno",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-taberna",
+        "source": "feira",
+        "target": "taberna",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-gaita",
+        "source": "feira",
+        "target": "gaita",
+        "type": "dependency"
+      },
+      {
+        "id": "e-feira-romaria",
+        "source": "feira",
+        "target": "romaria",
+        "type": "dependency"
+      },
+      {
+        "id": "e-fiado-ferreiro",
+        "source": "fiado",
+        "target": "ferreiro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-aceiro-ferreiro",
+        "source": "aceiro",
+        "target": "ferreiro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-forno-tratante",
+        "source": "forno",
+        "target": "tratante",
+        "type": "dependency"
+      },
+      {
+        "id": "e-ferreiro-cabeza-vila",
+        "source": "ferreiro",
+        "target": "cabeza-vila",
+        "type": "dependency"
+      },
+      {
+        "id": "e-tratante-cabeza-vila",
+        "source": "tratante",
+        "target": "cabeza-vila",
+        "type": "dependency"
+      },
+      {
+        "id": "e-fisterra-cruceiro",
+        "source": "fisterra",
+        "target": "cruceiro",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-compana",
+        "source": "cruceiro",
+        "target": "compana",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-luz-animas",
+        "source": "cruceiro",
+        "target": "luz-animas",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-non-mirar",
+        "source": "cruceiro",
+        "target": "non-mirar",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-meigallo",
+        "source": "cruceiro",
+        "target": "meigallo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-nomes",
+        "source": "cruceiro",
+        "target": "nomes",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-desfacer",
+        "source": "cruceiro",
+        "target": "desfacer",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-fonte",
+        "source": "cruceiro",
+        "target": "fonte",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-auga-marzo",
+        "source": "cruceiro",
+        "target": "auga-marzo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-sinal",
+        "source": "cruceiro",
+        "target": "sinal",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-corredoira",
+        "source": "cruceiro",
+        "target": "corredoira",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-medianoite",
+        "source": "cruceiro",
+        "target": "medianoite",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruceiro-silencio",
+        "source": "cruceiro",
+        "target": "silencio",
+        "type": "dependency"
+      },
+      {
+        "id": "e-non-mirar-sabia",
+        "source": "non-mirar",
+        "target": "sabia",
+        "type": "dependency"
+      },
+      {
+        "id": "e-desfacer-sabia",
+        "source": "desfacer",
+        "target": "sabia",
+        "type": "dependency"
+      },
+      {
+        "id": "e-sinal-camino-torto",
+        "source": "sinal",
+        "target": "camino-torto",
+        "type": "dependency"
+      },
+      {
+        "id": "e-sabia-voz-alen",
+        "source": "sabia",
+        "target": "voz-alen",
+        "type": "dependency"
+      },
+      {
+        "id": "e-camino-torto-voz-alen",
+        "source": "camino-torto",
+        "target": "voz-alen",
+        "type": "dependency"
+      }
+    ],
+    "layout": {
+      "type": "clustered-radial",
+      "groupRadius": 1250,
+      "orbitRadius": 350,
+      "memberLayout": "cluster",
+      "clusterArc": 340,
+      "meshType": "none"
+    }
+  },
+  "editor": {
+    "formatVersion": "1.0.0",
+    "theme": {
+      "preset": "forxa",
+      "nodeFills": {
+        "locked": "#11131c",
+        "unlockable": "#1c2436",
+        "unlocked": "#2a2416",
+        "maxed": "#3d3018",
+        "inProgress": "#1f2130"
+      },
+      "nodeRings": {
+        "locked": "#3a3a44",
+        "unlockable": "#d8b15a",
+        "unlocked": "#e6c77a",
+        "maxed": "#f2e2b0",
+        "inProgress": "#8a7a4a"
+      },
+      "edges": {
+        "color": "#4a4433",
+        "active": "#d8b15a"
+      },
+      "textColor": "#f0e6d2",
+      "typography": {
+        "fontFamily": "'Cinzel', 'Trajan Pro', Georgia, serif",
+        "fontWeight": 600,
+        "letterSpacing": "0.06em"
+      },
+      "regions": [
+        {
+          "id": "r-costa",
+          "label": "A Costa",
+          "tag": "costa",
+          "color": "#3a6a7c"
+        },
+        {
+          "id": "r-monte",
+          "label": "O Monte",
+          "tag": "monte",
+          "color": "#6b5a3a"
+        },
+        {
+          "id": "r-fraga",
+          "label": "A Fraga",
+          "tag": "fraga",
+          "color": "#3f6b46"
+        },
+        {
+          "id": "r-mar",
+          "label": "O Mar Aberto",
+          "tag": "mar",
+          "color": "#2f4f7a"
+        },
+        {
+          "id": "r-vila",
+          "label": "A Vila",
+          "tag": "vila",
+          "color": "#7a5a2f"
+        },
+        {
+          "id": "r-alen",
+          "label": "O Alén",
+          "tag": "alen",
+          "color": "#5a3a6b"
+        }
+      ]
+    }
+  }
+}

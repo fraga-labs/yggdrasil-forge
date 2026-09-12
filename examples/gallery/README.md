@@ -115,6 +115,34 @@ the `gotico` spec verbatim, id included. Exercises:
 - Icons from **three different official sets at once** (`logic-*`,
   `norse-*`, `forge-*`) — they coexist in one document.
 
+### `atlas-de-fisterra.json` — the SCALE example (19.3)
+
+*"The Finisterre Atlas"* — 97 nodes and 108 edges in **6 tinted regions**
+around a single root, script-generated (never hand-edited). This is the
+answer to "does it hold up at size?", and the tree to reach for when you
+want to see the renderer under load. Exercises:
+
+- **A real layout engine instead of hand-placed coordinates**: the
+  document carries **no `position` and no `coordinateBounds`** and
+  declares `layout: clustered-radial` (`groupRadius`, `orbitRadius`,
+  `memberLayout: "cluster"`). The engine places all 97 nodes and the
+  renderer derives the bounds. A generator does not need to know geometry.
+- **`GroupDef` + region tint together**: each node carries `group` (what
+  the layout clusters by) and a matching `tags` entry (what the theme
+  tints by). They are different axes and this file shows both wired.
+- The full `forxa` preset spec, region tints included.
+- The `ascendancy` node type at region centres (octagon), `keystone`
+  gates, and two resources where the scarce one (`sona`) is only spent on
+  keystones and ascendancies.
+
+**Deliberately shallow inside each region** (twelve nodes hanging off the
+gateway, then two keystones and an ascendancy). That is a legibility
+choice, not an oversight: `clustered-radial` places members on a ring
+without looking at the graph, so a long prerequisite chain becomes a
+chord across the circle and six regions of chords read as spaghetti. For
+**depth**, read `lobo-de-inverno`, `escola-de-gaita` or `a-vixilia`
+instead — this one is here for breadth.
+
 ### `adversarial.json` — the deliberately awkward tree
 Generated from `adversarialDocument()` (`@yggdrasil-forge/editor-core`)
 with `serializeDocument` — never edited by hand. Exercises the paths

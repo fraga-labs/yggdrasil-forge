@@ -62,6 +62,33 @@
         "vixilia": 12
       },
       "unlock": ["candea", "cruz", "sal", "ladaina:3", "man-limpa", "campa", "ollo", "lua", "corvo"]
+    },
+    "atlas-de-fisterra": {
+      "why": "A Costa enteira conquistada (ata a sua ascendencia), O Monte e O Alen recen abertos coa comarca brillando en latón, e tres comarcas aínda ás escuras. O que ten que transmitir a foto é que hai moito máis fóra do que se ve.",
+      "grant": {
+        "xornadas": 20,
+        "sona": 6
+      },
+      "unlock": [
+        "fisterra",
+        "praia",
+        "redes",
+        "no",
+        "remendo",
+        "marisqueo",
+        "mareas",
+        "berberecho",
+        "dorna",
+        "calafate",
+        "vela",
+        "ribeira",
+        "patron",
+        "senor-costa",
+        "carreiro",
+        "pastoreo",
+        "curro",
+        "cruceiro"
+      ]
     }
   }
 }

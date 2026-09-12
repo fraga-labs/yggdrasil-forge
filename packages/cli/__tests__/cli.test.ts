@@ -158,3 +158,27 @@ describe('validateDocumentText — API directa', () => {
   })
 })
 // ── FIN: tests do CLI ──
+
+// ── 19.1: as bandeiras de xogo non poden fallar caladas ──
+describe('ygg render --grant/--unlock — uso incorrecto', () => {
+  const ARBORE = join(GALLERY, 'panadeiro.json')
+
+  it.each(['--grant', '--unlock'])(
+    '★ %s sen valor é erro de uso, non un render mudo',
+    async (b) => {
+      const io = makeIO()
+      // `--dark` detrás fai que takeOption non colla valor: o caso real.
+      const code = await run(['render', ARBORE, '--out', 'x.svg', b, '--dark'], io)
+      expect(code).toBe(2)
+      expect(io.err()).toContain(b)
+      expect(io.err()).toContain('precisa un valor')
+    },
+  )
+
+  it('--grant mal formado («ouro» sen =N) é erro de uso', async () => {
+    const io = makeIO()
+    const code = await run(['render', ARBORE, '--out', 'x.svg', '--grant', 'ouro'], io)
+    expect(code).toBe(2)
+    expect(io.err()).toContain('recurso=N')
+  })
+})

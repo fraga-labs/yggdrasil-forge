@@ -158,6 +158,19 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
   const [unlockRaw, rest5] = takeOption(rest4, '--unlock')
   const dark = rest5.includes('--dark')
   const positional = rest5.filter((a) => !a.startsWith('--'))
+  // `takeOption` quita a bandeira SÓ se atopou valor; se segue aquí é que
+  // se escribiu baleira (p.ex. `--unlock --dark`). Sen este control, o
+  // render sairía no día cero calado: pediches xogar e daríasche outra
+  // foto sen dicir nada — o descarte silencioso que non admitimos.
+  for (const bandeira of ['--grant', '--unlock'] as const) {
+    if (rest5.includes(bandeira)) {
+      io.stderr(`ygg render: ${bandeira} precisa un valor (p.ex. ${
+        bandeira === '--grant' ? '--grant "ouro=10"' : '--unlock "raiz,folla:2"'
+      })
+`)
+      return 2
+    }
+  }
   if (out === undefined) {
     io.stderr('ygg render: falta --out <saida.svg>\n')
     return 2

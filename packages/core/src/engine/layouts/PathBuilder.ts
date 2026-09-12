@@ -15,6 +15,14 @@ import type { EdgePath, LayoutResult } from './LayoutResult.js'
  * - `'radial'`: cubic Bézier en coordenadas polares (control points
  *   no medio do segmento). Ideal para RadialLayout.
  * - `'orthogonal'`: polyline (L-shape ou S-shape). Patrón "Manhattan".
+ * - `'arc'`: cubic Bézier cunha combadura LIXEIRA perpendicular ao
+ *   segmento, proporcional á súa lonxitude. É o único estilo sen nesgo
+ *   de dirección: os cinco anteriores asumen unha orientación dominante
+ *   (vertical, horizontal, radial ou Manhattan) e nunha MALLA, onde as
+ *   arestas van a todas as direccións, iso produce eses S raros nas
+ *   perpendiculares ao nesgo. Aquí a curva depende só da propia aresta,
+ *   así que unha tea de centos de liñas curva toda igual de suave — o
+ *   «curved bezier edges, no straight flowchart lines» dos mockups.
  * - `'octilinear'`: polyline cun tramo recto (H ou V) e un tramo a 45°.
  *   Look PCB / metro / Deus Ex. Bo para posicións fixas con
  *   conexións locais (IdentityLayout en exemplos cyber). Degenera a
@@ -25,6 +33,7 @@ export type CurveStyle =
   | 'diagonal-vertical'
   | 'diagonal-horizontal'
   | 'radial'
+  | 'arc'
   | 'orthogonal'
   | 'octilinear'
 
@@ -36,9 +45,17 @@ export type CurveStyle =
  * - `centerX/centerY`: centro do layout (para 'radial'). Default 0.
  * - `cornerRatio`: para 'orthogonal', posición do "corner" como
  *   fracción (0..1). Default 0.5 (midpoint).
+ * - `arcBow`: para 'arc', combadura como fracción da lonxitude da
+ *   aresta. Default 0.12 (un 12% — visible pero lonxe de parecer un
+ *   arco). `arcMaxBow` acóutaa en unidades de layout para que unha
+ *   aresta moi longa non se converta nunha bóveda.
  */
 export interface PathBuilderOptions {
   readonly tension?: number
+  /** Combadura de `'arc'` como fracción da lonxitude. Default 0.12. */
+  readonly arcBow?: number
+  /** Tope absoluto da combadura de `'arc'`. Default 90. */
+  readonly arcMaxBow?: number
   readonly centerX?: number
   readonly centerY?: number
   readonly cornerRatio?: number
@@ -58,6 +75,8 @@ export function buildPaths(
   const centerX = options.centerX ?? 0
   const centerY = options.centerY ?? 0
   const cornerRatio = options.cornerRatio ?? 0.5
+  const arcBow = options.arcBow ?? 0.12
+  const arcMaxBow = options.arcMaxBow ?? 90
 
   const newEdges = new Map<string, EdgePath>()
   for (const [edgeId, oldPath] of layoutResult.edges) {
@@ -81,6 +100,8 @@ export function buildPaths(
       centerX,
       centerY,
       cornerRatio,
+      arcBow,
+      arcMaxBow,
     })
     newEdges.set(edgeId, newPath)
   }
@@ -101,6 +122,8 @@ function buildPath(
     centerX: number
     centerY: number
     cornerRatio: number
+    arcBow: number
+    arcMaxBow: number
   },
 ): EdgePath {
   switch (style) {
@@ -145,6 +168,29 @@ function buildPath(
       const c2: Position = {
         x: target.x + (mid.x - target.x) * opts.tension,
         y: target.y + (mid.y - target.y) * opts.tension,
+      }
+      return { points: [source, c1, c2, target], kind: 'cubic' }
+    }
+
+    case 'arc': {
+      // Combadura PERPENDICULAR: o único estilo que non asume dirección.
+      const dx = target.x - source.x
+      const dy = target.y - source.y
+      const len = Math.hypot(dx, dy)
+      // Aresta degenerada (mesmo punto): recta, sen dividir por cero.
+      if (len < 1e-6) return { points: [source, target], kind: 'line' }
+      const bow = Math.min(len * opts.arcBow, opts.arcMaxBow)
+      // Normal unitaria ao segmento. O signo é sempre o mesmo, así que
+      // unha tea curva de forma coherente en vez de ao chou.
+      const nx = -dy / len
+      const ny = dx / len
+      const c1: Position = {
+        x: source.x + dx / 3 + nx * bow,
+        y: source.y + dy / 3 + ny * bow,
+      }
+      const c2: Position = {
+        x: source.x + (dx * 2) / 3 + nx * bow,
+        y: source.y + (dy * 2) / 3 + ny * bow,
       }
       return { points: [source, c1, c2, target], kind: 'cubic' }
     }
@@ -228,6 +274,8 @@ export function applyEdgeRouting(
 
   const tension = options.tension ?? 0.5
   const cornerRatio = options.cornerRatio ?? 0.5
+  const arcBow = options.arcBow ?? 0.12
+  const arcMaxBow = options.arcMaxBow ?? 90
   // Centro derivado dos bounds (consistente con 'radial' de buildPaths).
   const { bounds } = layoutResult
   const centerX = options.centerX ?? (bounds.minX + bounds.maxX) / 2
@@ -256,7 +304,14 @@ export function applyEdgeRouting(
     /* v8 ignore stop */
     newEdges.set(
       edge.id,
-      buildPath(resolved, source, target, { tension, centerX, centerY, cornerRatio }),
+      buildPath(resolved, source, target, {
+        tension,
+        centerX,
+        centerY,
+        cornerRatio,
+        arcBow,
+        arcMaxBow,
+      }),
     )
   }
 

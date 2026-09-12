@@ -1076,6 +1076,7 @@
                       "diagonal-vertical",
                       "diagonal-horizontal",
                       "radial",
+                      "arc",
                       "orthogonal",
                       "octilinear"
                     ]

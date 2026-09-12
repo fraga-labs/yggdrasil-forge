@@ -300,6 +300,9 @@ const curveStyleSchema = z.enum([
   'diagonal-vertical',
   'diagonal-horizontal',
   'radial',
+  // 19.5: 'arc' — combadura lixeira perpendicular, sen nesgo de dirección
+  // (o único que serve para mallas).
+  'arc',
   'orthogonal',
   'octilinear',
 ])

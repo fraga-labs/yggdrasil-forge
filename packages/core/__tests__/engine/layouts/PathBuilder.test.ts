@@ -259,3 +259,60 @@ describe('buildPaths', () => {
   })
 })
 // ── FIN: tests de PathBuilder ──
+
+// ── 19.5: 'arc' — o único estilo sen nesgo de dirección ──
+// Os cinco anteriores asumen unha orientación dominante; nunha MALLA, con
+// arestas a todas as direccións, iso produce S raros nas perpendiculares
+// ao nesgo. 'arc' depende só da propia aresta.
+describe("★ 19.5 — buildPaths 'arc'", () => {
+  const p = (id: string, lr = makeLR([[id, { x: 0, y: 0 }, { x: 300, y: 0 }]])) =>
+    buildPaths(lr, 'arc').edges.get(id)
+
+  it('devolve cubic con catro puntos', () => {
+    const path = p('e')
+    expect(path?.kind).toBe('cubic')
+    expect(path?.points).toHaveLength(4)
+  })
+
+  it('★ a combadura é PERPENDICULAR ao segmento e proporcional (12% por defecto)', () => {
+    // Aresta horizontal de 300: os controis desprázanse 36 en Y (0.12·300)
+    // e nada fóra do eixe perpendicular.
+    const path = p('e')
+    const [p0, c1, c2, p3] = path?.points ?? []
+    expect(p0).toEqual({ x: 0, y: 0 })
+    expect(p3).toEqual({ x: 300, y: 0 })
+    expect(c1?.y).toBeCloseTo(36, 5)
+    expect(c2?.y).toBeCloseTo(36, 5)
+    // Os controis reparten o tramo en tercios.
+    expect(c1?.x).toBeCloseTo(100, 5)
+    expect(c2?.x).toBeCloseTo(200, 5)
+  })
+
+  it('★ sen nesgo de dirección: unha vertical combase igual ca unha horizontal', () => {
+    const vert = buildPaths(makeLR([['v', { x: 0, y: 0 }, { x: 0, y: 300 }]]), 'arc').edges.get('v')
+    const [, c1] = vert?.points ?? []
+    // Mesma magnitude (36), agora no eixe X.
+    expect(Math.abs(c1?.x ?? 0)).toBeCloseTo(36, 5)
+    expect(c1?.y).toBeCloseTo(100, 5)
+  })
+
+  it('★ `arcMaxBow` acouta: unha aresta longuísima non se volve unha bóveda', () => {
+    const lr = makeLR([['l', { x: 0, y: 0 }, { x: 4000, y: 0 }]])
+    const sen = buildPaths(lr, 'arc').edges.get('l')
+    const con = buildPaths(lr, 'arc', { arcMaxBow: 40 }).edges.get('l')
+    // Sen tope: 0.12·4000 = 480, pero o default xa acouta a 90.
+    expect(sen?.points[1]?.y).toBeCloseTo(90, 5)
+    expect(con?.points[1]?.y).toBeCloseTo(40, 5)
+  })
+
+  it('aresta degenerada (mesmo punto) → recta, sen dividir por cero', () => {
+    const path = buildPaths(makeLR([['d', { x: 7, y: 7 }, { x: 7, y: 7 }]]), 'arc').edges.get('d')
+    expect(path?.kind).toBe('line')
+    expect(path?.points).toHaveLength(2)
+  })
+
+  it('determinista: a mesma aresta combase sempre ao mesmo lado', () => {
+    const lr = makeLR([['e', { x: 10, y: 20 }, { x: 210, y: 120 }]])
+    expect(buildPaths(lr, 'arc').edges.get('e')).toEqual(buildPaths(lr, 'arc').edges.get('e'))
+  })
+})

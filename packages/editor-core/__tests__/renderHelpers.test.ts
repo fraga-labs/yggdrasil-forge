@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { standaloneSvg } from '../src/svg/standaloneSvg.js'
 import {
   themeOverridesFromSpec,
+  themeSizesFromSpec,
   themeTypographyFromSpec,
 } from '../src/theme/themeOverridesFromSpec.js'
 
@@ -160,6 +161,45 @@ describe('7.17 — standaloneSvg', () => {
     const a = standaloneSvg(base, { background: '#fff', width: 300 })
     const b = standaloneSvg(base, { background: '#fff', width: 300 })
     expect(a).toEqual(b)
+  })
+})
+
+describe('19.4 — tamaños e iconas: a terceira rama do tema', () => {
+  it('★ os cinco tamaños viaxan, incluído labelMinRadius', () => {
+    expect(
+      themeSizesFromSpec({
+        sizes: {
+          strokeWidth: 1.3,
+          ringWidth: 1.4,
+          fontSize: 13,
+          maxLabelChars: 18,
+          labelMinRadius: 20,
+        },
+      }),
+    ).toEqual({
+      strokeWidth: 1.3,
+      ringWidth: 1.4,
+      fontSize: 13,
+      maxLabelChars: 18,
+      labelMinRadius: 20,
+    })
+  })
+
+  it('★ sen `sizes` → undefined, para NON tapar a base', () => {
+    expect(themeSizesFromSpec(undefined)).toBeUndefined()
+    expect(themeSizesFromSpec({ textColor: '#fff' })).toBeUndefined()
+    expect(themeSizesFromSpec({ sizes: {} })).toBeUndefined()
+  })
+
+  it('iconColor mapea a `icon` (a cor propia das iconas)', () => {
+    expect(themeOverridesFromSpec({ iconColor: '#9a9276' }, false)).toEqual({ icon: '#9a9276' })
+  })
+
+  it('★ iconColor e textColor son independentes: a icona pode ser máis apagada', () => {
+    expect(themeOverridesFromSpec({ textColor: '#f0e6d2', iconColor: '#9a9276' }, false)).toEqual({
+      text: '#f0e6d2',
+      icon: '#9a9276',
+    })
   })
 })
 // ── FIN: tests helpers de render ──

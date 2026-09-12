@@ -65,6 +65,23 @@ export const themeTypographySpecSchema = z
   })
   .describe('Label typography as document data.')
 
+/** Espella `ThemeSizesSpec` (ThemeSpec.ts). */
+export const themeSizesSpecSchema = z
+  .object({
+    strokeWidth: z.number().positive().optional().describe('Line thickness (edges, mesh). Base 2.'),
+    ringWidth: z.number().positive().optional().describe('Node ring thickness. Base 3.'),
+    fontSize: z.number().positive().optional().describe('Label font size. Base 14.'),
+    maxLabelChars: z.number().int().positive().optional().describe('Opt-in label truncation.'),
+    labelMinRadius: z
+      .number()
+      .nonnegative()
+      .optional()
+      .describe(
+        'Minimum node radius that earns a label; smaller nodes render icon only. Enables atlas density.',
+      ),
+  })
+  .describe('Render sizes as document data.')
+
 /** Espella `ThemeSpec` (ThemeSpec.ts). */
 export const themeSpecSchema = z
   .object({
@@ -94,6 +111,15 @@ export const themeSpecSchema = z
     typography: themeTypographySpecSchema
       .optional()
       .describe('Label typography. Omit to fall back to the base.'),
+    iconColor: z
+      .string()
+      .optional()
+      .describe('Node icon color. Falls back to textColor when omitted.'),
+    regionShape: z
+      .enum(['box', 'hull'])
+      .optional()
+      .describe("Region tint shape: 'box' (default) or 'hull' (smoothed blob around the nodes)."),
+    sizes: themeSizesSpecSchema.optional().describe('Render sizes. Omit to fall back to the base.'),
     preset: z
       .string()
       .optional()

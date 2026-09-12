@@ -17,6 +17,7 @@ export type {
   ThemeEdgeSpec,
   ThemeNodeState,
   ThemeRegionTint,
+  ThemeSizesSpec,
   ThemeSpec,
   ThemeTypographySpec,
 } from './document/ThemeSpec.js'
@@ -43,6 +44,7 @@ export {
 } from './layout/applyAutoLayout.js'
 export {
   themeOverridesFromSpec,
+  themeSizesFromSpec,
   themeTypographyFromSpec,
 } from './theme/themeOverridesFromSpec.js'
 export { type StandaloneSvgOptions, standaloneSvg } from './svg/standaloneSvg.js'
@@ -54,6 +56,7 @@ export {
   themeEdgeSpecSchema,
   themeNodeStateSchema,
   themeRegionTintSchema,
+  themeSizesSpecSchema,
   themeSpecSchema,
   themeTypographySpecSchema,
 } from './document/documentMetaSchema.js'

@@ -43,6 +43,7 @@ import {
   buildRemoveCascade,
   createMoveOperation,
   themeOverridesFromSpec,
+  themeSizesFromSpec,
   themeTypographyFromSpec,
 } from '@yggdrasil-forge/editor-core'
 import {
@@ -775,12 +776,14 @@ export function EditorCanvas({
     // seu propio funil. Sen tipografía no documento non se toca a base
     // — por iso o spread condicional en vez de `typography: undefined`.
     const typography = themeTypographyFromSpec(themeSpec) as Theme['typography'] | undefined
+    const sizes = themeSizesFromSpec(themeSpec) as Partial<Theme['sizes']> | undefined
     return {
       ...base,
       colors: {
         ...base.colors,
         ...(themeOverridesFromSpec(themeSpec, dark) as Partial<Theme['colors']>),
       },
+      ...(sizes !== undefined && { sizes: { ...base.sizes, ...sizes } }),
       ...(typography !== undefined && {
         typography: { ...base.typography, ...typography },
       }),
@@ -830,6 +833,9 @@ export function EditorCanvas({
               {...(coordinateBounds !== undefined && { coordinateBounds })}
               {...(regions.length > 0 && { regions })}
               {...(backgroundImage !== undefined && { backgroundImage })}
+              {...(themeSpec?.regionShape !== undefined && {
+                regionShape: themeSpec.regionShape,
+              })}
             />
           </ThemeProvider>
           <CanvasOverlay

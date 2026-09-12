@@ -126,6 +126,12 @@ function SkillNodeImpl({
   // exactOptionalPropertyTypes: spread condicional para non emitir
   // `prop: undefined` (rompería con strict 'exactOptionalPropertyTypes').
   const theme = useTheme()
+  // 19.4: a esta densidade os nodos pequenos non levan texto (ver
+  // `ThemeSizes.labelMinRadius`). Agóchase só o <text>: nos nodos
+  // interactivos o `aria-label` segue levando o texto enteiro, así que
+  // quen usa lector de pantalla non perde nada.
+  const labelMinRadius = theme?.sizes.labelMinRadius ?? 0
+  const mereceRotulo = labelMinRadius <= 0 || radius >= labelMinRadius
   // Renderer sub-fase 1: estado visual derivado (in_progress cosmético
   // para multi-tier a medias) + fill por estado + override `node.color`.
   // Cero regresión: sen tokens de fill por estado nin `node.color`, o
@@ -445,9 +451,11 @@ function SkillNodeImpl({
           {icon}
         </text>
       )}
-      <text className="yf-skill-node__label" textAnchor="middle" y={labelY} style={labelStyle}>
-        {displayLabel}
-      </text>
+      {mereceRotulo && (
+        <text className="yf-skill-node__label" textAnchor="middle" y={labelY} style={labelStyle}>
+          {displayLabel}
+        </text>
+      )}
       {progress !== undefined && (
         <text
           className="yf-skill-node__progress"

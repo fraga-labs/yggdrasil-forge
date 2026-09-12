@@ -47,6 +47,8 @@ export function themeOverridesFromSpec(
     ...(rings.inProgress !== undefined && { nodeInProgress: rings.inProgress }),
     ...(edges?.color !== undefined && { edge: edges.color }),
     ...(edges?.active !== undefined && { edgeActive: edges.active }),
+    // 19.4 — cor propia das iconas (sen ela, @react cae a `text`).
+    ...(spec?.iconColor !== undefined && { icon: spec.iconColor }),
   }
 }
 
@@ -73,6 +75,30 @@ export function themeTypographyFromSpec(
     ...(t.fontWeight !== undefined && { fontWeight: t.fontWeight }),
     ...(t.letterSpacing !== undefined && { letterSpacing: t.letterSpacing }),
     ...(t.textTransform !== undefined && { textTransform: t.textTransform }),
+  }
+  return Object.keys(out).length > 0 ? out : undefined
+}
+/**
+ * Overrides de TAMAÑOS derivados do tema do documento (19.4).
+ *
+ * Terceiro funil, irmán dos outros dous: `colors`, `typography` e
+ * `sizes` son ramas distintas do `Theme` de @react, e cada unha ten a
+ * súa porta para que engadir unha non cambie a sinatura das demais.
+ *
+ * Devolve `undefined` cando o documento non declara tamaños, para que o
+ * consumidor deixe a base intacta.
+ */
+export function themeSizesFromSpec(
+  spec: ThemeSpec | undefined,
+): Record<string, number> | undefined {
+  const z = spec?.sizes
+  if (z === undefined) return undefined
+  const out: Record<string, number> = {
+    ...(z.strokeWidth !== undefined && { strokeWidth: z.strokeWidth }),
+    ...(z.ringWidth !== undefined && { ringWidth: z.ringWidth }),
+    ...(z.fontSize !== undefined && { fontSize: z.fontSize }),
+    ...(z.maxLabelChars !== undefined && { maxLabelChars: z.maxLabelChars }),
+    ...(z.labelMinRadius !== undefined && { labelMinRadius: z.labelMinRadius }),
   }
   return Object.keys(out).length > 0 ? out : undefined
 }

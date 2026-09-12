@@ -2,6 +2,9 @@ import { fireEvent, render } from '@testing-library/react'
 // ── INICIO: tests SkillNode ──
 import { describe, expect, it, vi } from 'vitest'
 import { SkillNode } from '../src/SkillNode.js'
+import { ThemeProvider } from '../src/ThemeProvider.js'
+import type { Theme } from '../src/theme-types.js'
+import { minimal } from '../src/themes/minimal.js'
 
 function q(container: HTMLElement, selector: string): Element {
   const el = container.querySelector(selector)
@@ -220,3 +223,59 @@ describe('SkillNode — long press (7.10)', () => {
   })
 })
 // ── FIN: tests SkillNode ──
+
+// ── 19.4: labelMinRadius — a densidade de atlas ──
+describe('★ 19.4 — os nodos pequenos non levan rótulo', () => {
+  const tema = (labelMinRadius?: number): Theme => ({
+    ...minimal,
+    sizes: { ...minimal.sizes, ...(labelMinRadius !== undefined && { labelMinRadius }) },
+  })
+  const pinta = (size: number, labelMinRadius?: number) =>
+    render(
+      <ThemeProvider theme={tema(labelMinRadius)}>
+        <svg role="img" aria-label="proba">
+          <SkillNode
+            node={{ id: 'n', type: 'small', label: 'Sal Mariña', size } as never}
+            instance={undefined}
+            position={{ x: 0, y: 0 }}
+          />
+        </svg>
+      </ThemeProvider>,
+    )
+
+  it('cun raio por baixo do limiar, o <text> do rótulo non se pinta', () => {
+    const { container } = pinta(13, 20)
+    expect(container.querySelector('.yf-skill-node__label')).toBeNull()
+  })
+
+  it('cun raio por riba do limiar, pintase coma sempre', () => {
+    const { container } = pinta(42, 20)
+    expect(container.querySelector('.yf-skill-node__label')?.textContent).toBe('Sal Mariña')
+  })
+
+  it('★ sen labelMinRadius, TODOS levan rótulo (cero regresión)', () => {
+    const { container } = pinta(13)
+    expect(container.querySelector('.yf-skill-node__label')?.textContent).toBe('Sal Mariña')
+  })
+
+  it('★ o rótulo agóchase só á vista: o aria-label segue completo', () => {
+    // O `aria-label` só se emite en nodos INTERACTIVOS (os que levan
+    // onClick): é aí onde a accesibilidade importa, e aí o texto segue
+    // enteiro aínda que non se pinte.
+    const { container } = render(
+      <ThemeProvider theme={tema(20)}>
+        <svg role="img" aria-label="proba">
+          <SkillNode
+            node={{ id: 'n', type: 'small', label: 'Sal Mariña', size: 13 } as never}
+            instance={undefined}
+            position={{ x: 0, y: 0 }}
+            onClick={() => undefined}
+          />
+        </svg>
+      </ThemeProvider>,
+    )
+    expect(container.querySelector('.yf-skill-node__label')).toBeNull()
+    const g = container.querySelector('[data-node-id="n"]')
+    expect(g?.getAttribute('aria-label') ?? '').toContain('Sal Mariña')
+  })
+})

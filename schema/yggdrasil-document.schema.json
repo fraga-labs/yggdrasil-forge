@@ -1403,6 +1403,47 @@
               "additionalProperties": false,
               "description": "Label typography. Omit to fall back to the base."
             },
+            "iconColor": {
+              "type": "string",
+              "description": "Node icon color. Falls back to textColor when omitted."
+            },
+            "regionShape": {
+              "type": "string",
+              "enum": ["box", "hull"],
+              "description": "Region tint shape: 'box' (default) or 'hull' (smoothed blob around the nodes)."
+            },
+            "sizes": {
+              "type": "object",
+              "properties": {
+                "strokeWidth": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Line thickness (edges, mesh). Base 2."
+                },
+                "ringWidth": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Node ring thickness. Base 3."
+                },
+                "fontSize": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Label font size. Base 14."
+                },
+                "maxLabelChars": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "description": "Opt-in label truncation."
+                },
+                "labelMinRadius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Minimum node radius that earns a label; smaller nodes render icon only. Enables atlas density."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Render sizes. Omit to fall back to the base."
+            },
             "preset": {
               "type": "string",
               "description": "Id of the preset this theme started from (informative, for UIs)."

@@ -187,5 +187,20 @@ export interface ThemeSizes {
    * `undefined` = sen truncado (comportamento actual).
    */
   readonly maxLabelChars?: number
+
+  /**
+   * Raio mínimo (en unidades de layout) para que un nodo MEREZA rótulo
+   * (19.4). Os nodos máis pequenos pintan icona e nada máis.
+   *
+   * É o que fai posible a densidade de atlas: con centos de nodos
+   * pequenos, douscentos rótulos sobrepóñense e o mapa vólvese
+   * ilexible — nos mockups fundacionais eses nodos non levan texto. O
+   * `aria-label` do nodo NON se toca: nos nodos interactivos (os que
+   * levan `onClick`, que son os que o emiten) o texto segue enteiro para
+   * quen le cun lector de pantalla, aínda que non se pinte.
+   *
+   * Sen definir (ou `0`) = todos levan rótulo (comportamento previo).
+   */
+  readonly labelMinRadius?: number
 }
 // ── FIN: Theme types ──

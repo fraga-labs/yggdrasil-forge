@@ -22,6 +22,7 @@ import {
   deserializeDocument,
   standaloneSvg,
   themeOverridesFromSpec,
+  themeSizesFromSpec,
   themeTypographyFromSpec,
 } from '@yggdrasil-forge/editor-core'
 import { FORGE_ICONS, LOGIC_ICONS, NORSE_ICONS, registerIcons } from '@yggdrasil-forge/react'
@@ -105,6 +106,7 @@ interface Preparado {
   readonly regions: readonly RegionSpec[]
   readonly coordinateBounds: { minX: number; minY: number; maxX: number; maxY: number } | undefined
   readonly backgroundImage: string | undefined
+  readonly regionShape: 'box' | 'hull' | undefined
   readonly dark: boolean
 }
 
@@ -121,12 +123,14 @@ function preparar(
   // Tema: mesma composición que EditorCanvas (base + overrides do doc).
   const base = dark ? minimalDark : minimal
   const typography = themeTypographyFromSpec(doc.meta.theme) as Theme['typography'] | undefined
+  const sizes = themeSizesFromSpec(doc.meta.theme) as Partial<Theme['sizes']> | undefined
   const theme: Theme = {
     ...base,
     colors: {
       ...base.colors,
       ...(themeOverridesFromSpec(doc.meta.theme, dark) as Partial<Theme['colors']>),
     },
+    ...(sizes !== undefined && { sizes: { ...base.sizes, ...sizes } }),
     ...(typography !== undefined && {
       typography: { ...base.typography, ...typography },
     }),
@@ -140,6 +144,7 @@ function preparar(
       regions: doc.meta.theme?.regions ?? [],
       coordinateBounds: doc.meta.coordinateBounds,
       backgroundImage: doc.meta.background?.src,
+      regionShape: doc.meta.theme?.regionShape,
       dark,
     },
   }
@@ -157,6 +162,7 @@ function pintar(p: Preparado, options: RenderTextOptions): RenderTextResult {
           ...(p.coordinateBounds !== undefined && { coordinateBounds: p.coordinateBounds }),
           ...(p.regions.length > 0 && { regions: p.regions }),
           ...(p.backgroundImage !== undefined && { backgroundImage: p.backgroundImage }),
+          ...(p.regionShape !== undefined && { regionShape: p.regionShape }),
         }),
       ),
     )

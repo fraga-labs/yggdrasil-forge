@@ -87,6 +87,36 @@ export interface ThemeEdgeSpec {
 }
 
 /**
+ * Tamaños do render, como DATO do documento (19.4).
+ *
+ * Espella a parte tematizable de `ThemeSizes` de
+ * `@yggdrasil-forge/react`. Existe porque o estilo «atlas» — a
+ * filigrana fina de centos de arestas dos mockups fundacionais — non se
+ * pode pedir só con cores: un trazo de 2 px afoga unha malla densa.
+ */
+export interface ThemeSizesSpec {
+  /** Grosor das liñas (arestas, malla, trazo). Base: 2. */
+  readonly strokeWidth?: number
+  /** Grosor do anel do nodo. Base: 3. */
+  readonly ringWidth?: number
+  /** Corpo dos rótulos. Base: 14. */
+  readonly fontSize?: number
+  /** Truncado opt-in do rótulo a N caracteres. */
+  readonly maxLabelChars?: number
+  /**
+   * **Raio mínimo para MERECER rótulo.** Os nodos cun raio menor que
+   * isto pintan icona e nada máis.
+   *
+   * É a peza que fai posible a densidade de atlas: nos mockups os
+   * centos de nodos pequenos non levan texto — só as comarcas e os
+   * nodos grandes. Sen isto, douscentos rótulos sobrepóñense e o mapa
+   * volvese ilexible. `0` ou sen definir = todos levan rótulo
+   * (comportamento previo).
+   */
+  readonly labelMinRadius?: number
+}
+
+/**
  * Tema do documento. Capa de presentación separada do TreeDef.
  *
  * Todos os campos son opcionais: sen `nodeFills`/`regions` aplícase o
@@ -131,6 +161,26 @@ export interface ThemeSpec {
   readonly edges?: ThemeEdgeSpec
   /** Tipografía dos rótulos (19.0). Sen definir, cae á base. */
   readonly typography?: ThemeTypographySpec
+  /**
+   * Cor das iconas dos nodos (19.4). Sen definir, cae a `textColor`.
+   *
+   * Sepáranse porque a esa densidade as iconas teñen que ser máis
+   * apagadas que os rótulos: se brillan igual, a malla desaparece
+   * detrás de douscentos glifos brancos.
+   */
+  readonly iconColor?: string
+  /**
+   * Forma do tinte de rexión (19.4): `'box'` é un rectángulo (o
+   * comportamento de sempre) e `'hull'` un blob suavizado que envolve
+   * os nodos da rexión.
+   *
+   * O renderer sabía facer `'hull'` desde a súa sub-fase de rexións,
+   * pero só como prop do compoñente: nin un documento nin `ygg render`
+   * podían pedilo, así que en práctica non se usaba en ningures.
+   */
+  readonly regionShape?: 'box' | 'hull'
+  /** Tamaños do render (19.4). Sen definir, caen á base. */
+  readonly sizes?: ThemeSizesSpec
   /** Id do preset de partida (informativo, para a UI). */
   readonly preset?: string
 }

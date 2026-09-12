@@ -88,6 +88,8 @@ colors: {
 - `typography` — `fontFamily` (always with a generic fallback), `fontWeight`, `letterSpacing`, `textTransform`. **Type is identity, not decoration**: a gothic document and a sci-fi one are not told apart by color alone.
 - `textColor` — node text and icons, and region labels. Without it, the editor picks a legible one for its chrome.
 - `regions` — **tints by tag**: nodes carrying that `tag` get a colored background (low opacity) and a region label.
+- `regionLabel` — where the **region name** goes (19.8): `'top'` hugging the edge (the old behaviour) or `'center'`, floating in the middle, large and in the region's own color. It sits behind the nodes, so it never covers them.
+- `sizes.ornateMinRadius` — minimum node radius that earns an **ornate frame**: a second concentric ring outside the body. In the mockups only the big nodes carry it, and it is what makes them read as important without more color.
 - `glow` — the **glow effect** (19.7): `radius` (blur, in layout units), `states` (which ones glow; defaults to the three live ones: `unlockable`, `unlocked`, `maxed`) and `edges` (whether lit edges glow too). Without `glow` the filter **is not even emitted**: zero cost.
 - `preset` — **informational**: which preset it started from (the UI marks the active chip). It does not affect rendering by itself: applying a preset means copying its full spec.
 

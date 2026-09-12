@@ -108,6 +108,7 @@ interface Preparado {
   readonly coordinateBounds: { minX: number; minY: number; maxX: number; maxY: number } | undefined
   readonly backgroundImage: string | undefined
   readonly regionShape: 'box' | 'hull' | undefined
+  readonly regionLabel: 'top' | 'center' | undefined
   readonly dark: boolean
 }
 
@@ -148,6 +149,7 @@ function preparar(
       coordinateBounds: doc.meta.coordinateBounds,
       backgroundImage: doc.meta.background?.src,
       regionShape: doc.meta.theme?.regionShape,
+      regionLabel: doc.meta.theme?.regionLabel,
       dark,
     },
   }
@@ -166,6 +168,7 @@ function pintar(p: Preparado, options: RenderTextOptions): RenderTextResult {
           ...(p.regions.length > 0 && { regions: p.regions }),
           ...(p.backgroundImage !== undefined && { backgroundImage: p.backgroundImage }),
           ...(p.regionShape !== undefined && { regionShape: p.regionShape }),
+          ...(p.regionLabel !== undefined && { regionLabel: p.regionLabel }),
         }),
       ),
     )

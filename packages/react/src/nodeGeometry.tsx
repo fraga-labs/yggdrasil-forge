@@ -9,6 +9,13 @@ import type { CSSProperties, JSX } from 'react'
 
 export const FALLBACK_RADIUS = 24
 export const SHAPE_CLASS = 'yf-skill-node__shape'
+/**
+ * Clase do MARCO exterior (19.8). Distinta da do shape a propósito: o
+ * pulso de `animations.ts` e as consultas existentes apuntan a
+ * `SHAPE_CLASS`, e un segundo elemento coa mesma clase dobraría a
+ * animación e rompería tests que contan un só shape por nodo.
+ */
+export const ORNATE_CLASS = 'yf-skill-node__ornate'
 
 const DEFAULT_SHAPE_BY_TYPE: Readonly<Record<NodeType, NodeShape>> = {
   root: 'circle',
@@ -62,21 +69,26 @@ function polygonPoints(sides: number, r: number, rotationDeg: number): string {
  * `useTheme()` no consumidor; `fill`/`stroke`/`strokeWidth` viaxan
  * coma propiedades CSS — non atributos — para conservar transicións).
  */
-export function renderNodeShape(shape: NodeShape, r: number, style?: CSSProperties): JSX.Element {
+export function renderNodeShape(
+  shape: NodeShape,
+  r: number,
+  style?: CSSProperties,
+  className: string = SHAPE_CLASS,
+): JSX.Element {
   const styleProp = style !== undefined ? { style } : {}
   switch (shape) {
     case 'square':
       return (
-        <rect x={-r} y={-r} width={r * 2} height={r * 2} className={SHAPE_CLASS} {...styleProp} />
+        <rect x={-r} y={-r} width={r * 2} height={r * 2} className={className} {...styleProp} />
       )
     case 'diamond':
-      return <polygon points={polygonPoints(4, r, -90)} className={SHAPE_CLASS} {...styleProp} />
+      return <polygon points={polygonPoints(4, r, -90)} className={className} {...styleProp} />
     case 'hexagon':
-      return <polygon points={polygonPoints(6, r, -90)} className={SHAPE_CLASS} {...styleProp} />
+      return <polygon points={polygonPoints(6, r, -90)} className={className} {...styleProp} />
     case 'octagon':
-      return <polygon points={polygonPoints(8, r, -67.5)} className={SHAPE_CLASS} {...styleProp} />
+      return <polygon points={polygonPoints(8, r, -67.5)} className={className} {...styleProp} />
     default:
-      return <circle r={r} className={SHAPE_CLASS} {...styleProp} />
+      return <circle r={r} className={className} {...styleProp} />
   }
 }
 // ── FIN: nodeGeometry ──

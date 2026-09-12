@@ -241,5 +241,16 @@ export interface ThemeSizes {
    * Sen definir (ou `0`) = todos levan rótulo (comportamento previo).
    */
   readonly labelMinRadius?: number
+
+  /**
+   * Raio mínimo para levar **marco ornamental** (19.8): un segundo anel
+   * concéntrico por fóra, máis fino e translúcido.
+   *
+   * Nos mockups fundacionais só os nodos grandes — keystones e
+   * ascendencias — levan ese dobre aro; é o que os fai ler como
+   * «importantes» sen recorrer a máis cor. Sen definir (ou `0`), ningún
+   * nodo o leva e o markup non cambia.
+   */
+  readonly ornateMinRadius?: number
 }
 // ── FIN: Theme types ──

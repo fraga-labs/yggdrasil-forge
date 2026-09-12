@@ -139,6 +139,12 @@ export interface ThemeSizesSpec {
    * (comportamento previo).
    */
   readonly labelMinRadius?: number
+  /**
+   * Raio mínimo para levar **marco ornamental** (19.8): un segundo anel
+   * concéntrico por fóra. Nos mockups só o levan os nodos grandes, e é o
+   * que os fai ler como importantes sen máis cor. Sen definir, ningún.
+   */
+  readonly ornateMinRadius?: number
 }
 
 /**
@@ -204,6 +210,16 @@ export interface ThemeSpec {
    * podían pedilo, así que en práctica non se usaba en ningures.
    */
   readonly regionShape?: 'box' | 'hull'
+  /**
+   * Onde vai o NOME da rexión (19.8): `'top'` pegado ao bordo (o de
+   * sempre) ou `'center'` flotando no medio, grande e coa cor da propia
+   * rexión.
+   *
+   * `'center'` é o dos mockups, e a escala de atlas dálle razón: con
+   * varias comarcas, un rótulo no bordo lese como se fose doutra. Vai
+   * DEBAIXO dos nodos, así que non tapa nada.
+   */
+  readonly regionLabel?: 'top' | 'center'
   /** Tamaños do render (19.4). Sen definir, caen á base. */
   readonly sizes?: ThemeSizesSpec
   /** Resplandor (19.7). Sen definir, non hai efecto e nin se emite filtro. */

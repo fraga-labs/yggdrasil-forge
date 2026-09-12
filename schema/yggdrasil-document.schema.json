@@ -1413,6 +1413,11 @@
               "enum": ["box", "hull"],
               "description": "Region tint shape: 'box' (default) or 'hull' (smoothed blob around the nodes)."
             },
+            "regionLabel": {
+              "type": "string",
+              "enum": ["top", "center"],
+              "description": "Where the region name goes: 'top' (default) or 'center' (large, in the region color, behind the nodes)."
+            },
             "sizes": {
               "type": "object",
               "properties": {
@@ -1440,6 +1445,11 @@
                   "type": "number",
                   "minimum": 0,
                   "description": "Minimum node radius that earns a label; smaller nodes render icon only. Enables atlas density."
+                },
+                "ornateMinRadius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Minimum node radius that earns an ornate outer frame (a second concentric ring)."
                 }
               },
               "additionalProperties": false,

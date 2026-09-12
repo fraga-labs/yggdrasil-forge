@@ -21,7 +21,7 @@ import { glowFilterStyle, glowRadiusOf, glowsForState } from './glow.js'
 import { IconGlyph } from './icons/IconGlyph.js'
 import { isImageRef } from './icons/imageRef.js'
 import { getIcon } from './icons/registry.js'
-import { renderNodeShape, resolveRadius, resolveShape } from './nodeGeometry.js'
+import { ORNATE_CLASS, renderNodeShape, resolveRadius, resolveShape } from './nodeGeometry.js'
 import type { Theme } from './theme-types.js'
 
 export interface SkillNodeProps {
@@ -132,6 +132,11 @@ function SkillNodeImpl({
   // interactivos o `aria-label` segue levando o texto enteiro, así que
   // quen usa lector de pantalla non perde nada.
   const labelMinRadius = theme?.sizes.labelMinRadius ?? 0
+  // 19.8: marco ornamental nos nodos grandes. Vai ANTES do shape para
+  // que o corpo se pinte enriba; o `fill: none` deixa ver o fondo entre
+  // os dous aneis, que é o que fai que pareza un marco e non un borde.
+  const ornateMinRadius = theme?.sizes.ornateMinRadius ?? 0
+  const levaMarco = ornateMinRadius > 0 && radius >= ornateMinRadius
   const mereceRotulo = labelMinRadius <= 0 || radius >= labelMinRadius
   // Renderer sub-fase 1: estado visual derivado (in_progress cosmético
   // para multi-tier a medias) + fill por estado + override `node.color`.
@@ -423,6 +428,18 @@ function SkillNodeImpl({
     >
       {labelTruncated && <title>{fullLabel}</title>}
       {overlay}
+      {levaMarco &&
+        renderNodeShape(
+          shape,
+          radius * 1.2,
+          {
+            fill: 'none',
+            strokeWidth: Math.max(1, ringWidth * 0.6),
+            ...(ring !== undefined && { stroke: ring }),
+            opacity: 0.55,
+          },
+          ORNATE_CLASS,
+        )}
       {renderNodeShape(shape, radius, shapeStyle)}
       {iconDef !== undefined && (
         <IconGlyph

@@ -99,6 +99,7 @@ export function themeSizesFromSpec(
     ...(z.fontSize !== undefined && { fontSize: z.fontSize }),
     ...(z.maxLabelChars !== undefined && { maxLabelChars: z.maxLabelChars }),
     ...(z.labelMinRadius !== undefined && { labelMinRadius: z.labelMinRadius }),
+    ...(z.ornateMinRadius !== undefined && { ornateMinRadius: z.ornateMinRadius }),
   }
   return Object.keys(out).length > 0 ? out : undefined
 }

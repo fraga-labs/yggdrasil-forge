@@ -79,6 +79,11 @@ export const themeSizesSpecSchema = z
       .describe(
         'Minimum node radius that earns a label; smaller nodes render icon only. Enables atlas density.',
       ),
+    ornateMinRadius: z
+      .number()
+      .nonnegative()
+      .optional()
+      .describe('Minimum node radius that earns an ornate outer frame (a second concentric ring).'),
   })
   .describe('Render sizes as document data.')
 
@@ -135,6 +140,12 @@ export const themeSpecSchema = z
       .enum(['box', 'hull'])
       .optional()
       .describe("Region tint shape: 'box' (default) or 'hull' (smoothed blob around the nodes)."),
+    regionLabel: z
+      .enum(['top', 'center'])
+      .optional()
+      .describe(
+        "Where the region name goes: 'top' (default) or 'center' (large, in the region color, behind the nodes).",
+      ),
     sizes: themeSizesSpecSchema.optional().describe('Render sizes. Omit to fall back to the base.'),
     glow: themeGlowSpecSchema.optional().describe('Glow effect. Omit for no glow at all.'),
     preset: z

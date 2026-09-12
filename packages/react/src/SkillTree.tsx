@@ -19,7 +19,12 @@ import { SVGRenderer } from './SVGRenderer.js'
 import { SkillEdge, edgeStateFor } from './SkillEdge.js'
 import { SkillNode } from './SkillNode.js'
 import { SkillNodeControls } from './SkillNodeControls.js'
-import { type RegionShape, type RegionSpec, SkillRegions } from './SkillRegions.js'
+import {
+  type RegionLabelPlacement,
+  type RegionShape,
+  type RegionSpec,
+  SkillRegions,
+} from './SkillRegions.js'
 import { createDefaultLayoutRegistry } from './createDefaultLayoutRegistry.js'
 import { shortenEdgeAtTarget } from './edgeGeometry.js'
 import { type ViewportState, useViewport } from './hooks/useViewport.js'
@@ -202,6 +207,8 @@ export interface SkillTreeProps {
    * Regresión cero sobre consumidores existentes (default `'box'`).
    */
   readonly regionShape?: RegionShape
+  /** Onde vai o nome da rexión (19.8). Default `'top'`. */
+  readonly regionLabel?: RegionLabelPlacement
 }
 
 export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function SkillTree(
@@ -226,6 +233,7 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
     canIncrease,
     regions,
     regionShape = 'box',
+    regionLabel = 'top',
     coordinateBounds,
     backgroundImage,
   },
@@ -454,6 +462,7 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
           nodePositions={nodePositions}
           nodes={treeDef.nodes}
           regionShape={regionShape}
+          regionLabel={regionLabel}
         />
       )}
       <g className="yf-skill-edges">{edgeElements}</g>

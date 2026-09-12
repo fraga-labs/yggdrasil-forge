@@ -88,6 +88,8 @@ colors: {
 - `typography` — `fontFamily` (con fallback xenérico sempre), `fontWeight`, `letterSpacing`, `textTransform`. **A fonte é identidade, non adorno**: un documento gótico e un sci-fi non se distinguen só polas cores.
 - `textColor` — texto e iconas dos nodos e etiquetas de rexión. Sen el, o editor escolle un lexible segundo o seu chrome.
 - `regions` — **tintes por tag**: os nodos con ese `tag` levan un fondo de cor (con opacidade baixa) e unha etiqueta de rexión.
+- `regionLabel` — onde vai o **nome da rexión** (19.8): `'top'` pegado ao bordo (o de sempre) ou `'center'` flotando no medio, grande e coa cor da propia rexión. Vai debaixo dos nodos, así que non tapa.
+- `sizes.ornateMinRadius` — raio mínimo para levar **marco ornamental**: un segundo anel concéntrico por fóra. Nos mockups só o levan os nodos grandes, e é o que os fai ler como importantes sen máis cor.
 - `glow` — **resplandor** (19.7): `radius` (o desenfoque, en unidades de layout), `states` (cales brillan; por defecto os tres vivos: `unlockable`, `unlocked`, `maxed`) e `edges` (se as arestas acesas brillan tamén). Sen `glow` **nin se emite o filtro**: cero custo.
 - `preset` — **informativo**: de que preset partiu (a UI marca a ficha activa). Non afecta ao render por si só: aplicar un preset é copiar o seu spec completo.
 

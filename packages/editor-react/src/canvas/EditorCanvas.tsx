@@ -839,6 +839,9 @@ export function EditorCanvas({
               {...(themeSpec?.regionShape !== undefined && {
                 regionShape: themeSpec.regionShape,
               })}
+              {...(themeSpec?.regionLabel !== undefined && {
+                regionLabel: themeSpec.regionLabel,
+              })}
             />
           </ThemeProvider>
           <CanvasOverlay

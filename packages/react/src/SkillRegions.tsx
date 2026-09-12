@@ -50,6 +50,19 @@ export interface RegionSpec {
  */
 export type RegionShape = 'box' | 'hull'
 
+/**
+ * Onde vai o nome da rexión (19.8).
+ *
+ * - `'top'`: pegado ao bordo superior, pequeno e discreto. Default, e o
+ *   comportamento de sempre.
+ * - `'center'`: **flotando no medio**, grande e coa cor da propia
+ *   rexión. É o dos mockups fundacionais, e a esa escala ten sentido:
+ *   cun atlas de varias comarcas, un rótulo no bordo lese como se fose
+ *   doutra cousa. Vai DEBAIXO dos nodos (as rexións píntanse antes), así
+ *   que non tapa nada.
+ */
+export type RegionLabelPlacement = 'top' | 'center'
+
 interface SkillRegionsProps {
   /** Especificacións das rexións (orde de render = orde no array). */
   readonly regions: readonly RegionSpec[]
@@ -66,6 +79,8 @@ interface SkillRegionsProps {
    * o blob orgánico (Catmull-Rom pechado sobre convex hull mostraxado).
    */
   readonly regionShape?: RegionShape
+  /** Onde vai o nome da rexión. Default `'top'` (regresión cero). */
+  readonly regionLabel?: RegionLabelPlacement
 }
 
 interface ComputedRegion {
@@ -296,6 +311,7 @@ export function SkillRegions({
   padding = 32,
   tintOpacity = 0.12,
   regionShape = 'box',
+  regionLabel = 'top',
 }: SkillRegionsProps): JSX.Element | null {
   const theme = useTheme()
   if (regions.length === 0) return null
@@ -348,16 +364,31 @@ export function SkillRegions({
             )}
             <text
               x={bbox.minX + width / 2}
-              y={bbox.minY + 18}
+              y={regionLabel === 'center' ? bbox.minY + height / 2 : bbox.minY + 18}
               textAnchor="middle"
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                fill: textColor,
-                fillOpacity: 0.55,
-              }}
+              style={
+                regionLabel === 'center'
+                  ? {
+                      // Grande, coa cor da comarca e translúcido: é un
+                      // rótulo de mapa, non unha etiqueta de UI. Ao ir
+                      // debaixo dos nodos, a opacidade baixa é o que
+                      // evita que compita con eles.
+                      fontSize: Math.max(18, Math.min(46, width * 0.11)),
+                      fontWeight: 700,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      fill: spec.color,
+                      fillOpacity: 0.5,
+                    }
+                  : {
+                      fontSize: 13,
+                      fontWeight: 700,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      fill: textColor,
+                      fillOpacity: 0.55,
+                    }
+              }
             >
               {spec.label}
             </text>

@@ -79,7 +79,7 @@
   },
   "overrides": [
     {
-      "include": ["examples/**", "docs-site/scripts/**"],
+      "include": ["examples/**", "docs-site/scripts/**", "tools/malla-proto/**"],
       "linter": {
         "rules": {
           "suspicious": {

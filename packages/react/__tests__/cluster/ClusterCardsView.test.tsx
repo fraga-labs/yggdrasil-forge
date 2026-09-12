@@ -116,6 +116,107 @@ describe('ClusterCardsView — render', () => {
     expect(badges).toContain('✓') // g1-c (3/3) e g2-a (1/1)
   })
 })
+// ── 19.10: o anel automático non pode solapar tarxetas ──
+//
+// O anel ía a un 36% do CONTEDOR sen mirar canto miden as tarxetas. Nun
+// panel de 700×439 iso dá un semi-eixe vertical de 158 px, e unha
+// tarxeta de 16 membros mide uns 460: pisábanse. Vísteo abrindo o atlas
+// da galería (sete grupos) na vista tarxetas do editor.
+
+/** `n` grupos de `filas` membros cada un. */
+function aneis(n: number, filas: number): ClusterGroup[] {
+  return Array.from({ length: n }, (_, i) => ({
+    id: `g${i}`,
+    label: `G${i}`,
+    color: '#888888',
+    members: Array.from({ length: filas }, (_, j) => ({
+      id: `g${i}-${j}`,
+      label: `m${j}`,
+      currentTier: 0,
+      maxTier: 1,
+    })),
+  }))
+}
+
+/** Centro de cada tarxeta en píxeles, lido do `calc(50% + Npx)`. */
+function centros(container: HTMLElement): { x: number; y: number }[] {
+  return [...container.querySelectorAll<HTMLElement>('.yf-cluster-card')].map((e) => {
+    const px = (v: string): number => {
+      // O navegador normaliza `calc(50% + -792px)` a `calc(50% - 792px)`,
+      // así que hai que aceptar os dous signos.
+      const m = /calc\(50% ([+-]) ([\d.]+)px\)/.exec(v)
+      if (m === null) throw new Error(`esperábase calc(50% ± Npx), recibín «${v}»`)
+      return (m[1] === '-' ? -1 : 1) * Number(m[2])
+    }
+    return { x: px(e.style.left), y: px(e.style.top) }
+  })
+}
+
+describe('★ ClusterCardsView — o anel automático NON solapa', () => {
+  const W = 280 + 24
+  const alto = (filas: number): number => 46 + filas * 26 + 24
+
+  it('★★ sete grupos de dezaseis membros: cero pares solapados', () => {
+    // O caso real: o atlas da galería no editor.
+    const { container } = render(<ClusterCardsView groups={aneis(7, 16)} onRowClick={vi.fn()} />)
+    const cs = centros(container)
+    const h = alto(16)
+    const malos: string[] = []
+    for (let i = 0; i < cs.length; i++) {
+      for (let j = i + 1; j < cs.length; j++) {
+        const a = cs[i]
+        const b = cs[j]
+        if (a === undefined || b === undefined) continue
+        if (Math.abs(a.x - b.x) < W && Math.abs(a.y - b.y) < h) malos.push(`${i}↔${j}`)
+      }
+    }
+    expect(malos).toEqual([])
+  })
+
+  it('★ mantense de dous a doce grupos e con tarxetas de calquera alto', () => {
+    for (const n of [2, 3, 5, 8, 12]) {
+      for (const filas of [1, 6, 20]) {
+        const { container, unmount } = render(
+          <ClusterCardsView groups={aneis(n, filas)} onRowClick={vi.fn()} />,
+        )
+        const cs = centros(container)
+        const h = alto(filas)
+        for (let i = 0; i < cs.length; i++) {
+          for (let j = i + 1; j < cs.length; j++) {
+            const a = cs[i]
+            const b = cs[j]
+            if (a === undefined || b === undefined) continue
+            const separadas = Math.abs(a.x - b.x) >= W || Math.abs(a.y - b.y) >= h
+            expect(separadas, `n=${n} filas=${filas} ${i}↔${j}`).toBe(true)
+          }
+        }
+        unmount()
+      }
+    }
+  })
+
+  it('★ con `autoRadiusPercent` explícito consérvase o comportamento vello (en %)', () => {
+    // Compatibilidade: quen o pasaba segue mandando, aínda que solape.
+    const { container } = render(
+      <ClusterCardsView groups={aneis(7, 16)} autoRadiusPercent={36} onRowClick={vi.fn()} />,
+    )
+    const primeira = container.querySelector<HTMLElement>('.yf-cluster-card')
+    expect(primeira?.style.left).toMatch(/%$/)
+  })
+
+  it('as posicións explícitas seguen gañando sobre o anel', () => {
+    const { container } = render(
+      <ClusterCardsView
+        groups={aneis(3, 4)}
+        positions={{ g0: { left: '10%', top: '20%' } }}
+        onRowClick={vi.fn()}
+      />,
+    )
+    const primeira = container.querySelector<HTMLElement>('.yf-cluster-card')
+    expect(primeira?.style.left).toBe('10%')
+    expect(primeira?.style.top).toBe('20%')
+  })
+})
 // ── FIN: tests ClusterCardsView ──
 
 // ── 17.2: paridade de iconas — os tres camiños da cela ──

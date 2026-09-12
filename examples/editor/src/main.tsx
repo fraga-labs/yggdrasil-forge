@@ -346,11 +346,22 @@ function App(): JSX.Element {
     const clone = live.cloneNode(true) as SVGSVGElement
     const viewport = clone.querySelector(':scope > g')
     viewport?.setAttribute('transform', 'translate(0 0) scale(1)')
+    // 19.10: fóra o MINIMAPA. É mobiliario do visor, non a árbore; e o
+    // seu rectángulo quedaría conxelado no encadre que tiñas ao
+    // exportar, xusto o que este export promete non facer (acaba de
+    // resetear o pan/zoom para ser determinista). Sae en árbores de 40
+    // nodos ou máis, así que sen isto os exports grandes levan un
+    // minimapa incrustado.
+    clone.querySelector('.yf-minimap')?.remove()
     const markup = new XMLSerializer().serializeToString(clone)
+    // 19.10: manda o LENZO do documento se o declara. Antes saía sempre
+    // do CSS do chrome, así que exportar un documento escuro desde un
+    // editor en claro daba un marco claro arredor dun debuxo escuro.
     const background =
-      getComputedStyle(document.documentElement).getPropertyValue('--editor-bg-canvas').trim() ||
+      engine.getDocument().meta.theme?.background ??
+      getComputedStyle(document.documentElement).getPropertyValue('--editor-bg-canvas').trim() ??
       '#f4f4f1'
-    const result = standaloneSvg(markup, { background })
+    const result = standaloneSvg(markup, { background: background || '#f4f4f1' })
     if (!result.ok) {
       window.alert(`Non se puido exportar a imaxe: ${result.error.message}`)
       return null

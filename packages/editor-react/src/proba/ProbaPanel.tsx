@@ -22,6 +22,7 @@ import {
   type SelectionRef,
   getNodeStateLabel,
 } from '@yggdrasil-forge/editor-core'
+import { IconGlyph, getIcon } from '@yggdrasil-forge/react'
 import { type JSX, useCallback, useRef, useSyncExternalStore } from 'react'
 import { PROBA_STRINGS, pickLoc } from './probaStrings.js'
 import type { ProbaSession } from './useProbaSession.js'
@@ -177,6 +178,8 @@ interface ResourceRowProps {
 function ResourceRow({ resource, amount, onGrant }: ResourceRowProps): JSX.Element {
   const label = pickLabel(resource.label, resource.id)
   const swatch = resource.color
+  const icona = resource.icon
+  const registada = icona !== undefined && icona !== '' ? getIcon(icona) : undefined
   return (
     <li className="editor-proba__resource-row">
       {swatch !== undefined && (
@@ -186,9 +189,15 @@ function ResourceRow({ resource, amount, onGrant }: ResourceRowProps): JSX.Eleme
           aria-hidden="true"
         />
       )}
-      {resource.icon !== undefined && (
+      {icona !== undefined && (
         <span className="editor-proba__resource-icon" aria-hidden="true">
-          {resource.icon}
+          {/* 19.10: se o id está rexistrado píntase a ICONA; só cae ao
+              texto cando non o está, que é o caso lexítimo dun emoji.
+              Antes pintábase sempre `resource.icon` cru, así que un
+              recurso con `icon: "norse-sun"` amosaba «norse-sun» ao
+              lado da etiqueta — o mesmo fallo que o dono atopara na
+              portada 1.0, pero no panel Proba. */}
+          {registada !== undefined ? <IconGlyph def={registada} size={14} /> : icona}
         </span>
       )}
       <span className="editor-proba__resource-label">{label}</span>

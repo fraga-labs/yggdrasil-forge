@@ -58,7 +58,14 @@ export interface ClusterCardsViewProps {
    * lenzo) ao redor do centro. Sen `positions`, todos van ao anel.
    */
   readonly positions?: CardPositions
-  /** % do tamaño do contedor para o raio do anel automático. Default 36. */
+  /**
+   * % do tamaño do contedor para o raio do anel automático.
+   *
+   * **Sen definir (o normal), o anel calcúlase en PÍXELES a partir do
+   * tamaño das tarxetas** e a vista encádrase soa ao abrir. Dáse un
+   * valor só para forzar o comportamento vello, que non mira canto
+   * miden as tarxetas e pode solapalas.
+   */
   readonly autoRadiusPercent?: number
   readonly crownLabel?: string
   readonly crownIcon?: IconDef
@@ -172,6 +179,48 @@ function RowIcon({
   )
 }
 
+/** Ancho máximo dunha tarxeta (o `maxWidth` do `cardStyle`) máis folgura. */
+const CARD_W = 280 + 24
+/** Oco que hai que deixar no medio para a coroa (icona 72 + rótulo). */
+const CROWN_W = 180
+const CROWN_H = 104
+/** Alto estimado: cabeceira + fila por membro + folgura. */
+const CARD_HEAD = 46
+const CARD_ROW = 26
+const CARD_GAP = 24
+
+/**
+ * Semi-eixes (en PÍXELES) do anel automático para `n` tarxetas de ata
+ * `filas` membros.
+ *
+ * **Por que en píxeles e non en % (19.10).** O anel ía a un 36% do
+ * CONTEDOR sen mirar canto miden as tarxetas. Nun panel de 700×439 iso
+ * dá un semi-eixe vertical de 158 px, e unha tarxeta de 16 membros mide
+ * uns 460: as tarxetas pisábanse uns ás outras. Vísteo co atlas da
+ * galería (sete grupos) no editor.
+ *
+ * O factor √2 é o que dá a GARANTÍA. Con paso angular Δ, dúas tarxetas
+ * veciñas sepáranse |dx| = 2·Rx·sin(Δ/2)·|sin φ| e |dy| =
+ * 2·Ry·sin(Δ/2)·|cos φ|. Tomando Rx = √2·w/(2·sin(Δ/2)) (e igual para
+ * Ry con h), queda |dx| = √2·w·|sin φ| e |dy| = √2·h·|cos φ|; como
+ * max(|sin φ|, |cos φ|) ≥ 1/√2, sempre se cumpre |dx| ≥ w ou |dy| ≥ h.
+ * É dicir: as caixas nunca se solapan, veña o ángulo que veña.
+ */
+function ringRadii(n: number, filas: number): { rx: number; ry: number } {
+  const h = CARD_HEAD + filas * CARD_ROW + CARD_GAP
+  if (n <= 1) return { rx: 0, ry: 0 }
+  const paso = Math.sin(Math.PI / n)
+  const k = Math.SQRT2 / (2 * paso)
+  // Chan: no medio vai a COROA (icona + nome da árbore), así que o anel
+  // ten que despexala. Sen este chan, con dous grupos o anel sae máis
+  // apertado que o de antes e as tarxetas rózana — vísteo na captura
+  // 10 da guía, co panadeiro.
+  return {
+    rx: Math.max(k * CARD_W, CROWN_W / 2 + CARD_W / 2 + CARD_GAP),
+    ry: Math.max(k * h, CROWN_H / 2 + h / 2 + CARD_GAP),
+  }
+}
+
 /**
  * Posición CSS para un grupo: usa `positions[groupId]` se existe; senón,
  * dispón os grupos restantes nun anel automático ao redor do centro.
@@ -180,7 +229,8 @@ function resolvePosition(
   groupId: string,
   groups: readonly ClusterGroup[],
   positions: CardPositions | undefined,
-  autoRadiusPercent: number,
+  autoRadiusPercent: number | undefined,
+  radii: { rx: number; ry: number },
 ): { left: string; top: string } {
   if (positions?.[groupId] !== undefined) return positions[groupId]
   // Anel automático: índice entre os grupos SEN posición explícita.
@@ -189,17 +239,26 @@ function resolvePosition(
   const total = groupsWithoutPos.length
   // Empezar arriba (-π/2) e ir en sentido horario.
   const angle = -Math.PI / 2 + (2 * Math.PI * idx) / Math.max(1, total)
-  const cx = 50
-  const cy = 50
-  const x = cx + autoRadiusPercent * Math.cos(angle)
-  const y = cy + autoRadiusPercent * Math.sin(angle)
-  return { left: `${x}%`, top: `${y}%` }
+  // Con `autoRadiusPercent` explícito mándao quen chama (compatibilidade
+  // exacta); sen el, o anel en píxeles que non deixa solapar.
+  if (autoRadiusPercent !== undefined) {
+    return {
+      left: `${50 + autoRadiusPercent * Math.cos(angle)}%`,
+      top: `${50 + autoRadiusPercent * Math.sin(angle)}%`,
+    }
+  }
+  const dx = radii.rx * Math.cos(angle)
+  const dy = radii.ry * Math.sin(angle)
+  return {
+    left: `calc(50% + ${dx.toFixed(1)}px)`,
+    top: `calc(50% + ${dy.toFixed(1)}px)`,
+  }
 }
 
 export function ClusterCardsView({
   groups,
   positions,
-  autoRadiusPercent = 36,
+  autoRadiusPercent,
   crownLabel,
   crownIcon,
   selectedNodeId,
@@ -212,12 +271,42 @@ export function ClusterCardsView({
   const [zoom, setZoom] = useState(1)
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // ── 19.10: anel en píxeles + encadre inicial ──
+  //
+  // Van xuntos a propósito: un anel máis grande sen encadrar deixaría
+  // as tarxetas fóra da vista ao abrir, que é peor que solapadas.
+  const nAnel = groups.filter((g) => positions?.[g.id] === undefined).length
+  const filasMax = groups.reduce((m, g) => Math.max(m, g.members.length), 0)
+  const radii = ringRadii(nAnel, filasMax)
+  const anelKey = `${nAnel}:${filasMax}:${autoRadiusPercent ?? 'auto'}`
+  const encadradoRef = useRef<string>('')
   const dragStartRef = useRef<{
     clientX: number
     clientY: number
     initialPanX: number
     initialPanY: number
   } | null>(null)
+
+  // Encadre: unha soa vez por «forma do anel». Non se repite en cada
+  // render para non pelexar co zoom que faga quen mira.
+  useEffect(() => {
+    if (autoRadiusPercent !== undefined) return
+    if (encadradoRef.current === anelKey) return
+    const el = containerRef.current
+    if (el === null) return
+    const { width, height } = el.getBoundingClientRect()
+    if (width <= 0 || height <= 0) return
+    encadradoRef.current = anelKey
+    const anchoAnel = 2 * radii.rx + CARD_W
+    const altoAnel = 2 * radii.ry + CARD_HEAD + filasMax * CARD_ROW + CARD_GAP
+    const cabe = Math.min(width / anchoAnel, height / altoAnel)
+    const z = Math.max(minZoom, Math.min(1, cabe))
+    setZoom(z)
+    // O `transformOrigin` é '0 0', así que escalar arrastra cara á
+    // esquina: este pan é o que mantén o centro no centro.
+    setPan({ x: ((1 - z) * width) / 2, y: ((1 - z) * height) / 2 })
+  }, [anelKey, autoRadiusPercent, radii.rx, radii.ry, filasMax, minZoom])
 
   // Wheel listener non-pasivo (preventDefault require non-pasivo).
   useEffect(() => {
@@ -352,7 +441,7 @@ export function ClusterCardsView({
           </div>
         )}
         {groups.map((g) => {
-          const position = resolvePosition(g.id, groups, positions, autoRadiusPercent)
+          const position = resolvePosition(g.id, groups, positions, autoRadiusPercent, radii)
           const cardStyle: CSSProperties = {
             position: 'absolute',
             left: position.left,

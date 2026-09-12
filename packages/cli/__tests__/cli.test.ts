@@ -196,6 +196,27 @@ const ENFERMO = JSON.stringify({
   editor: { formatVersion: '1.0.0' },
 })
 
+describe('★ ygg layout — a lista de algoritmos sae do rexistro (19.10)', () => {
+  it('★ o erro de --algo nomea TODOS, `mesh` incluído', async () => {
+    // Estaba escrita a man e quedou en cinco cando entrou `mesh`: a
+    // axuda de `ygg --help` si o nomeaba e este erro non, así que quen
+    // se equivocaba lía que `mesh` non existía.
+    const io = makeIO()
+    const code = await run(['layout', join(GALLERY, 'minimal.json')], io)
+    expect(code).toBe(2)
+    expect(io.err()).toContain('mesh')
+    expect(io.err()).toContain('clustered-radial')
+  })
+
+  it('`--algo mesh` funciona de verdade, non só na mensaxe', async () => {
+    const io = makeIO()
+    const code = await run(['layout', join(GALLERY, 'minimal.json'), '--algo', 'mesh'], io)
+    expect(code).toBe(0)
+    const doc = JSON.parse(io.out()) as { tree: { nodes: readonly { position?: unknown }[] } }
+    expect(doc.tree.nodes.every((n) => n.position !== undefined)).toBe(true)
+  })
+})
+
 describe('★ ygg validate — a conciencia (19.10)', () => {
   it('★★ un ciclo de prerrequisitos xa NON pasa en silencio', async () => {
     const io = makeIO(ENFERMO)

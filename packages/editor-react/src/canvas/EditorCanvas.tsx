@@ -54,6 +54,7 @@ import {
   type Theme,
   ThemeProvider,
   type ViewportState,
+  esCorEscura,
   minimal,
   minimalDark,
 } from '@yggdrasil-forge/react'
@@ -638,11 +639,22 @@ export function EditorCanvas({
   // 7.16 — convite tras importar: se ≥30% dos nodos non teñen posición,
   // barra discreta con «Dispor?» (sen modais; ✕ péchaa; ao dispor, a
   // condición faise falsa e desaparece soa).
+  //
+  // **19.10 — só con `layout: custom`.** Un documento que declara un
+  // layout VIVO (`mesh`, `radial`, `tree`…) non leva coordenadas A
+  // PROPÓSITO: colócao o motor ao pintar, e iso é precisamente o que
+  // recomendan as docs a quen xera árbores. O convite aparecía igual e
+  // tapaba o lenzo cun panel de seis algoritmos, dicindo que había 97
+  // nodos «sen posición» cando estaban todos colocados. Con `custom` a
+  // cousa é distinta e o convite é urxente: aí SI quedan sen colocar (o
+  // IdentityLayout mándaos todos ao (0,0), amoreados e sen poder
+  // premelos).
   const senPosicion = doc.tree.nodes.filter((n) => n.position === undefined).length
   const showConvite =
     !conviteDismissed &&
     view === 'graph' &&
     !inProba &&
+    doc.tree.layout.type === 'custom' &&
     doc.tree.nodes.length > 0 &&
     senPosicion / doc.tree.nodes.length >= 0.3
 
@@ -777,7 +789,16 @@ export function EditorCanvas({
     // (themeOverridesFromSpec) para que o CLI de render o comparta.
     // Mesmo comportamento que antes: base enteira por chromeTheme,
     // overrides do documento gañan sempre.
-    const dark = chromeTheme === 'dark'
+    // 19.10: manda o LENZO do documento se o declara.
+    //
+    // A base existe para que texto, arestas e malla se lean sobre o
+    // fondo; ata agora ese fondo era o do chrome, porque o documento
+    // non podía declarar o seu. Desde que `ThemeSpec.background` existe,
+    // si pode — e un documento con lenzo escuro aberto nun chrome claro
+    // collía a base clara: texto escuro sobre fondo escuro, invisible.
+    // Co `background` declarado, decide ese; sen el, o chrome, coma
+    // sempre.
+    const dark = esCorEscura(themeSpec?.background) ?? chromeTheme === 'dark'
     const base = dark ? minimalDark : minimal
     // 19.0: a tipografía é a OUTRA rama do Theme (irmá de `colors`), co
     // seu propio funil. Sen tipografía no documento non se toca a base

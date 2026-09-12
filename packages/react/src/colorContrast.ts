@@ -63,6 +63,21 @@ export function razonDeContraste(a: string, b: string): number | undefined {
   return (claro + 0.05) / (escuro + 0.05)
 }
 
+/**
+ * ¿É unha cor escura? (luminancia relativa por baixo do medio).
+ * `undefined` se non se pode ler — quen pregunta decide o seu default.
+ *
+ * Serve para escoller BASE de tema: desde que o documento pode declarar
+ * o seu `background`, quen renderiza ten que mirar ese lenzo e non só o
+ * chrome que o rodea.
+ */
+export function esCorEscura(cor: string | undefined): boolean | undefined {
+  if (cor === undefined) return undefined
+  const rgb = leHex(cor)
+  if (rgb === undefined) return undefined
+  return luminancia(rgb) < 0.4
+}
+
 /** Mínimo WCAG para texto grande; o nome dunha comarca vai en versaletas. */
 export const CONTRASTE_MINIMO = 3
 

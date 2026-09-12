@@ -316,6 +316,79 @@ const RADIOS: Readonly<Record<string, number>> = {
 }
 const radioDe = (id: string): number => RADIOS[id] ?? 15
 
+describe('★ MeshLayout — un documento SEN agrupar dá unha tea, non un anel', () => {
+  /**
+   * Árbore que declara grupos pero NON lles asigna nodos: a pertenza
+   * exprésase con `tags`, que é o eixe do TEMA. Pasa de verdade —
+   * `lobo-de-inverno` da galería está así.
+   */
+  function senAgrupar(): TreeDef {
+    const nodes: unknown[] = []
+    const edges: unknown[] = []
+    for (let i = 0; i < 18; i++) {
+      nodes.push({
+        id: `n${i}`,
+        type: 'small',
+        label: { gl: `n${i}` },
+        tags: [i % 3 === 0 ? 'a' : 'b'],
+      })
+      if (i > 0) {
+        edges.push({ id: `e${i}`, source: `n${i - 1}`, target: `n${i}`, type: 'dependency' })
+      }
+    }
+    return {
+      id: 'sen-agrupar',
+      schemaVersion: '1.0.0',
+      version: '1.0.0',
+      label: { gl: 'S' },
+      groups: [
+        { id: 'a', label: { gl: 'A' } },
+        { id: 'b', label: { gl: 'B' } },
+      ],
+      nodes,
+      edges,
+      layout: { type: 'mesh', spacing: S, seed: 1 },
+    } as unknown as TreeDef
+  }
+
+  it('★★ non saen todos ao mesmo radio: iso era o anel de «soltos»', () => {
+    // Antes: os 18 nodos ían ao anel exterior repartindo 360°, e o
+    // resultado era un círculo perfecto — un layout inútil, en
+    // silencio, para quen pediu precisamente unha tea.
+    const { nodes } = pos(senAgrupar())
+    const radios = [...nodes.values()].map((p) => Math.hypot(p.x, p.y))
+    const desviacion = Math.max(...radios) - Math.min(...radios)
+    expect(desviacion).toBeGreaterThan(S)
+  })
+
+  it('★ e as arestas quedan CURTAS, que é o que este motor promete', () => {
+    const { nodes } = pos(senAgrupar())
+    const ids = [...nodes.keys()]
+    let suma = 0
+    let n = 0
+    for (let i = 1; i < ids.length; i++) {
+      const a = nodes.get(ids[i - 1] ?? '')
+      const b = nodes.get(ids[i] ?? '')
+      if (a === undefined || b === undefined) continue
+      // Só as arestas da cadea, que son as declaradas.
+      suma += Math.hypot(a.x - b.x, a.y - b.y)
+      n++
+    }
+    // Nun anel de 18 nodos a distancia entre veciños era moito maior.
+    expect(suma / Math.max(n, 1)).toBeLessThan(S * 3)
+  })
+
+  it('cun só nodo agrupado NON se toca o comportamento (os soltos seguen no anel)', () => {
+    const tree = senAgrupar() as unknown as {
+      nodes: { id: string; group?: string }[]
+    }
+    const primeiro = tree.nodes[0]
+    if (primeiro !== undefined) primeiro.group = 'a'
+    const { nodes } = pos(tree as unknown as TreeDef)
+    expect(nodes.size).toBe(18)
+  })
+})
+
 describe('★ MeshLayout — os corpos NON se solapan', () => {
   it('★★ en CATORCE sementes, ningún par de corpos se solapa', () => {
     // Barrido, non un caso solto: o solape depende do jitter, e con

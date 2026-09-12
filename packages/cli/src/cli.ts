@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { renderDocumentJsonSchema } from './documentSchema.js'
-import { isAutoLayoutAlgo, layoutDocumentText } from './layoutCmd.js'
+import { AUTO_LAYOUT_ALGOS, isAutoLayoutAlgo, layoutDocumentText } from './layoutCmd.js'
 import { newDocumentJson } from './newDocument.js'
 import { type PlayOptions, renderPlayedDocumentText } from './renderCmd.js'
 import { validateDocumentText } from './validate.js'
@@ -127,9 +127,11 @@ async function cmdLayout(args: readonly string[], io: CliIO): Promise<number> {
   const [out, rest2] = takeOption(rest1, '--out')
   const positional = rest2.filter((a) => !a.startsWith('--'))
   if (algo === undefined || !isAutoLayoutAlgo(algo)) {
-    io.stderr(
-      'ygg layout: falta --algo (radial | tree | layered | clustered-radial | constellation)\n',
-    )
+    // A lista sae do propio rexistro. Escrita a man quedou atrás cando
+    // entrou `mesh`: a axuda de `ygg --help` si o nomeaba e este erro
+    // non, así que quen se equivocaba de algoritmo lía que `mesh` non
+    // existía.
+    io.stderr(`ygg layout: falta --algo (${AUTO_LAYOUT_ALGOS.join(' | ')})\n`)
     return 2
   }
   if (positional.length > 1) {

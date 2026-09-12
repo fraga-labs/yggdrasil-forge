@@ -9,7 +9,9 @@
 // conectados atráense ata quedar á distancia `spacing`.
 //
 // Pasos:
-//   1. Un blob por grupo; o seu raio derívase de cantos nodos ten.
+//   1. Un blob por grupo; o seu raio derívase de cantos nodos ten. Se
+//      NINGÚN nodo está agrupado, un só blob con todo: quen pide
+//      `mesh` quere unha tea, non un anel.
 //   2. O grupo central no medio; o resto nun anel cuxo radio medra ata
 //      que dúas veciñas non se solapen. Logo o central medra para
 //      encher o medio.
@@ -101,6 +103,31 @@ export class MeshLayout implements LayoutEngine {
 
     const radioDe = new Map(treeDef.nodes.map((n) => [n.id, resolveRadius(n)]))
     const blobs = this.buildBlobs(treeDef, cfg.centerGroupId, s)
+    // ── Documento SEN agrupar: unha soa tea ──
+    //
+    // Se ningún nodo ten `group` (nin aparece no `nodeIds` dun grupo),
+    // todos irían ao anel exterior de «soltos» e o resultado sería un
+    // círculo perfecto: un layout inútil, e en silencio. Pasa de
+    // verdade — `lobo-de-inverno` declara tres `GroupDef` pero expresa
+    // a pertenza por `tags`, que é o eixe do TEMA e non o do layout.
+    //
+    // Quen pide `mesh` quere unha tea, así que sen información de
+    // agrupamento faise unha soa: un blob con todo dentro. As arestas
+    // teñen entón algo que tensar, que é o propósito deste motor.
+    if (blobs.every((b) => b.memberIds.length === 0)) {
+      blobs.length = 0
+      const ids = treeDef.nodes.map((n) => n.id)
+      blobs.push({
+        id: '__todo',
+        memberIds: ids,
+        cx: 0,
+        cy: 0,
+        raio: raioPara(
+          ids.map((id) => radioDe.get(id) ?? 0),
+          s,
+        ),
+      })
+    }
     this.colocarBlobs(blobs, gap)
 
     const positions = new Map<string, Position>()

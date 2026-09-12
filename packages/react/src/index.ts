@@ -43,6 +43,7 @@ export {
   glowRadiusOf,
   glowsForState,
 } from './glow.js'
+export { esCorEscura, corLexible, razonDeContraste } from './colorContrast.js'
 export { minimal } from './themes/minimal.js'
 export { minimalDark } from './themes/minimalDark.js'
 

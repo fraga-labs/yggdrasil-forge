@@ -23,6 +23,11 @@ export interface LayoutTextResult {
   readonly error?: string
 }
 
+// Reexportado para que a AXUDA e os ERROS do CLI saian da mesma lista
+// que a validación. Tela escrita a man nun sitio e derivada noutro é
+// como `mesh` acabou fóra da mensaxe de erro.
+export { AUTO_LAYOUT_ALGOS }
+
 export function isAutoLayoutAlgo(value: string): value is AutoLayoutAlgo {
   return (AUTO_LAYOUT_ALGOS as readonly string[]).includes(value)
 }

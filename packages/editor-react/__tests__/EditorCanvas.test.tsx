@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { EditorCanvas } from '../src/canvas/EditorCanvas.js'
 
 // Fixture local pequena (3 nodos, 2 arestas).
-function buildFixtureEngine(): EditorEngine {
+function buildFixtureEngine(theme?: Record<string, unknown>): EditorEngine {
   const tree: TreeDef = {
     id: 'canvas-test',
     schemaVersion: '1.0.0',
@@ -31,6 +31,7 @@ function buildFixtureEngine(): EditorEngine {
   } as TreeDef
   const doc = createEditorDocument(tree, {
     coordinateBounds: { minX: -50, minY: -50, maxX: 250, maxY: 50 },
+    ...(theme !== undefined && { theme: theme as never }),
   })
   return new EditorEngine(doc)
 }
@@ -98,6 +99,35 @@ describe('★ F7.9 — base do tema segundo o chrome (texto + arestas, non só c
     render(<EditorCanvas editorEngine={engine} chromeTheme="light" />)
     const label = screen.getByText('A')
     expect(label.style.fill).toBe('#222222')
+  })
+
+  it('★★ 19.10: se o DOCUMENTO declara un lenzo escuro, manda el sobre o chrome', () => {
+    // Trampa aberta ao engadir `ThemeSpec.background`: o documento xa
+    // pode pedir lenzo escuro, pero a base seguía saíndo do chrome. Un
+    // documento así nun editor en claro daba texto escuro sobre fondo
+    // escuro — invisible. A base existe precisamente para que o texto
+    // se lea sobre o fondo, e agora o fondo pode vir do ficheiro.
+    const engine = buildFixtureEngine({ background: '#14151a' })
+    render(<EditorCanvas editorEngine={engine} chromeTheme="light" />)
+    expect(screen.getByText('A').style.fill).toBe('#e8e9ea')
+  })
+
+  it('★ e ao revés: lenzo CLARO declarado nun chrome escuro dá texto escuro', () => {
+    const engine = buildFixtureEngine({ background: '#fdf6e3' })
+    render(<EditorCanvas editorEngine={engine} chromeTheme="dark" />)
+    expect(screen.getByText('A').style.fill).toBe('#222222')
+  })
+
+  it('o `textColor` do documento segue gañando sobre todo', () => {
+    const engine = buildFixtureEngine({ background: '#14151a', textColor: '#ff00ff' })
+    render(<EditorCanvas editorEngine={engine} chromeTheme="light" />)
+    expect(screen.getByText('A').style.fill).toBe('#ff00ff')
+  })
+
+  it('sen `background` no documento decide o chrome, coma sempre', () => {
+    const engine = buildFixtureEngine({ textColor: undefined })
+    render(<EditorCanvas editorEngine={engine} chromeTheme="dark" />)
+    expect(screen.getByText('A').style.fill).toBe('#e8e9ea')
   })
 
   it('★ as ARESTAS tamén cambian de base en escuro (non só o texto — arranxo de raíz)', () => {

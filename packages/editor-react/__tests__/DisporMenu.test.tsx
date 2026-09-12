@@ -14,7 +14,7 @@ import type { ProbaSession } from '../src/proba/useProbaSession.js'
 
 afterEach(() => cleanup())
 
-function buildEngine(opts?: { senPosicion?: boolean }): EditorEngine {
+function buildEngine(opts?: { senPosicion?: boolean; layout?: TreeDef['layout'] }): EditorEngine {
   const withPos = opts?.senPosicion !== true
   const tree: TreeDef = {
     id: 'dispor-test',
@@ -40,7 +40,7 @@ function buildEngine(opts?: { senPosicion?: boolean }): EditorEngine {
       { id: 'e1', source: 'a', target: 'b', type: 'dependency' },
       { id: 'e2', source: 'a', target: 'c', type: 'dependency' },
     ],
-    layout: { type: 'custom' },
+    layout: opts?.layout ?? { type: 'custom' },
   } as TreeDef
   return new EditorEngine(createEditorDocument(tree))
 }
@@ -132,6 +132,25 @@ describe('7.16 — convite tras importar (≥30% sen posición)', () => {
   it('non aparece se todos os nodos teñen posición', () => {
     render(<EditorCanvas editorEngine={buildEngine()} />)
     expect(screen.queryByText(/sen posición — ¿Dispor\?/)).toBeNull()
+  })
+
+  it('★★ 19.10: NON aparece se o documento declara un layout VIVO', () => {
+    // Un documento con `layout: mesh` non leva coordenadas a propósito
+    // — colócao o motor ao pintar. O convite tapaba o lenzo dicindo que
+    // había nodos «sen posición» cando estaban todos colocados; vísteo
+    // ao abrir o atlas da galería no editor.
+    const engine = buildEngine({
+      senPosicion: true,
+      layout: { type: 'mesh', spacing: 66, seed: 1 } as TreeDef['layout'],
+    })
+    render(<EditorCanvas editorEngine={engine} />)
+    expect(screen.queryByText(/sen posición — ¿Dispor\?/)).toBeNull()
+  })
+
+  it('e SI aparece con `custom`, onde os nodos quedan de verdade sen colocar', () => {
+    const engine = buildEngine({ senPosicion: true })
+    render(<EditorCanvas editorEngine={engine} />)
+    expect(screen.getByText(/sen posición — ¿Dispor\?/)).toBeDefined()
   })
 
   it('o ✕ pecha o convite sen tocar nada', () => {

@@ -123,7 +123,7 @@ O corpo (`nodeFills`) e o anel (`nodeRings`) son independentes a propósito. Un 
 | `escolar` | O único claro: verdes amables, amarelo sol e azul ceo sobre creme, con redonda. Para currículos e itinerarios. |
 | `atlas` | **Mapa denso** (19.10): o único que non é só paleta. Trae `regionShape: 'hull'`, `regionLabel: 'top'`, trazos finos, `labelMinRadius: 40`, marco ornamental nos grandes, iconas apagadas, `background` propio e glow no camiño tomado. Pensado para centos de nodos. |
 
-O `atlas` merece unha nota aparte: é a **receita completa** dun aspecto, non unha paleta, porque o mockup do atlas precisa seis eixes á vez e ningún deles funciona só. E hai dúas cousas que un preset **non pode traer**, porque non son tema senón `tree.layout`: `type: "mesh"` e `curve: "arc"`. Sen esas dúas o aspecto de tea queda a medias — están no [xerador do atlas da galería](https://github.com/fraga-labs/yggdrasil-forge/blob/master/tools/galeria/atlas-fisterra.mjs).
+O `atlas` merece unha nota aparte: é a **receita completa** dun aspecto, non unha paleta, porque o mockup do atlas precisa seis eixes á vez e ningún deles funciona só. E hai dúas cousas que un preset **non pode traer**, porque non son tema senón `tree.layout`: `type: "mesh"` e `curve: "arc"`. Sen esas dúas o aspecto de tea queda a medias — están no [xerador do atlas da galería](https://github.com/fraga-labs/yggdrasil-forge/blob/main/tools/galeria/atlas-fisterra.mjs).
 
 Os catro anteriores (19.0) son os estilos dos **mockups fundacionais** do proxecto e os primeiros que usan `nodeRings`, `edges` e `typography`: copiar un deses specs é a forma máis rápida de que un documento xerado se vexa terminado.
 

@@ -193,26 +193,80 @@ function monotoneChainHull(input: readonly Point[]): Point[] {
   return lower.concat(upper)
 }
 
+/** Expoñente da parametrización: 0.5 = centrípeta. */
+const CATMULL_ALPHA = 0.5
+
 /**
  * Devolve un path SVG `d` pechado e suavizado (Catmull-Rom cúbico) que
  * conecta os vértices en orde, formando un blob orgánico.
+ *
+ * **Parametrización centrípeta** (19.10), non uniforme. A uniforme
+ * calcula a tanxente nun vértice como `(seguinte − anterior) / 2`, e iso
+ * só vale se os lados miden parecido. Os vértices deste blob veñen dun
+ * convex hull sobre puntos mostreados nos círculos dos nodos, así que
+ * hai lados de 10 unidades pegados a lados de 187 — razóns de 12x a 19x
+ * medidas no atlas da galería. Nesas condicións a tanxente hérdaa o lado
+ * LONGO e aplícase no CURTO: o brazo de control chegaba a medir 3,3
+ * veces a corda (63 segmentos deformados dos ~100), e iso vese como
+ * espigas e mordidas na silueta.
+ *
+ * A centrípeta escala cada tanxente co espazado local. Con lados iguais
+ * redúcese termo a termo á fórmula uniforme de antes — regresión cero
+ * por construción, e hai proba.
  */
 function catmullRomClosedPath(verts: readonly Point[]): string {
   const n = verts.length
   if (n === 0) return ''
   const first = verts[0]
   if (first === undefined) return ''
+
+  // Intervalos de nó: a lonxitude de cada lado elevada a `alpha`. O
+  // mínimo evita dividir por cero con dous vértices coincidentes (o
+  // hull pode dalos cando dous nodos se tocan).
+  const t: number[] = []
+  for (let i = 0; i < n; i++) {
+    const a = verts[i]
+    const b = verts[(i + 1) % n]
+    if (a === undefined || b === undefined) {
+      t.push(1)
+      continue
+    }
+    t.push(Math.max(Math.hypot(b.x - a.x, b.y - a.y) ** CATMULL_ALPHA, 1e-6))
+  }
+
+  // Tanxente en cada vértice: media das dúas cordas PESADA polo
+  // espazado do lado oposto. É o que impide que o lado longo mande no
+  // curto.
+  const m: Point[] = []
+  for (let i = 0; i < n; i++) {
+    const pm = verts[(i - 1 + n) % n]
+    const p = verts[i]
+    const pn = verts[(i + 1) % n]
+    const tPrev = t[(i - 1 + n) % n] ?? 1
+    const tNext = t[i] ?? 1
+    if (pm === undefined || p === undefined || pn === undefined) {
+      m.push({ x: 0, y: 0 })
+      continue
+    }
+    const suma = tPrev + tNext
+    m.push({
+      x: (((p.x - pm.x) / tPrev) * tNext + ((pn.x - p.x) / tNext) * tPrev) / suma,
+      y: (((p.y - pm.y) / tPrev) * tNext + ((pn.y - p.y) / tNext) * tPrev) / suma,
+    })
+  }
+
   let d = `M ${first.x} ${first.y}`
   for (let i = 0; i < n; i++) {
     const p0 = verts[i]
     const p1 = verts[(i + 1) % n]
-    const pm = verts[(i - 1 + n) % n]
-    const pn = verts[(i + 2) % n]
-    if (p0 === undefined || p1 === undefined || pm === undefined || pn === undefined) continue
-    const c1x = p0.x + (p1.x - pm.x) / 6
-    const c1y = p0.y + (p1.y - pm.y) / 6
-    const c2x = p1.x - (pn.x - p0.x) / 6
-    const c2y = p1.y - (pn.y - p0.y) / 6
+    const m0 = m[i]
+    const m1 = m[(i + 1) % n]
+    const dt = t[i] ?? 1
+    if (p0 === undefined || p1 === undefined || m0 === undefined || m1 === undefined) continue
+    const c1x = p0.x + (m0.x * dt) / 3
+    const c1y = p0.y + (m0.y * dt) / 3
+    const c2x = p1.x - (m1.x * dt) / 3
+    const c2y = p1.y - (m1.y * dt) / 3
     d += ` C ${c1x} ${c1y} ${c2x} ${c2y} ${p1.x} ${p1.y}`
   }
   d += ' Z'

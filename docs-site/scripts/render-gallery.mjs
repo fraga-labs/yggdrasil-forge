@@ -86,6 +86,12 @@ for (const file of files) {
   // sobre branco (informe do dono na portada 1.0).
   const textColor = doc.editor?.theme?.textColor
   const wantsDarkGround = typeof textColor === 'string' && isLightColor(textColor)
+  // Minimapa nas árbores GRANDES. Non é dato do documento: é mobiliario
+  // do visor, así que decídeo quen renderiza. A partir de ~50 nodos a
+  // ficha xa non cabe dun ollo e o minimapa dá o mapa do mapa — é o que
+  // fan os dous mockups fundacionais que o levan. Nas árbores pequenas
+  // sería un adorno que rouba espazo.
+  const minimapa = tree.nodes.length >= 50 ? ['--minimap'] : []
   for (const [suffix, extra] of [
     ['.svg', wantsDarkGround ? ['--dark'] : []],
     ['.dark.svg', ['--dark']],
@@ -94,7 +100,7 @@ for (const file of files) {
     // Falla con stack se o render non sae: é o gate.
     execFileSync(
       process.execPath,
-      [cliBin, 'render', src, '--out', out, ...extra, ...playFlags(id)],
+      [cliBin, 'render', src, '--out', out, ...extra, ...minimapa, ...playFlags(id)],
       {
         stdio: ['ignore', 'ignore', 'inherit'],
       },
@@ -113,7 +119,8 @@ for (const file of files) {
     dark: `gallery/${id}.dark.svg`,
   })
   const xogada = showcase[id] !== undefined ? ' · xogada' : ''
-  console.log(`render-gallery: ${id} (${tree.nodes.length} nodos) → claro + escuro${xogada}`)
+  const mini = minimapa.length > 0 ? ' · minimapa' : ''
+  console.log(`render-gallery: ${id} (${tree.nodes.length} nodos) → claro + escuro${xogada}${mini}`)
 }
 writeFileSync(join(dataDir, 'gallery.json'), `${JSON.stringify(entries, null, 2)}\n`, 'utf8')
 console.log(`render-gallery: ${entries.length} documentos, src/data/gallery.json escrito`)

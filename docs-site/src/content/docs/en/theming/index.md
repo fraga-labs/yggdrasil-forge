@@ -123,7 +123,7 @@ Body (`nodeFills`) and ring (`nodeRings`) are independent on purpose. A theme ca
 | `escolar` | The only light one: friendly greens, sunny yellow and sky blue over cream, rounded type. For curricula and learning paths. |
 | `atlas` | **Dense map** (19.10): the only one that is not just a palette. Brings `regionShape: 'hull'`, `regionLabel: 'top'`, thin strokes, `labelMinRadius: 40`, an ornate frame on the big nodes, dimmed icons, its own `background` and a glow on the path you took. Built for hundreds of nodes. |
 
-`atlas` deserves its own note: it is the **complete recipe** for a look, not a palette, because the atlas mockup needs six axes at once and none of them works alone. And two things a preset **cannot** carry, because they are not theme but `tree.layout`: `type: "mesh"` and `curve: "arc"`. Without those two the web look stays half-done — they live in the [gallery atlas generator](https://github.com/fraga-labs/yggdrasil-forge/blob/master/tools/galeria/atlas-fisterra.mjs).
+`atlas` deserves its own note: it is the **complete recipe** for a look, not a palette, because the atlas mockup needs six axes at once and none of them works alone. And two things a preset **cannot** carry, because they are not theme but `tree.layout`: `type: "mesh"` and `curve: "arc"`. Without those two the web look stays half-done — they live in the [gallery atlas generator](https://github.com/fraga-labs/yggdrasil-forge/blob/main/tools/galeria/atlas-fisterra.mjs).
 
 The previous four (19.0) are the project's **founding mockup** styles and the first to use `nodeRings`, `edges` and `typography`: copying one of those specs is the fastest way to make a generated document look finished.
 

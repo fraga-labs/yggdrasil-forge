@@ -165,4 +165,137 @@ describe('SkillRegions render con regionShape', () => {
     expect(region?.querySelector('path')).toBeNull()
   })
 })
+// ── 19.10: a silueta non fai espigas ──
+//
+// Os vértices deste blob veñen dun convex hull sobre puntos mostreados
+// nos CÍRCULOS dos nodos, así que están moi desigualmente espazados:
+// medido no atlas da galería, lados de 10 unidades pegados a lados de
+// 187 (razóns de 12x a 19x). Coa parametrización uniforme a tanxente
+// hérdaa o lado longo e aplícase no curto, e o brazo de control chegaba
+// a medir 3,3 veces a corda: iso vese como esquinas e mordidas na
+// silueta. Estes dous tests fixan a cura (centrípeta) e o seu prezo
+// (ningún: coa mostraxe uniforme dá exactamente o mesmo path).
+
+interface Punto {
+  readonly x: number
+  readonly y: number
+}
+interface Segmento {
+  readonly p0: Punto
+  readonly c1: Punto
+  readonly c2: Punto
+  readonly p1: Punto
+}
+
+/** Parsea o `d` (só M + C…) en segmentos de Bézier cúbica. */
+function segmentos(d: string): Segmento[] {
+  const nums = (d.match(/-?\d+(\.\d+)?(e-?\d+)?/g) ?? []).map(Number)
+  const out: Segmento[] = []
+  let p0: Punto = { x: nums[0] ?? 0, y: nums[1] ?? 0 }
+  for (let i = 2; i + 5 < nums.length; i += 6) {
+    const p1 = { x: nums[i + 4] ?? 0, y: nums[i + 5] ?? 0 }
+    out.push({
+      p0,
+      c1: { x: nums[i] ?? 0, y: nums[i + 1] ?? 0 },
+      c2: { x: nums[i + 2] ?? 0, y: nums[i + 3] ?? 0 },
+      p1,
+    })
+    p0 = p1
+  }
+  return out
+}
+
+const dist = (a: Punto, b: Punto): number => Math.hypot(a.x - b.x, a.y - b.y)
+
+describe('★ 19.10 — a silueta do blob non fai espigas', () => {
+  /** Un nodo grande e tres pequenos lonxe: espazado de vértices moi desigual. */
+  const desigual = (): { d: string } => {
+    const nodes: NodeDef[] = [
+      { id: 'g', type: 'ascendancy', label: 'g', tags: ['t'], size: 44 } as NodeDef,
+      { id: 'a', type: 'small', label: 'a', tags: ['t'], size: 15 } as NodeDef,
+      { id: 'b', type: 'small', label: 'b', tags: ['t'], size: 15 } as NodeDef,
+      { id: 'c', type: 'small', label: 'c', tags: ['t'], size: 15 } as NodeDef,
+    ]
+    const d = computeRegionHullPath(
+      't',
+      nodes,
+      pos([
+        ['g', 0, 0],
+        ['a', 240, 20],
+        ['b', 120, 210],
+        ['c', -200, 150],
+      ]),
+      32,
+    )
+    if (d === null) throw new Error('sen path')
+    return { d }
+  }
+
+  it('o caso de proba é de verdade desigual (senón non probaría nada)', () => {
+    const segs = segmentos(desigual().d)
+    const lados = segs.map((s) => dist(s.p0, s.p1))
+    const razon = Math.max(...lados) / Math.min(...lados)
+    expect(razon).toBeGreaterThan(5)
+  })
+
+  it('★★ ningún brazo de control supera a súa corda', () => {
+    // Brazo > corda é literalmente unha espiga: o control sae máis alá
+    // do vértice seguinte. O san é ⅓ da corda. Coa parametrización
+    // uniforme este mesmo caso dá razóns por riba de 2.
+    const segs = segmentos(desigual().d)
+    const peor = Math.max(
+      ...segs.map(
+        (s) => Math.max(dist(s.c1, s.p0), dist(s.c2, s.p1)) / Math.max(dist(s.p0, s.p1), 1e-9),
+      ),
+    )
+    expect(peor).toBeLessThan(1)
+  })
+
+  it('★★ cun só nodo (mostraxe uniforme) o path é EXACTAMENTE o da fórmula uniforme', () => {
+    // O hull dun nodo só son os puntos mostreados no seu círculo:
+    // perfectamente equiespazados. Aí a centrípeta ten que reducirse
+    // termo a termo a `p + (seguinte − anterior) / 6`, que era a
+    // fórmula anterior. Isto é o que garante regresión cero.
+    const nodes: NodeDef[] = [
+      { id: 'u', type: 'notable', label: 'u', tags: ['t'], size: 30 } as NodeDef,
+    ]
+    const d = computeRegionHullPath('t', nodes, pos([['u', 10, 20]]), 24)
+    if (d === null) throw new Error('sen path')
+    const segs = segmentos(d)
+    const verts = segs.map((s) => s.p0)
+    const n = verts.length
+    expect(n).toBeGreaterThanOrEqual(8)
+    for (let i = 0; i < n; i++) {
+      const p0 = verts[i]
+      const p1 = verts[(i + 1) % n]
+      const pm = verts[(i - 1 + n) % n]
+      const pn = verts[(i + 2) % n]
+      const seg = segs[i]
+      if (p0 === undefined || p1 === undefined || pm === undefined || pn === undefined) continue
+      if (seg === undefined) continue
+      expect(seg.c1.x).toBeCloseTo(p0.x + (p1.x - pm.x) / 6, 6)
+      expect(seg.c1.y).toBeCloseTo(p0.y + (p1.y - pm.y) / 6, 6)
+      expect(seg.c2.x).toBeCloseTo(p1.x - (pn.x - p0.x) / 6, 6)
+      expect(seg.c2.y).toBeCloseTo(p1.y - (pn.y - p0.y) / 6, 6)
+    }
+  })
+
+  it('dous nodos coincidentes non petan nin dan NaN (lado de lonxitude cero)', () => {
+    const nodes: NodeDef[] = [
+      { id: 'a', type: 'small', label: 'a', tags: ['t'], size: 20 } as NodeDef,
+      { id: 'b', type: 'small', label: 'b', tags: ['t'], size: 20 } as NodeDef,
+    ]
+    const d = computeRegionHullPath(
+      't',
+      nodes,
+      pos([
+        ['a', 0, 0],
+        ['b', 0, 0],
+      ]),
+      16,
+    )
+    expect(d).not.toBeNull()
+    expect(d).not.toContain('NaN')
+  })
+})
 // ── FIN: tests regionShape='hull' ──

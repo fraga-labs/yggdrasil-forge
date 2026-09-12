@@ -89,6 +89,18 @@ export function Minimap({
   const rW = visW * escala
   const rH = visH * escala
 
+  // Rectángulo recortado ao marco.
+  const rx = Math.max(mmX, r0.x)
+  const ry = Math.max(mmY, r0.y)
+  const rw = Math.min(rW, mmX + mmW - rx)
+  const rh = Math.min(rH, mmY + mmH - ry)
+  // **Se se ve TODO, non se pinta.** Un rectángulo que coincide co
+  // marco non informa de nada e lese como un bordo branco groso: é o
+  // que se vía en cada ficha da galería, porque un `ygg render` sempre
+  // sae a zoom 1 e encadrado. O rectángulo é para dicir «estás aquí», e
+  // iso só ten sentido cando hai un «alí».
+  const veseTodo = rw >= mmW * 0.99 && rh >= mmH * 0.99
+
   const cor = theme?.colors.text ?? '#888888'
   const fondo = theme?.colors.surface ?? theme?.colors.background ?? '#000000'
 
@@ -153,18 +165,20 @@ export function Minimap({
       </g>
       {/* O rectángulo do que se ve. Recórtase ao marco para que, cando o
           zoom é menor que o encadre, non se escape do minimapa. */}
-      <rect
-        x={Math.max(mmX, r0.x)}
-        y={Math.max(mmY, r0.y)}
-        width={Math.min(rW, mmX + mmW - Math.max(mmX, r0.x))}
-        height={Math.min(rH, mmY + mmH - Math.max(mmY, r0.y))}
-        fill="none"
-        stroke={cor}
-        strokeOpacity={0.85}
-        strokeWidth={Math.max(0.8, mmW * 0.008)}
-        pointerEvents="none"
-        data-testid="minimap-viewport"
-      />
+      {!veseTodo && (
+        <rect
+          x={rx}
+          y={ry}
+          width={rw}
+          height={rh}
+          fill="none"
+          stroke={cor}
+          strokeOpacity={0.85}
+          strokeWidth={Math.max(0.8, mmW * 0.008)}
+          pointerEvents="none"
+          data-testid="minimap-viewport"
+        />
+      )}
     </g>
   )
 }

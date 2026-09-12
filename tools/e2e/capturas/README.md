@@ -14,7 +14,17 @@ corepack pnpm run capturas
 
 ## Regras
 
-- **Determinista**: cada escena arranca limpa (`localStorage.clear()`), documento de partida fixo (o panadeiro da galería ou un doc novo). Nunca estado residual.
+- **Determinista no CONTIDO**, non no píxel: cada escena arranca limpa
+  (`localStorage.clear()`) e cun documento de partida fixo (o panadeiro da
+  galería ou un doc novo), así que nunca hai estado residual. Pero o
+  antialiasing do texto varía entre execucións: medido, unha pasada sen
+  cambio ningún move ~14.000 píxeles de `01-editor.png` sen que se vexa
+  nada distinto. **Se o único que cambia é iso, descarta a captura** en vez
+  de commitear ruído binario:
+
+  ```bash
+  git restore docs-site/src/assets/capturas/01-editor.png
+  ```
 - **Recorte intelixente**: cada PNG ensina UN concepto — elemento ou zona, non sempre pantalla enteira.
 - **Nomes estables**: `01-editor.png` … `14-problemas.png`. A guía referencia estes nomes; non os cambies sen tocar a guía (gl **e** en — comparten imaxes).
 - **Frescura**: rexenerar antes de cada release (regra no checklist do ROADMAP). Capturas rancias son documentación mentindo.

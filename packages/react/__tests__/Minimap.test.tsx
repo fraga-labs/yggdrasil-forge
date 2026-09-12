@@ -83,11 +83,15 @@ describe('Minimap — o marco e os puntos', () => {
 })
 
 describe('★ Minimap — o rectángulo ten que DICIR A VERDADE', () => {
-  it('★★ sen zoom vese todo: o rectángulo enche o marco', () => {
-    const { container } = pinta()
-    const marco = container.querySelector('.yf-minimap rect')
-    const r = rect(container)
-    expect(Number(r?.getAttribute('width'))).toBeCloseTo(Number(marco?.getAttribute('width')), 1)
+  it('★★ 19.10: se se ve TODO, non se pinta rectángulo', () => {
+    // Un rectángulo que coincide co marco non informa de nada e lese
+    // como un bordo branco groso. Víase en cada ficha da galería,
+    // porque un `ygg render` sempre sae a zoom 1 e encadrado.
+    expect(rect(pinta().container)).toBeNull()
+  })
+
+  it('★ en canto hai zoom, o rectángulo aparece', () => {
+    expect(rect(pinta({ viewport: { panX: 0, panY: 0, zoom: 2 } }).container)).not.toBeNull()
   })
 
   it('★★ ao dobrar o zoom, o rectángulo mide a METADE', () => {
@@ -103,8 +107,11 @@ describe('★ Minimap — o rectángulo ten que DICIR A VERDADE', () => {
     )
   })
 
-  it('★ o rectángulo recórtase ao marco: cun zoom menor que o encadre non se escapa', () => {
-    const { container } = pinta({ viewport: { panX: 0, panY: 0, zoom: 0.3 } })
+  it('★ o rectángulo recórtase ao marco: cun pan fóra do mapa non se escapa', () => {
+    // Con zoom 2 vese a metade (logo hai rectángulo) e cun pan grande a
+    // xanela sae polo bordo esquerdo do documento: o rectángulo ten que
+    // quedar dentro do marco, non medio fóra.
+    const { container } = pinta({ viewport: { panX: 900, panY: 0, zoom: 2 } })
     const marco = container.querySelector('.yf-minimap rect')
     const r = rect(container)
     const mmX = Number(marco?.getAttribute('x'))

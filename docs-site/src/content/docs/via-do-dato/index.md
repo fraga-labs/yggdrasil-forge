@@ -49,7 +49,7 @@ As fichas da galería deste sitio xéranse así; os guións viven en [`examples/
 | `gaia-cards.json` | O patrón para a **vista de tarxetas** e o escaparate da **estética por declaración**: 12 iconas `logic-*` e preset `neon`. |
 | `adversarial.json` | O caso incómodo (nodos sen posición, referencias límite) para probar robustez. |
 | `escola-de-gaita.json`, `congoxa-netrunner.json` | Dous temas máis (educativo e cyberpunk) para variedade de few-shot. |
-| `atlas-de-fisterra.json` | O exemplo de **escala**: 97 nodos en 6 comarcas, SEN posicións nin encadre no ficheiro — colócao o motor con `clustered-radial`. Un xerador non ten por que saber xeometría. |
+| `atlas-de-fisterra.json` | O exemplo de **escala**: 97 nodos e 174 arestas en 6 comarcas, SEN posicións nin encadre no ficheiro — colócao o motor con `mesh`, o único layout que le as arestas. Cada comarca é unha TEA pechada (anel, cordas e claves en lados opostos), e o ficheiro sae dun xerador reproducible. Un xerador non ten por que saber xeometría. |
 | `a-vixilia.json` | O escaparate gótico: preset con nome copiado enteiro, `nodeRings`/`edges`/`typography` como dato, grupo `none` puro, `exclusions` con peso narrativo e `resource_min` nunha árbore de verdade. |
 
 Todos renderizados en [Exemplos](../exemplos/galeria/). README detallado (en inglés, para audiencia externa): [`examples/gallery/README.md`](https://github.com/fraga-labs/yggdrasil-forge/blob/main/examples/gallery/README.md).

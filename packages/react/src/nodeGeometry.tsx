@@ -5,9 +5,12 @@
 // Sen hooks → sen `'use client'`. Devolve JSX → .tsx.
 
 import type { NodeDef, NodeShape, NodeType } from '@yggdrasil-forge/core'
+// O radio vive en `core` desde 19.10 (os layouts precísano para
+// reservar sitio) e reexpórtase aquí para que os consumidores de
+// `nodeGeometry` non teñan que saber onde mudou.
+export { FALLBACK_RADIUS, DEFAULT_RADIUS_BY_TYPE, resolveRadius } from '@yggdrasil-forge/core'
 import type { CSSProperties, JSX } from 'react'
 
-export const FALLBACK_RADIUS = 24
 export const SHAPE_CLASS = 'yf-skill-node__shape'
 /**
  * Clase do MARCO exterior (19.8). Distinta da do shape a propósito: o
@@ -31,26 +34,8 @@ const DEFAULT_SHAPE_BY_TYPE: Readonly<Record<NodeType, NodeShape>> = {
   custom: 'circle',
 }
 
-const DEFAULT_RADIUS_BY_TYPE: Readonly<Record<NodeType, number>> = {
-  root: 40,
-  small: 16,
-  notable: 26,
-  keystone: 34,
-  mastery: 30,
-  ascendancy: 32,
-  cluster: 22,
-  gateway: 26,
-  milestone: 24,
-  subtree_anchor: 28,
-  custom: 24,
-}
-
 export function resolveShape(node: NodeDef): NodeShape {
   return node.shape ?? DEFAULT_SHAPE_BY_TYPE[node.type] ?? 'circle'
-}
-
-export function resolveRadius(node: NodeDef): number {
-  return node.size ?? DEFAULT_RADIUS_BY_TYPE[node.type] ?? FALLBACK_RADIUS
 }
 
 /** Puntos dun polígono regular de `sides` lados, raio `r`, rotación en graos. */

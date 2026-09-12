@@ -55,7 +55,40 @@ describe('★ 19.8 — o nome da comarca', () => {
     expect(Number(t?.getAttribute('y'))).toBeCloseTo(150, 0)
   })
 
-  it('★ `center` pinta co color da COMARCA e máis grande: é rótulo de mapa', () => {
+  it('★ 19.10: `top` tamén leva a COR DA COMARCA e escala co mapa', () => {
+    // Antes ía sempre a 13 px e na cor do texto. Nun atlas de 1.100
+    // unidades iso é unha etiqueta de UI perdida, e non dicía de que
+    // comarca era. No mockup cada nome vai tinguido coma a súa terra.
+    const t = rexions().container.querySelector<SVGElement>('.yf-skill-regions text')
+    expect(t?.style.fill).toBe('#4a7fa8')
+    // Bbox: 400 de ancho + 2×(16 de radio + 32 de padding) = 496.
+    // 496 × 0.05 = 24,8, que topa no máximo de 24 — un nome de comarca
+    // non debe competir co título do mapa.
+    expect(Number.parseFloat(t?.style.fontSize ?? '0')).toBe(24)
+  })
+
+  it('★ 19.10: nun documento pequeno o tamaño non cambia (clamp inferior de 13)', () => {
+    const { container } = render(
+      <ThemeProvider theme={minimalDark}>
+        <svg role="img" aria-label="proba">
+          <SkillRegions
+            regions={[REXION]}
+            nodes={NODOS}
+            nodePositions={
+              new Map([
+                ['a', { x: 0, y: 0 }],
+                ['b', { x: 40, y: 30 }],
+              ])
+            }
+          />
+        </svg>
+      </ThemeProvider>,
+    )
+    const t = container.querySelector<SVGElement>('.yf-skill-regions text')
+    expect(Number.parseFloat(t?.style.fontSize ?? '0')).toBe(13)
+  })
+
+  it('★ `center` pinta máis grande que `top`: é rótulo de mapa, non etiqueta', () => {
     const arriba = rexions().container.querySelector<SVGElement>('.yf-skill-regions text')
     const medio = rexions('center').container.querySelector<SVGElement>('.yf-skill-regions text')
     expect(medio?.style.fill).toBe('#4a7fa8')

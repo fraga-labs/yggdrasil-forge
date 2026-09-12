@@ -418,9 +418,26 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
     return ids
   }, [engine, treeDef, state])
 
+  // ── 19.10: os nodos GRANDES pintan enriba ──
+  //
+  // En SVG non hai z-index: manda a orde do documento. Coa orde do
+  // ficheiro, un nodo pequeno emitido despois tápalle o RÓTULO a un
+  // grande emitido antes — vísteo no atlas, con «Mestre de Ribeira»
+  // cortado por dous smalls.
+  //
+  // A regra é «o fito pinta enriba»: ordénase por radio ascendente, así
+  // que os grandes (que son, pola regra de `labelMinRadius`, xustamente
+  // os que levan texto) quedan ao final. `sort` de V8 é estable, así que
+  // entre iguais consérvase a orde do documento e o render segue sendo
+  // determinista.
+  const nodosPintados = useMemo(
+    () => [...treeDef.nodes].sort((a, b) => resolveRadius(a) - resolveRadius(b)),
+    [treeDef],
+  )
+
   const nodeElements = useMemo(
     () =>
-      treeDef.nodes.map((node) => {
+      nodosPintados.map((node) => {
         const position = nodePositions.get(node.id)
         /* v8 ignore next 1 -- defensivo: computeLayout produce posicións para tódolos treeDef.nodes */
         if (position === undefined) return null
@@ -441,7 +458,7 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
         )
       }),
     [
-      treeDef,
+      nodosPintados,
       nodePositions,
       state,
       onNodeClick,

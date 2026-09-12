@@ -14,7 +14,7 @@ import { THEME_PRESETS, getThemePreset } from '../src/document/themePresets.js'
 const NODE_STATES = ['locked', 'unlockable', 'unlocked', 'maxed', 'inProgress'] as const
 
 describe('THEME_PRESETS — rexistro (7.19)', () => {
-  it('contén exactamente 9 presets cos ids esperados, en orde', () => {
+  it('contén exactamente 10 presets cos ids esperados, en orde', () => {
     expect(THEME_PRESETS.map((p) => p.id)).toEqual([
       'tintado',
       'neutro',
@@ -25,6 +25,7 @@ describe('THEME_PRESETS — rexistro (7.19)', () => {
       'gotico',
       'sci-fi',
       'escolar',
+      'atlas',
     ])
   })
 
@@ -83,7 +84,7 @@ describe('THEME_PRESETS — rexistro (7.19)', () => {
   })
 
   // ── 19.0 ──
-  const PRESETS_MOCKUP = ['forxa', 'gotico', 'sci-fi', 'escolar'] as const
+  const PRESETS_MOCKUP = ['forxa', 'gotico', 'sci-fi', 'escolar', 'atlas'] as const
 
   it('★ os presets dos mockups exercen os TRES eixes novos (anel, aresta, fonte)', () => {
     for (const id of PRESETS_MOCKUP) {

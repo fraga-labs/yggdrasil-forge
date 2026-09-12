@@ -49,6 +49,10 @@ export function themeOverridesFromSpec(
     ...(edges?.active !== undefined && { edgeActive: edges.active }),
     // 19.4 — cor propia das iconas (sen ela, @react cae a `text`).
     ...(spec?.iconColor !== undefined && { icon: spec.iconColor }),
+    // 19.10 — cor do lenzo. `SVGRenderer` xa a le (fondo inline do
+    // `<svg>`) e `standaloneSvg` tamén; o que faltaba era que o
+    // DOCUMENTO puidese declarala.
+    ...(spec?.background !== undefined && { background: spec.background }),
   }
 }
 

@@ -168,6 +168,22 @@ export interface ThemeSpec {
    */
   readonly textColor?: string
   /**
+   * Cor do LENZO (19.10). `ThemeColors.background`, que `SVGRenderer`
+   * aplica como fondo inline do `<svg>` e que `standaloneSvg` usa no
+   * export.
+   *
+   * **Por que faltaba e por que importa**: o documento xa sabía levar
+   * recheos, aneis, arestas, tipografía, tamaños, glow e tintes de
+   * comarca... pero non a cor do seu propio fondo. Iso deixaba o
+   * aspecto a medias fóra do editor: `ygg render` pintaba branco ou o
+   * escuro por defecto segundo o flag `--dark`, non segundo o ficheiro.
+   * Un tema gótico nun fondo branco non é o tema gótico.
+   *
+   * Sen definir, mándao o consumidor (o chrome do editor; no CLI, o
+   * `--dark`), igual que antes.
+   */
+  readonly background?: string
+  /**
    * Tintes de rexión. A CREACIÓN de rexións é doutra ferramenta
    * futura. Aquí só se define o tinte por rexión existente.
    */

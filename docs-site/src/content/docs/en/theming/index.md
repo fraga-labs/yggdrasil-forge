@@ -77,6 +77,7 @@ colors: {
     "edges": { "color": "#3c4636", "active": "#b08d3e" },
     "typography": { "fontFamily": "Cinzel, serif", "fontWeight": 600, "letterSpacing": "0.08em", "textTransform": "uppercase" },
     "textColor": "#f4efdf",
+    "background": "#14151a",
     "regions": [{ "id": "r1", "label": "Breath", "tag": "breath", "color": "#c8875f" }]
   }
 }
@@ -87,14 +88,18 @@ colors: {
 - `edges` — `color` for the lines and `active` for **lit** ones (those leaving an `unlocked`/`maxed` node). Without `active`, lit edges fall back to `color`.
 - `typography` — `fontFamily` (always with a generic fallback), `fontWeight`, `letterSpacing`, `textTransform`. **Type is identity, not decoration**: a gothic document and a sci-fi one are not told apart by color alone.
 - `textColor` — node text and icons, and region labels. Without it, the editor picks a legible one for its chrome.
+- `background` — the **canvas** color (19.10). `SVGRenderer` applies it as the inline background of the `<svg>`, and the standalone export uses it too. **Without it the look is only half-done outside the editor**: `ygg render` painted white or the default dark depending on the `--dark` flag rather than on the file, and a gothic theme on a white page is not the gothic theme.
 - `regions` — **tints by tag**: nodes carrying that `tag` get a colored background (low opacity) and a region label.
-- `regionLabel` — where the **region name** goes (19.8): `'top'` hugging the edge (the old behaviour) or `'center'`, floating in the middle, large and in the region's own color. It sits behind the nodes, so it never covers them.
+- `regionLabel` — where the **region name** goes (19.8): `'top'` at the top edge (the old behaviour; since 19.10 in the region's own color and scaled with the map, like the atlas mockup) or `'center'`, floating in the middle and larger. Both sit behind the nodes. **On a dense map pick `'top'`**: a mesh fills the whole blob, so a centered name comes out chopped up by nodes.
+- `sizes.labelMinRadius` — minimum radius to carry **painted text**. This is the legibility tool at scale: a three-word name is about 157 viewBox units wide and an atlas has spacings around 60, so past a certain density labels cannot sit beside their nodes however far the layout separates them. Raising it leaves text on the landmarks only; the full name stays in the document (tooltip, `aria-label`, editor).
 - `sizes.ornateMinRadius` — minimum node radius that earns an **ornate frame**: a second concentric ring outside the body. In the mockups only the big nodes carry it, and it is what makes them read as important without more color.
 - `glow` — the **glow effect** (19.7): `radius` (blur, in layout units), `states` (which ones glow; defaults to the three live ones: `unlockable`, `unlocked`, `maxed`) and `edges` (whether lit edges glow too). Without `glow` the filter **is not even emitted**: zero cost.
 - `preset` — **informational**: which preset it started from (the UI marks the active chip). It does not affect rendering by itself: applying a preset means copying its full spec.
 
 :::caution[The glow is not free]
-A glow is not painted: it is **filtered**. Every filtered element costs the browser its own rasterization pass, so in an atlas of hundreds of nodes prefer narrowing `glow.states` to `['maxed']` instead of lighting all three. `radius` 2-4 gives a discreet halo; 6-10, the mockups' bloom.
+A glow is not painted: it is **filtered**. Every filtered element costs the browser its own rasterization pass, so in an atlas of hundreds of nodes prefer narrowing `glow.states` instead of lighting all three. The `atlas` preset lights **the path you took** (`['unlocked', 'maxed']`) and leaves out `unlockable`, which is the entire frontier: in a 97-node picture that is 29 halos saying nothing. `radius` 2-4 gives a discreet halo; 6-10, the mockups' bloom.
+
+Mind one detail you only see by playing: a **single-tier node without `maxTier`** never reaches `maxed` — the engine leaves it `unlocked`. A `glow.states: ['maxed']` on such a document lights nothing at all.
 :::
 
 :::note[Two layers, two axes]
@@ -116,8 +121,11 @@ Body (`nodeFills`) and ring (`nodeRings`) are independent on purpose. A theme ca
 | `gotico` | Blackened iron, crimson and brass; heavy uppercase serif; edges like dried blood veins. |
 | `sci-fi` | Holographic matrix: near-black body with all the neon in the thin ring (cyan → magenta), wide-tracked labels. |
 | `escolar` | The only light one: friendly greens, sunny yellow and sky blue over cream, rounded type. For curricula and learning paths. |
+| `atlas` | **Dense map** (19.10): the only one that is not just a palette. Brings `regionShape: 'hull'`, `regionLabel: 'top'`, thin strokes, `labelMinRadius: 40`, an ornate frame on the big nodes, dimmed icons, its own `background` and a glow on the path you took. Built for hundreds of nodes. |
 
-The last four (19.0) are the project's **founding mockup** styles and the first to use `nodeRings`, `edges` and `typography`: copying one of those specs is the fastest way to make a generated document look finished.
+`atlas` deserves its own note: it is the **complete recipe** for a look, not a palette, because the atlas mockup needs six axes at once and none of them works alone. And two things a preset **cannot** carry, because they are not theme but `tree.layout`: `type: "mesh"` and `curve: "arc"`. Without those two the web look stays half-done — they live in the [gallery atlas generator](https://github.com/fraga-labs/yggdrasil-forge/blob/master/tools/galeria/atlas-fisterra.mjs).
+
+The previous four (19.0) are the project's **founding mockup** styles and the first to use `nodeRings`, `edges` and `typography`: copying one of those specs is the fastest way to make a generated document look finished.
 
 :::caution[Fonts are not bundled]
 The named families (Cinzel, Orbitron, Nunito…) do not ship with the package. Every stack ends in a real generic (`serif`/`sans-serif`), so a consumer without them sees the fallback — never a failure. If you want the real thing, load it on your own page.

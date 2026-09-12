@@ -77,6 +77,7 @@ colors: {
     "edges": { "color": "#3c4636", "active": "#b08d3e" },
     "typography": { "fontFamily": "Cinzel, serif", "fontWeight": 600, "letterSpacing": "0.08em", "textTransform": "uppercase" },
     "textColor": "#f4efdf",
+    "background": "#14151a",
     "regions": [{ "id": "r1", "label": "Sopro", "tag": "sopro", "color": "#c8875f" }]
   }
 }
@@ -87,14 +88,18 @@ colors: {
 - `edges` — `color` para as liñas e `active` para as **acesas** (as que saen dun nodo `unlocked`/`maxed`). Sen `active`, as acesas caen a `color`.
 - `typography` — `fontFamily` (con fallback xenérico sempre), `fontWeight`, `letterSpacing`, `textTransform`. **A fonte é identidade, non adorno**: un documento gótico e un sci-fi non se distinguen só polas cores.
 - `textColor` — texto e iconas dos nodos e etiquetas de rexión. Sen el, o editor escolle un lexible segundo o seu chrome.
+- `background` — cor do **lenzo** (19.10). `SVGRenderer` aplícaa como fondo inline do `<svg>` e o export autocontido úsaa tamén. **Sen ela o aspecto queda a medias fóra do editor**: `ygg render` pintaba branco ou o escuro por defecto segundo o flag `--dark`, non segundo o ficheiro, e un tema gótico nun fondo branco non é o tema gótico.
 - `regions` — **tintes por tag**: os nodos con ese `tag` levan un fondo de cor (con opacidade baixa) e unha etiqueta de rexión.
-- `regionLabel` — onde vai o **nome da rexión** (19.8): `'top'` pegado ao bordo (o de sempre) ou `'center'` flotando no medio, grande e coa cor da propia rexión. Vai debaixo dos nodos, así que non tapa.
+- `regionLabel` — onde vai o **nome da rexión** (19.8): `'top'` no bordo de arriba (o de sempre; desde 19.10 coa cor da comarca e escalado co mapa, como no mockup do atlas) ou `'center'` flotando no medio, máis grande. Os dous van debaixo dos nodos. **Nun mapa denso escolle `'top'`**: unha malla enche o blob enteiro e un nome centrado sae cortado polos nodos.
+- `sizes.labelMinRadius` — raio mínimo para levar **texto pintado**. É a ferramenta de lexibilidade a escala: un nome de tres palabras ocupa uns 157 unidades de viewBox e un atlas ten espazados de 60, así que a partir de certa densidade os rótulos non caben ao lado dos nodos por moito que o layout os separe. Subilo deixa o texto só nos fitos; o nome completo segue no documento (tooltip, `aria-label`, editor).
 - `sizes.ornateMinRadius` — raio mínimo para levar **marco ornamental**: un segundo anel concéntrico por fóra. Nos mockups só o levan os nodos grandes, e é o que os fai ler como importantes sen máis cor.
 - `glow` — **resplandor** (19.7): `radius` (o desenfoque, en unidades de layout), `states` (cales brillan; por defecto os tres vivos: `unlockable`, `unlocked`, `maxed`) e `edges` (se as arestas acesas brillan tamén). Sen `glow` **nin se emite o filtro**: cero custo.
 - `preset` — **informativo**: de que preset partiu (a UI marca a ficha activa). Non afecta ao render por si só: aplicar un preset é copiar o seu spec completo.
 
 :::caution[O resplandor cóbrase]
-Un glow non se pinta: **fíltrase**. Cada elemento filtrado custa ao navegador unha pasada de rasterización aparte, así que nun atlas de centos de nodos convén reducir `glow.states` a `['maxed']` en vez de acender os tres. `radius` 2-4 dá un halo discreto; 6-10, o bloom dos mockups.
+Un glow non se pinta: **fíltrase**. Cada elemento filtrado custa ao navegador unha pasada de rasterización aparte, así que nun atlas de centos de nodos convén restrinxir `glow.states` en vez de acender os tres. O `atlas` acende **o camiño tomado** (`['unlocked', 'maxed']`) e deixa fóra `unlockable`, que é a fronteira enteira: nunha foto de 97 nodos iso son 29 halos que non din nada. `radius` 2-4 dá un halo discreto; 6-10, o bloom dos mockups.
+
+Coidado cun detalle que se ve só xogando: un nodo de **rango único sen `maxTier`** nunca chega a `maxed` — o motor déixao en `unlocked`. Un `glow.states: ['maxed']` nun documento así non acende nada.
 :::
 
 :::note[Dúas capas, dous eixes]
@@ -116,8 +121,11 @@ O corpo (`nodeFills`) e o anel (`nodeRings`) son independentes a propósito. Un 
 | `gotico` | Ferro negro, carmesí e latón; serif pesada en maiúsculas; arestas como vetas de sangue seca. |
 | `sci-fi` | Matriz holográfica: corpo case negro e todo o neon no anel fino (cian → maxenta), rótulos tracking ancho. |
 | `escolar` | O único claro: verdes amables, amarelo sol e azul ceo sobre creme, con redonda. Para currículos e itinerarios. |
+| `atlas` | **Mapa denso** (19.10): o único que non é só paleta. Trae `regionShape: 'hull'`, `regionLabel: 'top'`, trazos finos, `labelMinRadius: 40`, marco ornamental nos grandes, iconas apagadas, `background` propio e glow no camiño tomado. Pensado para centos de nodos. |
 
-Os catro últimos (19.0) son os estilos dos **mockups fundacionais** do proxecto e os primeiros que usan `nodeRings`, `edges` e `typography`: copiar un deses specs é a forma máis rápida de que un documento xerado se vexa terminado.
+O `atlas` merece unha nota aparte: é a **receita completa** dun aspecto, non unha paleta, porque o mockup do atlas precisa seis eixes á vez e ningún deles funciona só. E hai dúas cousas que un preset **non pode traer**, porque non son tema senón `tree.layout`: `type: "mesh"` e `curve: "arc"`. Sen esas dúas o aspecto de tea queda a medias — están no [xerador do atlas da galería](https://github.com/fraga-labs/yggdrasil-forge/blob/master/tools/galeria/atlas-fisterra.mjs).
+
+Os catro anteriores (19.0) son os estilos dos **mockups fundacionais** do proxecto e os primeiros que usan `nodeRings`, `edges` e `typography`: copiar un deses specs é a forma máis rápida de que un documento xerado se vexa terminado.
 
 :::caution[As fontes non van empaquetadas]
 As familias nomeadas (Cinzel, Orbitron, Nunito…) non se distribúen co paquete. Cada stack remata nun xenérico real (`serif`/`sans-serif`), así que un consumidor que non as teña ve a reserva — nunca un fallo. Se as queres de verdade, cárgaas ti na túa páxina.

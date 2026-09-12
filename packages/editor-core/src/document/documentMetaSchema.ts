@@ -118,6 +118,12 @@ export const themeSpecSchema = z
       .describe(
         'Color for node labels, progress text, icons and region labels. Omit for an automatic legible default.',
       ),
+    background: z
+      .string()
+      .optional()
+      .describe(
+        'Canvas color. Applied as the inline background of the <svg> and used by the standalone export. Omit to let the consumer decide (editor chrome, or the CLI --dark flag).',
+      ),
     regions: z
       .array(themeRegionTintSchema)
       .optional()

@@ -19,6 +19,13 @@
 //      repulsión local + tirón suave cara ao centro do blob, con
 //      arrefriado.
 //
+// **Le o TAMAÑO dos nodos** (19.10). Ao principio non: todos eran
+// puntos co mesmo hueco `spacing`, e nunha árbore real (a do atlas ten
+// radios de 15 a 46) os grandes solapábanse cos veciños e os seus
+// rótulos pisábanse. O hueco entre dous nodos é agora
+// `max(spacing, r₁ + r₂ + marxe)`, así que o par de smalls segue
+// exactamente igual que antes e só se separa o que o precisa.
+//
 // **Non crea arestas**: un LayoutEngine só coloca. A topoloxía é dato
 // do documento (receita de xeración en `tools/malla-proto/`).
 //
@@ -27,6 +34,7 @@
 
 import { type Result, ok } from '@yggdrasil-forge/common'
 import type { Position } from '../../types/node.js'
+import { resolveRadius } from '../../types/nodeRadius.js'
 import type { TreeDef } from '../../types/tree.js'
 import { computeBounds } from './BoundsCalculator.js'
 import type { LayoutEngine } from './LayoutEngine.js'
@@ -52,9 +60,29 @@ interface Blob {
   raio: number
 }
 
-/** Raio que precisa un blob para caber `n` nodos ao espazado `s`. */
-function raioPara(n: number, s: number): number {
-  return Math.sqrt((Math.max(n, 1) * s * s * 0.866) / Math.PI) * 1.18
+/** Marxe libre que se deixa arredor do corpo dun nodo. */
+function marxe(s: number): number {
+  return s * 0.35
+}
+
+/** Hueco mínimo entre os centros de dous nodos de radios `ra` e `rb`. */
+function hueco(ra: number, rb: number, s: number): number {
+  return Math.max(s, ra + rb + marxe(s))
+}
+
+/**
+ * Raio que precisa un blob para caber nodos deses radios ao espazado
+ * `s`. Súmase a ÁREA que ocupa cada un (empaquetado hexagonal, 0.866):
+ * con todos os nodos pequenos dá o mesmo que a fórmula uniforme de
+ * antes, e medra só se hai nodos grandes de verdade.
+ */
+function raioPara(radios: readonly number[], s: number): number {
+  let area = 0
+  for (const r of radios) {
+    const d = Math.max(s, 2 * r + marxe(s))
+    area += d * d * 0.866
+  }
+  return Math.sqrt(Math.max(area, s * s) / Math.PI) * 1.18
 }
 
 export class MeshLayout implements LayoutEngine {
@@ -69,6 +97,7 @@ export class MeshLayout implements LayoutEngine {
     const iteracions = cfg.iterations ?? 220
     const rng = makeRng(cfg.seed ?? 1)
 
+    const radioDe = new Map(treeDef.nodes.map((n) => [n.id, resolveRadius(n)]))
     const blobs = this.buildBlobs(treeDef, cfg.centerGroupId, s)
     this.colocarBlobs(blobs, gap)
 
@@ -85,7 +114,7 @@ export class MeshLayout implements LayoutEngine {
           dentro.push([e.source, e.target])
         }
       }
-      for (const [id, p] of this.relaxar(blob, dentro, s, iteracions, rng)) {
+      for (const [id, p] of this.relaxar(blob, dentro, s, iteracions, rng, radioDe)) {
         positions.set(id, p)
       }
     }
@@ -126,6 +155,7 @@ export class MeshLayout implements LayoutEngine {
    */
   private buildBlobs(treeDef: TreeDef, centerGroupId: string | undefined, s: number): Blob[] {
     const groups = treeDef.groups ?? []
+    const radioDe = new Map(treeDef.nodes.map((n) => [n.id, resolveRadius(n)]))
     const asignados = new Set<string>()
     const blobs: Blob[] = []
     for (const g of groups) {
@@ -137,7 +167,16 @@ export class MeshLayout implements LayoutEngine {
           asignados.add(n.id)
         }
       }
-      blobs.push({ id: g.id, memberIds: ids, cx: 0, cy: 0, raio: raioPara(ids.length, s) })
+      blobs.push({
+        id: g.id,
+        memberIds: ids,
+        cx: 0,
+        cy: 0,
+        raio: raioPara(
+          ids.map((id) => radioDe.get(id) ?? 0),
+          s,
+        ),
+      })
     }
     // O central á cabeza: `colocarBlobs` trata sempre o primeiro como o
     // do medio.
@@ -195,6 +234,7 @@ export class MeshLayout implements LayoutEngine {
     s: number,
     iteracions: number,
     rng: () => number,
+    radioDe: ReadonlyMap<string, number>,
   ): Map<string, Position> {
     const n = blob.memberIds.length
     const out = new Map<string, Position>()
@@ -205,14 +245,26 @@ export class MeshLayout implements LayoutEngine {
       return out
     }
 
+    // Radios dos membros, no mesmo índice que `xs`/`ys`: o hueco que
+    // se reserva arredor de cada un depende do seu corpo.
+    const rs = new Float64Array(n)
+    blob.memberIds.forEach((id, k) => {
+      rs[k] = radioDe.get(id) ?? 0
+    })
+    const rMax = Math.max(...Array.from(rs))
+
     // 1. Puntos da retícula triangular, os `n` máis próximos ao centro
     //    (blob compacto), cun jitter determinista.
+    // O paso da retícula tenno en conta o nodo MAIOR do blob: sementar
+    // ao paso `s` con nodos de radio 44 nace todo solapado, e a
+    // relaxación arrinca desde un nó imposible de desfacer.
+    const paso = Math.max(s, rMax + marxe(s))
     const cand: Array<[number, number, number]> = []
-    const alcance = Math.ceil(blob.raio / s) + 2
+    const alcance = Math.ceil(blob.raio / paso) + 2
     for (let i = -alcance; i <= alcance; i++) {
       for (let j = -alcance; j <= alcance; j++) {
-        const x = j * s + (i % 2 === 0 ? 0 : s / 2)
-        const y = i * s * 0.866
+        const x = j * paso + (i % 2 === 0 ? 0 : paso / 2)
+        const y = i * paso * 0.866
         cand.push([x * x + y * y, x, y])
       }
     }
@@ -236,7 +288,9 @@ export class MeshLayout implements LayoutEngine {
       const ib = indice.get(b)
       if (ia !== undefined && ib !== undefined && ia !== ib) pares.push([ia, ib])
     }
-    const cela = s * 1.2
+    // A cela ten que cubrir o hueco MAIOR posible; se non, dous nodos
+    // grandes en celas non veciñas nunca se verían e quedarían pisados.
+    const cela = Math.max(s, 2 * rMax + marxe(s)) * 1.05
     const fx = new Float64Array(n)
     const fy = new Float64Array(n)
 
@@ -267,8 +321,9 @@ export class MeshLayout implements LayoutEngine {
               const vx = xk - (xs[m] ?? 0)
               const vy = yk - (ys[m] ?? 0)
               const d = Math.hypot(vx, vy)
-              if (d > 1e-6 && d < s) {
-                const empuxe = ((s - d) / d) * 0.5
+              const sep = hueco(rs[k] ?? 0, rs[m] ?? 0, s)
+              if (d > 1e-6 && d < sep) {
+                const empuxe = ((sep - d) / d) * 0.5
                 fx[k] = (fx[k] ?? 0) + vx * empuxe
                 fy[k] = (fy[k] ?? 0) + vy * empuxe
               }
@@ -283,7 +338,10 @@ export class MeshLayout implements LayoutEngine {
         const vy = (ys[b] ?? 0) - (ys[a] ?? 0)
         const d = Math.hypot(vx, vy)
         if (d < 1e-6) continue
-        const tira = ((d - s) / d) * 0.12
+        // A aresta tira á distancia na que os dous corpos se tocan coa
+        // marxe: se tirase sempre a `s`, unha aresta entre dous nodos
+        // grandes pelexaría para sempre coa repulsión.
+        const tira = ((d - hueco(rs[a] ?? 0, rs[b] ?? 0, s)) / d) * 0.12
         fx[a] = (fx[a] ?? 0) + vx * tira
         fy[a] = (fy[a] ?? 0) + vy * tira
         fx[b] = (fx[b] ?? 0) - vx * tira
@@ -295,8 +353,11 @@ export class MeshLayout implements LayoutEngine {
         const vx = blob.cx - (xs[k] ?? 0)
         const vy = blob.cy - (ys[k] ?? 0)
         const d = Math.hypot(vx, vy)
-        if (d > blob.raio * 0.92 && d > 1e-6) {
-          const tira = ((d - blob.raio * 0.92) / d) * 0.35
+        // O límite descóntalle o corpo: senón un nodo de radio 44
+        // quédalle medio corpo fóra do blob (e fóra da súa comarca).
+        const lim = Math.max(s * 0.5, blob.raio * 0.92 - (rs[k] ?? 0))
+        if (d > lim && d > 1e-6) {
+          const tira = ((d - lim) / d) * 0.35
           fx[k] = (fx[k] ?? 0) + vx * tira
           fy[k] = (fy[k] ?? 0) + vy * tira
         }
@@ -311,6 +372,63 @@ export class MeshLayout implements LayoutEngine {
         xs[k] = (xs[k] ?? 0) + gx * escala
         ys[k] = (ys[k] ?? 0) + gy * escala
       }
+    }
+
+    // ── 3. Pase final de SEPARACIÓN ──
+    //
+    // A relaxación arrefría: o tope de paso remata en `s * 0.02` (1,2
+    // unidades ao espazado do atlas), así que un solape de 10 unidades
+    // xa non se pode desfacer por moitas pasadas que queden. Medido no
+    // atlas: con 220 iteracións quedaban 3 pares solapados (o peor,
+    // -10,6); facían falta 1.200 para chegar a cero, e iso son 2,65 s a
+    // 1.500 nodos en vez de 0,74 s.
+    //
+    // Este pase custa o mesmo que unha iteración e dá unha garantía
+    // DURA en vez de estatística: os corpos non se solapan. Pide só o
+    // toque (`r₁ + r₂`), non o hueco estético completo, así que non
+    // pelexa co que a relaxación acaba de compoñer.
+    for (let pase = 0; pase < 30; pase++) {
+      const balde = new Map<string, number[]>()
+      for (let k = 0; k < n; k++) {
+        const chave = `${Math.floor((xs[k] ?? 0) / cela)}:${Math.floor((ys[k] ?? 0) / cela)}`
+        const lista = balde.get(chave)
+        if (lista === undefined) balde.set(chave, [k])
+        else lista.push(k)
+      }
+      let movido = false
+      for (let k = 0; k < n; k++) {
+        const cx = Math.floor((xs[k] ?? 0) / cela)
+        const cy = Math.floor((ys[k] ?? 0) / cela)
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            for (const m of balde.get(`${cx + dx}:${cy + dy}`) ?? []) {
+              // Só un dos dous sentidos do par: senón a corrección
+              // aplícase dúas veces e sobrepasa.
+              if (m <= k) continue
+              const need = ((rs[k] ?? 0) + (rs[m] ?? 0)) * 1.02
+              let vx = (xs[k] ?? 0) - (xs[m] ?? 0)
+              let vy = (ys[k] ?? 0) - (ys[m] ?? 0)
+              let d = Math.hypot(vx, vy)
+              if (d >= need) continue
+              if (d < 1e-6) {
+                // Coincidentes: sepáranse nunha dirección FIXA
+                // derivada dos índices, para non perder o
+                // determinismo nin depender do rng.
+                vx = (k % 2 === 0 ? 1 : -1) * 1e-3
+                vy = 1e-3
+                d = Math.hypot(vx, vy)
+              }
+              const empuxe = (need - d) / 2 / d
+              xs[k] = (xs[k] ?? 0) + vx * empuxe
+              ys[k] = (ys[k] ?? 0) + vy * empuxe
+              xs[m] = (xs[m] ?? 0) - vx * empuxe
+              ys[m] = (ys[m] ?? 0) - vy * empuxe
+              movido = true
+            }
+          }
+        }
+      }
+      if (!movido) break
     }
 
     blob.memberIds.forEach((id, k) => {

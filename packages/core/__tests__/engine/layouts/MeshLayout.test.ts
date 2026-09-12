@@ -232,4 +232,142 @@ describe('MeshLayout — casos límite', () => {
     expect(bounds.maxY).toBeGreaterThan(bounds.minY)
   })
 })
+// ── 19.10: o layout LE O TAMAÑO dos nodos ──
+//
+// O defecto que isto fixa era real e vísteo no atlas da galería: o
+// `mesh` colocaba todo como puntos co mesmo hueco `spacing`, así que un
+// nodo de radio 44 saía por riba dos seus veciños pequenos. Tres pares
+// solapados, o peor por 10,6 unidades.
+
+/**
+ * Unha COMARCA do atlas da galería, copiada de
+ * `tools/galeria/atlas-fisterra.mjs`: radios de 15 a 44, anel de doce
+ * pequenos con cordas cada tres, unha porta enganchada a un de cada
+ * catro e dous keystones en lados opostos que soben á ascendencia.
+ *
+ * A fidelidade importa: cunha versión máis floxa (sen porta nin
+ * cordas) o defecto NON aparece, e a proba pasaría sen probar nada.
+ * Aquí é a densidade a que crea a presión que facía solapar os corpos.
+ */
+function arboreDesigual(seed = 3): TreeDef {
+  // A ORDE importa e por iso vai copiada tamén: o `mesh` sementa os
+  // membros por orde, do centro do blob cara fóra, así que o xerador do
+  // atlas pon a ascendencia no medio e intercala os outros grandes
+  // entre os pequenos. Coa orde «todos os grandes primeiro» o defecto
+  // tampouco aparece.
+  const grande = { id: 'grande', type: 'ascendancy', label: { gl: 'G' }, size: 44, group: 'g' }
+  const claveA = { id: 'clave-a', type: 'keystone', label: { gl: 'A' }, size: 30, group: 'g' }
+  const porta = { id: 'porta', type: 'notable', label: { gl: 'P' }, size: 26, group: 'g' }
+  const claveB = { id: 'clave-b', type: 'keystone', label: { gl: 'B' }, size: 30, group: 'g' }
+  const pequeno = (i: number): unknown => ({
+    id: `p${i}`,
+    type: 'small',
+    label: { gl: `p${i}` },
+    size: 15,
+    group: 'g',
+  })
+  const intercalado = [claveA, porta, claveB]
+  const nodes: unknown[] = [grande]
+  const edges: unknown[] = []
+  for (let i = 0; i < 12; i++) {
+    nodes.push(pequeno(i))
+    if ((i + 1) % 4 === 0) {
+      const g = intercalado.shift()
+      if (g !== undefined) nodes.push(g)
+    }
+  }
+  for (let i = 0; i < 12; i++) {
+    edges.push({ id: `anel-${i}`, source: `p${i}`, target: `p${(i + 1) % 12}`, type: 'dependency' })
+    if (i % 3 === 0) {
+      edges.push({
+        id: `corda-${i}`,
+        source: `p${i}`,
+        target: `p${(i + 4) % 12}`,
+        type: 'dependency',
+      })
+    }
+    if (i % 4 === 0) {
+      edges.push({ id: `porta-${i}`, source: 'porta', target: `p${i}`, type: 'dependency' })
+    }
+  }
+  for (const j of [0, 1, 2]) {
+    edges.push({ id: `ka-${j}`, source: `p${j}`, target: 'clave-a', type: 'dependency' })
+    edges.push({ id: `kb-${j}`, source: `p${j + 6}`, target: 'clave-b', type: 'dependency' })
+  }
+  edges.push({ id: 'ga', source: 'clave-a', target: 'grande', type: 'dependency' })
+  edges.push({ id: 'gb', source: 'clave-b', target: 'grande', type: 'dependency' })
+  return {
+    id: 'desigual',
+    schemaVersion: '1.0.0',
+    version: '1.0.0',
+    label: { gl: 'D' },
+    groups: [{ id: 'g', label: { gl: 'G' } }],
+    nodes,
+    edges,
+    layout: { type: 'mesh', spacing: 62, seed },
+  } as unknown as TreeDef
+}
+
+const RADIOS: Readonly<Record<string, number>> = {
+  grande: 44,
+  'clave-a': 30,
+  'clave-b': 30,
+  porta: 26,
+}
+const radioDe = (id: string): number => RADIOS[id] ?? 15
+
+describe('★ MeshLayout — os corpos NON se solapan', () => {
+  it('★★ en CATORCE sementes, ningún par de corpos se solapa', () => {
+    // Barrido, non un caso solto: o solape depende do jitter, e con
+    // sorte unha semente concreta sae limpa aínda co motor roto. Sen o
+    // pase final de separación isto falla nas sementes 6 e 7 (a 6 por
+    // -1,06 unidades, a 7 con dous pares), que é exactamente o que se
+    // vía no atlas da galería.
+    const malos: string[] = []
+    for (let seed = 1; seed <= 14; seed++) {
+      const { nodes } = pos(arboreDesigual(seed))
+      const ids = [...nodes.keys()]
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          const a = nodes.get(ids[i] ?? '')
+          const b = nodes.get(ids[j] ?? '')
+          if (a === undefined || b === undefined) continue
+          const d = Math.hypot(a.x - b.x, a.y - b.y)
+          const toque = radioDe(ids[i] ?? '') + radioDe(ids[j] ?? '')
+          if (d < toque) {
+            malos.push(`seed ${seed} ${ids[i]}↔${ids[j]}: ${d.toFixed(1)} < ${toque}`)
+          }
+        }
+      }
+    }
+    expect(malos).toEqual([])
+  })
+
+  it('★ o hueco medra co tamaño: o grande queda máis lonxe dos veciños que un pequeno', () => {
+    const { nodes } = pos(arboreDesigual())
+    const dist = (a: string, b: string): number => {
+      const pa = nodes.get(a)
+      const pb = nodes.get(b)
+      if (pa === undefined || pb === undefined) throw new Error('sen posición')
+      return Math.hypot(pa.x - pb.x, pa.y - pb.y)
+    }
+    const preto = (id: string): number =>
+      Math.min(...[...nodes.keys()].filter((o) => o !== id).map((o) => dist(id, o)))
+    expect(preto('grande')).toBeGreaterThan(preto('p0') * 1.2)
+  })
+
+  it('a separación non custa unha morea de iteracións: chega co default', () => {
+    // A alternativa era subir `iterations` de 220 a 1.200, e iso medido
+    // son 2,65 s a 1.500 nodos en vez de 0,74 s. O pase final vale o
+    // mesmo que unha iteración.
+    const r = new MeshLayout().compute(arboreDesigual(6))
+    expect(r.ok).toBe(true)
+  })
+
+  it('segue determinista tras o pase de separación: mesma semente, mesmas posicións', () => {
+    const a = pos(arboreDesigual()).nodes
+    const b = pos(arboreDesigual()).nodes
+    for (const [id, p] of a) expect(b.get(id)).toEqual(p)
+  })
+})
 // ── FIN: tests MeshLayout ──

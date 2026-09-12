@@ -202,6 +202,23 @@ describe('19.4 — tamaños e iconas: a terceira rama do tema', () => {
       icon: '#9a9276',
     })
   })
+
+  it('★★ 19.10: `background` mapea a `background` — o documento leva o seu LENZO', () => {
+    // Antes disto, o fondo dun render era do flag `--dark`, non do
+    // ficheiro: un tema gótico en branco non é o tema gótico.
+    expect(themeOverridesFromSpec({ background: '#14151a' }, false)).toEqual({
+      background: '#14151a',
+    })
+    // E gaña sobre a base clara igual que sobre a escura (contrato do
+    // funil: o documento manda).
+    expect(themeOverridesFromSpec({ background: '#14151a' }, true)).toEqual({
+      background: '#14151a',
+    })
+  })
+
+  it('sen `background` non se escribe a clave (a base decide)', () => {
+    expect(themeOverridesFromSpec({ textColor: '#fff' }, false)).toEqual({ text: '#fff' })
+  })
 })
 describe('19.7 — themeEffectsFromSpec (o resplandor)', () => {
   it('mapea radio, estados e arestas', () => {

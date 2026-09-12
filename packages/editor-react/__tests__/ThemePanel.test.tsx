@@ -282,6 +282,7 @@ describe('★ ThemePanel — fichas desde o rexistro (7.19)', () => {
       'Gótico',
       'Sci-fi',
       'Escolar',
+      'Atlas',
     ]) {
       expect(screen.getByRole('button', { name: label })).toBeDefined()
     }

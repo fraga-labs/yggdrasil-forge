@@ -1327,6 +1327,10 @@
               "type": "string",
               "description": "Color for node labels, progress text, icons and region labels. Omit for an automatic legible default."
             },
+            "background": {
+              "type": "string",
+              "description": "Canvas color. Applied as the inline background of the <svg> and used by the standalone export. Omit to let the consumer decide (editor chrome, or the CLI --dark flag)."
+            },
             "regions": {
               "type": "array",
               "items": {

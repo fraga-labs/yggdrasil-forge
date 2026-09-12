@@ -21,6 +21,14 @@ export {
 // Content
 export type { RichContent, NodeContent } from './content.js'
 
+// Radio do nodo (19.10): dato, non pintado — os layouts precísano para
+// reservar sitio, así que a táboa vive aquí e `react` reexpórtaa.
+export {
+  FALLBACK_RADIUS,
+  DEFAULT_RADIUS_BY_TYPE,
+  resolveRadius,
+} from './nodeRadius.js'
+
 // Node
 export type {
   NodeType,

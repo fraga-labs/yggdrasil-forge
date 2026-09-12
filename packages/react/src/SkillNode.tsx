@@ -254,10 +254,39 @@ function SkillNodeImpl({
     ...(fontSize !== undefined && { fontSize }),
     ...typographyStyle,
   }
+  // ── 19.10: halo do rótulo ──
+  //
+  // O texto do nodo cae sobre arestas, tintes de comarca e o nome da
+  // rexión. Sen halo hai combinacións nas que non se le — e nos mockups
+  // fundacionais o texto SEMPRE se le. `paintOrder: 'stroke'` pinta
+  // primeiro un trazo da cor do FONDO e despois o recheo por riba: o
+  // glifo queda nítido e o contorno abre un oco arredor.
+  //
+  // Só no rótulo e no progreso, non no icono: o glifo do icono xa vai
+  // dentro do corpo do nodo, que é opaco.
+  //
+  // A cor sae de `background` e, faltando esa, de `mesh`. **Non é un
+  // detalle**: `colors.background` é opcional e NINGÚN dos dous temas
+  // base o define, así que atarlle o halo só a el deixábao morto
+  // exactamente onde máis falta — nun `ygg render`. Mesma trampa que o
+  // `nodeStroke` do 19.0, cazada esta vez mirando o SVG. `mesh` é a cor
+  // da retícula do lenzo: sempre definida e sempre veciña do fondo.
+  const fondo = theme?.colors.background ?? theme?.colors.mesh
+  const haloStyle: CSSProperties =
+    fondo === undefined
+      ? {}
+      : {
+          paintOrder: 'stroke',
+          stroke: fondo,
+          strokeWidth: Math.max(2, (fontSize ?? 12) * 0.3),
+          strokeLinejoin: 'round',
+        }
+  const labelConHalo: CSSProperties = { ...labelStyle, ...haloStyle }
   const progressStyle: CSSProperties = {
     ...(textColor !== undefined && { fill: textColor }),
     ...(fontSizeSmall !== undefined && { fontSize: fontSizeSmall }),
     ...typographyStyle,
+    ...haloStyle,
   }
 
   // F11.x: truncado opt-in da etiqueta. Activo só se theme.sizes.maxLabelChars
@@ -477,7 +506,7 @@ function SkillNodeImpl({
         </text>
       )}
       {mereceRotulo && (
-        <text className="yf-skill-node__label" textAnchor="middle" y={labelY} style={labelStyle}>
+        <text className="yf-skill-node__label" textAnchor="middle" y={labelY} style={labelConHalo}>
           {displayLabel}
         </text>
       )}

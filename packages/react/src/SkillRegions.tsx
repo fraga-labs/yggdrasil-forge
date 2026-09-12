@@ -53,7 +53,10 @@ export type RegionShape = 'box' | 'hull'
 /**
  * Onde vai o nome da rexión (19.8).
  *
- * - `'top'`: pegado ao bordo superior, pequeno e discreto. Default, e o
+ * - `'top'`: no bordo superior, coa cor da comarca e discreto — é o
+ *   trato do mockup do atlas, e vai na banda de `padding` que queda
+ *   entre o bordo do tinte e o primeiro nodo, así que non o tapa
+ *   ninguén. Default, e o
  *   comportamento de sempre.
  * - `'center'`: **flotando no medio**, grande e coa cor da propia
  *   rexión. É o dos mockups fundacionais, e a esa escala ten sentido:
@@ -381,12 +384,18 @@ export function SkillRegions({
                       fillOpacity: 0.5,
                     }
                   : {
-                      fontSize: 13,
+                      // 19.10: coa cor da comarca e escalado co mapa,
+                      // como no mockup do atlas. Antes ía sempre a 13 e
+                      // na cor do texto: nun mapa de 1.100 unidades iso
+                      // é unha etiqueta de UI perdida, e non dicía a
+                      // que comarca pertence. O clamp inferior deixa os
+                      // documentos pequenos exactamente coma antes.
+                      fontSize: Math.max(13, Math.min(24, width * 0.05)),
                       fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      fill: textColor,
-                      fillOpacity: 0.55,
+                      fill: spec.color ?? textColor,
+                      fillOpacity: 0.8,
                     }
               }
             >

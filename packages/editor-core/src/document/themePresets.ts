@@ -235,6 +235,91 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
       },
     },
   },
+  {
+    id: 'atlas',
+    label: { gl: 'Atlas', en: 'Atlas' },
+    // ── 19.10: o aspecto de ATLAS enteiro, nun só id ──
+    //
+    // Os catro do 19.0 son paletas. Este non: é a receita completa do
+    // mockup do atlas, que precisa **seis eixes á vez** e non se logra
+    // con cores soas. Cada un está aquí porque sen el o conxunto non
+    // funciona:
+    //
+    //   - `regionShape: 'hull'` — blobs orgánicos; con caixas parece
+    //     unha folla de cálculo.
+    //   - `regionLabel: 'top'` — **rectificado tras comparar co
+    //     mockup**: escollérase `'center'`, pero a malla enche o blob
+    //     enteiro e o nome centrado sae cortado polos nodos («O MONTE»
+    //     quedaba en «O MO TE»). No mockup o nome vai arriba, modesto e
+    //     coa cor da comarca, na banda libre entre o tinte e o primeiro
+    //     nodo. `'center'` segue sendo o certo nun mapa esparexido.
+    //   - `sizes.strokeWidth: 1.3` — un trazo de 2 px afoga unha malla
+    //     de centos de arestas.
+    //   - `sizes.labelMinRadius: 40` — texto SÓ na raíz e nas
+    //     ascendencias. Medido, non elixido a ollo: un nome como
+    //     «Mestre de Temporais» ocupa ~157 unidades de viewBox e a
+    //     comarca do atlas ten un espazado de 62. A esa densidade os
+    //     rótulos non caben ao lado dos nodos por moito que se separen
+    //     — e o mockup tampouco os pon: nomea os fitos e deixa o resto
+    //     en icona. O nome completo segue aí (tooltip, `aria-label`,
+    //     editor); o que se retira é o texto pintado.
+    //   - `sizes.ornateMinRadius: 24` — marco dobre só nos grandes, que
+    //     é o que os fai ler como importantes.
+    //   - `iconColor` máis apagado que o texto; se non, a malla
+    //     desaparece detrás dos glifos.
+    //   - `background` — o atlas declara o seu propio lenzo, así que
+    //     `ygg render` sen `--dark` xa sae ben; antes dependía do flag.
+    //   - `glow` no CAMIÑO TOMADO (`unlocked` + `maxed`) e nas arestas
+    //     acesas. Rectificado tras xogar a ficha da galería: estaba só
+    //     en `maxed`, e como os nodos dun atlas son de rango único e o
+    //     motor non lles dá `maxed` sen `maxTier`, o resplandor NON
+    //     acendía nunca. No mockup o que brilla é o que levas
+    //     conquistado. Queda fóra `unlockable`: iso acendería a
+    //     fronteira enteira (29 nodos na foto) e no mockup a fronteira
+    //     distínguese polo anel, non polo halo.
+    //
+    // **O que un preset NON pode traer**: o layout (`type: 'mesh'`) e a
+    // curva (`curve: 'arc'`) non son tema, son do `tree.layout`. Sen
+    // eses dous o aspecto queda a medias, e por iso vai dito nas docs e
+    // no README da galería.
+    spec: {
+      preset: 'atlas',
+      // O lenzo do mockup: un azul-negro moi escuro, non negro puro.
+      background: '#14151a',
+      nodeFills: {
+        locked: '#0e1018',
+        unlockable: '#1c2436',
+        unlocked: '#2a2416',
+        maxed: '#3d3018',
+        inProgress: '#1f2130',
+      },
+      nodeRings: {
+        locked: '#2e3140',
+        unlockable: '#d8b15a',
+        unlocked: '#e6c77a',
+        maxed: '#f2e2b0',
+        inProgress: '#8a7a4a',
+      },
+      edges: { color: '#9a8550', active: '#f0d48a' },
+      textColor: '#f0e6d2',
+      iconColor: '#9a9276',
+      regionShape: 'hull',
+      regionLabel: 'top',
+      sizes: {
+        strokeWidth: 1.3,
+        ringWidth: 1.4,
+        fontSize: 13,
+        labelMinRadius: 40,
+        ornateMinRadius: 24,
+      },
+      glow: { radius: 6, states: ['unlocked', 'maxed'], edges: true },
+      typography: {
+        fontFamily: "'Cinzel', 'Trajan Pro', Georgia, serif",
+        fontWeight: 600,
+        letterSpacing: '0.06em',
+      },
+    },
+  },
 ]
 
 /** Busca un preset polo seu id. `undefined` se non existe. */

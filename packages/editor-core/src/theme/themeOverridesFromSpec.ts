@@ -102,4 +102,25 @@ export function themeSizesFromSpec(
   }
   return Object.keys(out).length > 0 ? out : undefined
 }
+/**
+ * Overrides de EFECTOS derivados do tema do documento (19.7).
+ *
+ * Cuarto funil. Traduce de paso o nome do estado: o documento fala
+ * `inProgress` (coma en `nodeFills`) e o `NodeState` do motor
+ * `in_progress`. Sen esa tradución o estado non casaría e o glow non
+ * sairía, calado.
+ */
+export function themeEffectsFromSpec(
+  spec: ThemeSpec | undefined,
+): Record<string, unknown> | undefined {
+  const g = spec?.glow
+  if (g === undefined) return undefined
+  const estados = g.states?.map((e) => (e === 'inProgress' ? 'in_progress' : e))
+  const out: Record<string, unknown> = {
+    ...(g.radius !== undefined && { glowRadius: g.radius }),
+    ...(estados !== undefined && { glowStates: estados }),
+    ...(g.edges !== undefined && { glowEdges: g.edges }),
+  }
+  return Object.keys(out).length > 0 ? out : undefined
+}
 // ── FIN: themeOverridesFromSpec ──

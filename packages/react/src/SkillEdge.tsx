@@ -12,6 +12,7 @@ import type { EdgeDef, EdgePath, NodeState } from '@yggdrasil-forge/core'
 import { type CSSProperties, type JSX, type MouseEvent, memo } from 'react'
 import { ARROW_MARKER_ID } from './SVGRenderer.js'
 import { useTheme } from './ThemeProvider.js'
+import { glowFilterStyle, glowRadiusOf } from './glow.js'
 import { buildPathD } from './svg-helpers.js'
 
 export type EdgeState = 'active' | 'inactive'
@@ -62,11 +63,19 @@ function SkillEdgeImpl({
   const stroke = isActive ? activeStroke : baseStroke
   const strokeWidth = theme?.sizes.strokeWidth
 
+  // 19.7: só as ACESAS resplandecen, e só se o tema o pide con
+  // `effects.glowEdges`. Unha aresta apagada con halo sería un
+  // contrasentido: o halo é o que marca o camiño andado.
+  const glowStyle =
+    isActive && theme?.effects?.glowEdges === true
+      ? glowFilterStyle(glowRadiusOf(theme))
+      : undefined
   const style: CSSProperties = {
     ...(stroke !== undefined && { stroke }),
     ...(strokeWidth !== undefined && { strokeWidth }),
     // F10.4: edges inactivos quédan apagados (opacidade reducida).
     ...(isActive ? {} : { opacity: 0.4 }),
+    ...(glowStyle !== undefined && { filter: glowStyle }),
   }
 
   const directed = edge.style?.directed === true

@@ -32,7 +32,15 @@ export type { SVGRendererProps } from './SVGRenderer.js'
 // Tema infra (só dispoñible desde root entry).
 export { ThemeProvider } from './ThemeProvider.js'
 export type { ThemeProviderProps } from './ThemeProvider.js'
-export type { Theme, ThemeColors, ThemeSizes } from './theme-types.js'
+export type { Theme, ThemeColors, ThemeEffects, ThemeSizes } from './theme-types.js'
+// 19.7: o resplandor. O id do filtro derívase do radio para que o
+// `<defs>` e os elementos que o usan coincidan sen baixar props.
+export {
+  DEFAULT_GLOW_STATES,
+  glowFilterId,
+  glowRadiusOf,
+  glowsForState,
+} from './glow.js'
 export { minimal } from './themes/minimal.js'
 export { minimalDark } from './themes/minimalDark.js'
 

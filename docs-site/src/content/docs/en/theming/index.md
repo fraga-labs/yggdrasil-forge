@@ -88,7 +88,12 @@ colors: {
 - `typography` — `fontFamily` (always with a generic fallback), `fontWeight`, `letterSpacing`, `textTransform`. **Type is identity, not decoration**: a gothic document and a sci-fi one are not told apart by color alone.
 - `textColor` — node text and icons, and region labels. Without it, the editor picks a legible one for its chrome.
 - `regions` — **tints by tag**: nodes carrying that `tag` get a colored background (low opacity) and a region label.
+- `glow` — the **glow effect** (19.7): `radius` (blur, in layout units), `states` (which ones glow; defaults to the three live ones: `unlockable`, `unlocked`, `maxed`) and `edges` (whether lit edges glow too). Without `glow` the filter **is not even emitted**: zero cost.
 - `preset` — **informational**: which preset it started from (the UI marks the active chip). It does not affect rendering by itself: applying a preset means copying its full spec.
+
+:::caution[The glow is not free]
+A glow is not painted: it is **filtered**. Every filtered element costs the browser its own rasterization pass, so in an atlas of hundreds of nodes prefer narrowing `glow.states` to `['maxed']` instead of lighting all three. `radius` 2-4 gives a discreet halo; 6-10, the mockups' bloom.
+:::
 
 :::note[Two layers, two axes]
 Body (`nodeFills`) and ring (`nodeRings`) are independent on purpose. A theme can keep the body neutral and let only the ring move with progression (the "flat-adaptive" model of the `minimal` theme), or move both. Both accept the five states: `locked`, `unlockable`, `unlocked`, `maxed`, `inProgress`.

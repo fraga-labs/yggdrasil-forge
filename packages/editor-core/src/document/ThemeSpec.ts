@@ -87,6 +87,31 @@ export interface ThemeEdgeSpec {
 }
 
 /**
+ * Resplandor, como DATO do documento (19.7).
+ *
+ * O bloom dos mockups fundacionais. Non é un token de cor: un glow
+ * fíltrase (un `<filter>` SVG), e cada elemento filtrado custa unha
+ * pasada de rasterización ao navegador. Por iso é opt-in e por iso
+ * `states` existe — nun atlas de centos de nodos hai que acender só os
+ * poucos que importan.
+ */
+export interface ThemeGlowSpec {
+  /**
+   * Radio do desenfoque, en unidades de layout. Sen definir (ou 0) non
+   * hai resplandor e nin se emite o filtro. Discreto: 2-4; bloom dos
+   * mockups: 6-10.
+   */
+  readonly radius?: number
+  /**
+   * Estados que resplandecen. Sen definir, os tres vivos
+   * (`unlockable`, `unlocked`, `maxed`): os apagados non brillan.
+   */
+  readonly states?: readonly ThemeNodeState[]
+  /** Se as arestas ACESAS tamén resplandecen. Default `false`. */
+  readonly edges?: boolean
+}
+
+/**
  * Tamaños do render, como DATO do documento (19.4).
  *
  * Espella a parte tematizable de `ThemeSizes` de
@@ -181,6 +206,8 @@ export interface ThemeSpec {
   readonly regionShape?: 'box' | 'hull'
   /** Tamaños do render (19.4). Sen definir, caen á base. */
   readonly sizes?: ThemeSizesSpec
+  /** Resplandor (19.7). Sen definir, non hai efecto e nin se emite filtro. */
+  readonly glow?: ThemeGlowSpec
   /** Id do preset de partida (informativo, para a UI). */
   readonly preset?: string
 }

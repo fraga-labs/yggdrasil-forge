@@ -17,6 +17,7 @@ import {
   useState,
 } from 'react'
 import { useTheme } from './ThemeProvider.js'
+import { glowFilterStyle, glowRadiusOf, glowsForState } from './glow.js'
 import { IconGlyph } from './icons/IconGlyph.js'
 import { isImageRef } from './icons/imageRef.js'
 import { getIcon } from './icons/registry.js'
@@ -231,10 +232,17 @@ function SkillNodeImpl({
   // exemplo) por exclusións; só atenuamos cando o `instance.state` é 'locked'.
   const dimBadge = state === 'locked'
 
+  // 19.7: resplandor. Só nos estados que o tema acende, e só se o tema
+  // o pediu: sen `effects.glowRadius` isto é `undefined` e o markup non
+  // cambia nin un byte.
+  const glowStyle = glowsForState(theme, visualState)
+    ? glowFilterStyle(glowRadiusOf(theme))
+    : undefined
   const shapeStyle: CSSProperties = {
     fill,
     strokeWidth: ringWidth,
     ...(ring !== undefined && { stroke: ring }),
+    ...(glowStyle !== undefined && { filter: glowStyle }),
   }
   const labelStyle: CSSProperties = {
     ...(textColor !== undefined && { fill: textColor }),

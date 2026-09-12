@@ -15,6 +15,7 @@ export {
 } from './document/EditorDocument.js'
 export type {
   ThemeEdgeSpec,
+  ThemeGlowSpec,
   ThemeNodeState,
   ThemeRegionTint,
   ThemeSizesSpec,
@@ -43,6 +44,7 @@ export {
   applyAutoLayout,
 } from './layout/applyAutoLayout.js'
 export {
+  themeEffectsFromSpec,
   themeOverridesFromSpec,
   themeSizesFromSpec,
   themeTypographyFromSpec,
@@ -54,6 +56,7 @@ export {
   documentMetaSchema,
   type InferredDocumentMeta,
   themeEdgeSpecSchema,
+  themeGlowSpecSchema,
   themeNodeStateSchema,
   themeRegionTintSchema,
   themeSizesSpecSchema,

@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { standaloneSvg } from '../src/svg/standaloneSvg.js'
 import {
+  themeEffectsFromSpec,
   themeOverridesFromSpec,
   themeSizesFromSpec,
   themeTypographyFromSpec,
@@ -202,4 +203,29 @@ describe('19.4 — tamaños e iconas: a terceira rama do tema', () => {
     })
   })
 })
+describe('19.7 — themeEffectsFromSpec (o resplandor)', () => {
+  it('mapea radio, estados e arestas', () => {
+    expect(themeEffectsFromSpec({ glow: { radius: 7, states: ['maxed'], edges: true } })).toEqual({
+      glowRadius: 7,
+      glowStates: ['maxed'],
+      glowEdges: true,
+    })
+  })
+
+  it('★★ traduce `inProgress` → `in_progress`: sen isto o glow non saía, CALADO', () => {
+    // O documento fala `inProgress` (coma en nodeFills); o NodeState do
+    // motor é `in_progress`. Se non se traduce, o `includes` nunca casa
+    // e o nodo simplemente non brilla, sen erro ningún.
+    expect(themeEffectsFromSpec({ glow: { states: ['inProgress', 'maxed'] } })).toEqual({
+      glowStates: ['in_progress', 'maxed'],
+    })
+  })
+
+  it('★ sen `glow` → undefined: nin se emite o filtro', () => {
+    expect(themeEffectsFromSpec(undefined)).toBeUndefined()
+    expect(themeEffectsFromSpec({ textColor: '#fff' })).toBeUndefined()
+    expect(themeEffectsFromSpec({ glow: {} })).toBeUndefined()
+  })
+})
+
 // ── FIN: tests helpers de render ──

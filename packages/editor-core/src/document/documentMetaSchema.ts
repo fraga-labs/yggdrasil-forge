@@ -82,6 +82,22 @@ export const themeSizesSpecSchema = z
   })
   .describe('Render sizes as document data.')
 
+/** Espella `ThemeGlowSpec` (ThemeSpec.ts). */
+export const themeGlowSpecSchema = z
+  .object({
+    radius: z
+      .number()
+      .nonnegative()
+      .optional()
+      .describe('Glow blur radius in layout units. 0 or omitted means no glow at all.'),
+    states: z
+      .array(themeNodeStateSchema)
+      .optional()
+      .describe('Visual states that glow. Defaults to unlockable/unlocked/maxed.'),
+    edges: z.boolean().optional().describe('Whether lit edges glow too. Default false.'),
+  })
+  .describe('Glow effect as document data. Opt-in: filters cost a rasterization pass each.')
+
 /** Espella `ThemeSpec` (ThemeSpec.ts). */
 export const themeSpecSchema = z
   .object({
@@ -120,6 +136,7 @@ export const themeSpecSchema = z
       .optional()
       .describe("Region tint shape: 'box' (default) or 'hull' (smoothed blob around the nodes)."),
     sizes: themeSizesSpecSchema.optional().describe('Render sizes. Omit to fall back to the base.'),
+    glow: themeGlowSpecSchema.optional().describe('Glow effect. Omit for no glow at all.'),
     preset: z
       .string()
       .optional()

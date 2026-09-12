@@ -88,7 +88,12 @@ colors: {
 - `typography` — `fontFamily` (con fallback xenérico sempre), `fontWeight`, `letterSpacing`, `textTransform`. **A fonte é identidade, non adorno**: un documento gótico e un sci-fi non se distinguen só polas cores.
 - `textColor` — texto e iconas dos nodos e etiquetas de rexión. Sen el, o editor escolle un lexible segundo o seu chrome.
 - `regions` — **tintes por tag**: os nodos con ese `tag` levan un fondo de cor (con opacidade baixa) e unha etiqueta de rexión.
+- `glow` — **resplandor** (19.7): `radius` (o desenfoque, en unidades de layout), `states` (cales brillan; por defecto os tres vivos: `unlockable`, `unlocked`, `maxed`) e `edges` (se as arestas acesas brillan tamén). Sen `glow` **nin se emite o filtro**: cero custo.
 - `preset` — **informativo**: de que preset partiu (a UI marca a ficha activa). Non afecta ao render por si só: aplicar un preset é copiar o seu spec completo.
+
+:::caution[O resplandor cóbrase]
+Un glow non se pinta: **fíltrase**. Cada elemento filtrado custa ao navegador unha pasada de rasterización aparte, así que nun atlas de centos de nodos convén reducir `glow.states` a `['maxed']` en vez de acender os tres. `radius` 2-4 dá un halo discreto; 6-10, o bloom dos mockups.
+:::
 
 :::note[Dúas capas, dous eixes]
 O corpo (`nodeFills`) e o anel (`nodeRings`) son independentes a propósito. Un tema pode deixar o corpo neutro e mover só o anel coa progresión (o modelo «plano-adaptativo» do tema `minimal`), ou mover os dous. Ambos aceptan os cinco estados: `locked`, `unlockable`, `unlocked`, `maxed`, `inProgress`.

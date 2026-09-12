@@ -42,6 +42,7 @@ import {
   buildNewNode,
   buildRemoveCascade,
   createMoveOperation,
+  themeEffectsFromSpec,
   themeOverridesFromSpec,
   themeSizesFromSpec,
   themeTypographyFromSpec,
@@ -777,6 +778,7 @@ export function EditorCanvas({
     // — por iso o spread condicional en vez de `typography: undefined`.
     const typography = themeTypographyFromSpec(themeSpec) as Theme['typography'] | undefined
     const sizes = themeSizesFromSpec(themeSpec) as Partial<Theme['sizes']> | undefined
+    const effects = themeEffectsFromSpec(themeSpec) as Theme['effects'] | undefined
     return {
       ...base,
       colors: {
@@ -784,6 +786,7 @@ export function EditorCanvas({
         ...(themeOverridesFromSpec(themeSpec, dark) as Partial<Theme['colors']>),
       },
       ...(sizes !== undefined && { sizes: { ...base.sizes, ...sizes } }),
+      ...(effects !== undefined && { effects }),
       ...(typography !== undefined && {
         typography: { ...base.typography, ...typography },
       }),

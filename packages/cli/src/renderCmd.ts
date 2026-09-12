@@ -21,6 +21,7 @@ import { type TreeDef, TreeEngine } from '@yggdrasil-forge/core'
 import {
   deserializeDocument,
   standaloneSvg,
+  themeEffectsFromSpec,
   themeOverridesFromSpec,
   themeSizesFromSpec,
   themeTypographyFromSpec,
@@ -124,6 +125,7 @@ function preparar(
   const base = dark ? minimalDark : minimal
   const typography = themeTypographyFromSpec(doc.meta.theme) as Theme['typography'] | undefined
   const sizes = themeSizesFromSpec(doc.meta.theme) as Partial<Theme['sizes']> | undefined
+  const effects = themeEffectsFromSpec(doc.meta.theme) as Theme['effects'] | undefined
   const theme: Theme = {
     ...base,
     colors: {
@@ -131,6 +133,7 @@ function preparar(
       ...(themeOverridesFromSpec(doc.meta.theme, dark) as Partial<Theme['colors']>),
     },
     ...(sizes !== undefined && { sizes: { ...base.sizes, ...sizes } }),
+    ...(effects !== undefined && { effects }),
     ...(typography !== undefined && {
       typography: { ...base.typography, ...typography },
     }),

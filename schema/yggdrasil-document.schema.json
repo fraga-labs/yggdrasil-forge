@@ -1445,6 +1445,31 @@
               "additionalProperties": false,
               "description": "Render sizes. Omit to fall back to the base."
             },
+            "glow": {
+              "type": "object",
+              "properties": {
+                "radius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Glow blur radius in layout units. 0 or omitted means no glow at all."
+                },
+                "states": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["locked", "unlockable", "unlocked", "maxed", "inProgress"],
+                    "description": "Visual node state that a theme can fill."
+                  },
+                  "description": "Visual states that glow. Defaults to unlockable/unlocked/maxed."
+                },
+                "edges": {
+                  "type": "boolean",
+                  "description": "Whether lit edges glow too. Default false."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Glow effect. Omit for no glow at all."
+            },
             "preset": {
               "type": "string",
               "description": "Id of the preset this theme started from (informative, for UIs)."

@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { useTheme } from './ThemeProvider.js'
 import { buildAnimationsCSS } from './animations.js'
+import { glowFilterId, glowRadiusOf } from './glow.js'
 import { buildViewBox } from './svg-helpers.js'
 
 // Ambiente de módulo: tipa `process.env.NODE_ENV` sen depender de
@@ -100,6 +101,7 @@ export const SVGRenderer = forwardRef<SVGSVGElement, SVGRendererProps>(function 
 ): JSX.Element {
   const theme = useTheme()
   const themeId = useId()
+  const glowRadius = glowRadiusOf(theme)
   const viewBox = buildViewBox(bounds, padding)
 
   if (error !== undefined) {
@@ -230,6 +232,27 @@ export const SVGRenderer = forwardRef<SVGSVGElement, SVGRendererProps>(function 
       {animationsCSS !== null && <style>{animationsCSS}</style>}
       {theme !== null && (
         <defs>
+          {/* 19.7: o resplandor. Só se emite cando o tema o pide, así
+              que sen `effects.glowRadius` o SVG é byte a byte o de
+              antes. `feMerge` deixa o elemento nítido ENRIBA do seu
+              propio halo; sen iso o nodo vese borroso en vez de aceso. */}
+          {glowRadius !== undefined && (
+            <filter
+              id={glowFilterId(glowRadius)}
+              x="-75%"
+              y="-75%"
+              width="250%"
+              height="250%"
+              colorInterpolationFilters="sRGB"
+            >
+              <feGaussianBlur stdDeviation={glowRadius} result="yf-blur" />
+              <feMerge>
+                <feMergeNode in="yf-blur" />
+                <feMergeNode in="yf-blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          )}
           <marker
             id={ARROW_MARKER_ID}
             viewBox="0 0 10 10"

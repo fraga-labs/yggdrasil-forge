@@ -1,4 +1,5 @@
 // ── INICIO: Theme types ──
+import type { NodeState } from '@yggdrasil-forge/core'
 
 /**
  * Tema do `@yggdrasil-forge/react`. Define tokens (cores, sizes,
@@ -26,6 +27,44 @@ export interface Theme {
    * de icono-texto.
    */
   readonly typography?: ThemeTypography
+
+  /**
+   * Efectos de composición (19.7). Opcional; sen `effects` o render é
+   * exactamente o de sempre — cero regresión e cero custo.
+   */
+  readonly effects?: ThemeEffects
+}
+
+/**
+ * Efectos de composición: hoxe só o resplandor (19.7).
+ *
+ * **Por que non é un token de cor máis**: un glow non se pinta, fíltrase.
+ * Precisa un `<filter>` en `<defs>` e un `filter="url(#…)"` nos elementos
+ * que o levan, e iso é caro: o navegador rasteriza cada elemento
+ * filtrado aparte. Por iso é **opt-in** e por iso `glowStates` existe —
+ * nun atlas de 300 nodos hai que acender só os poucos que importan.
+ */
+export interface ThemeEffects {
+  /**
+   * Radio do desenfoque do resplandor, en unidades de layout. Sen
+   * definir (ou 0) non hai resplandor e non se emite ningún filtro.
+   *
+   * Valores sensatos: 2-4 para un halo discreto, 6-10 para o bloom
+   * dos mockups fundacionais.
+   */
+  readonly glowRadius?: number
+
+  /**
+   * Estados visuais que resplandecen. Sen definir, os tres «vivos»:
+   * `unlockable`, `unlocked` e `maxed` — os apagados non brillan.
+   *
+   * Nun grafo denso conviña reducilo a `['maxed']`: cada elemento
+   * filtrado custa unha pasada de rasterización.
+   */
+  readonly glowStates?: readonly NodeState[]
+
+  /** Se as arestas ACESAS tamén resplandecen. Default `false`. */
+  readonly glowEdges?: boolean
 }
 
 /**

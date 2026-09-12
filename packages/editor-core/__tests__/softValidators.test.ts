@@ -321,4 +321,76 @@ describe('createDefaultValidators — integración co EditorEngine', () => {
     expect(result.ok).toBe(false)
   })
 })
+// ── 19.10: as mensaxes van nos DOUS idiomas ──
+//
+// Deixaron de ser só cousa do editor: desde 19.10 `ygg validate` tamén
+// as imprime, e o idioma por defecto do proxecto é o galego. Había once
+// mensaxes só en inglés, así que un usuario galego vía o panel Problemas
+// e a saída do CLI en dous idiomas mesturados. Esta garda existe para
+// que unha mensaxe nova non naza outra vez a medias.
+
+describe('★ 19.10 — toda mensaxe de validación ten `gl` e `en`', () => {
+  /** Documento que dispara os cinco validadores soft dunha vez. */
+  function docEnfermo(): ReturnType<typeof createEditorDocument> {
+    const tree = minimalTreeDef()
+    tree.resources = [{ id: 'ouro', label: { gl: 'Ouro' }, initial: 5 } as never]
+    const a = tree.nodes.find((n) => n.id === 'root')
+    const b = tree.nodes.find((n) => n.id === 'child')
+    if (a !== undefined) {
+      // exclusión asimétrica + custo a un recurso que non existe
+      ;(a as { exclusions?: unknown }).exclusions = ['child']
+      ;(a as { costPerTier?: unknown }).costPerTier = [[{ resourceId: 'prata', amount: 1 }]]
+      // efecto que o motor NON aplica (`modify_stat` está en
+      // UNSUPPORTED_EFFECT_TYPES; `custom` como condición SI está
+      // soportada, así que non serve para disparar este validador)
+      ;(a as { effects?: unknown }).effects = [{ type: 'modify_stat', statId: 'forza', amount: 1 }]
+    }
+    if (b !== undefined) {
+      // bloqueo real: depende de si mesmo
+      ;(b as { prerequisites?: unknown }).prerequisites = {
+        type: 'node_unlocked',
+        nodeId: 'child',
+      }
+      ;(b as { position?: unknown }).position = { x: 900, y: 0 }
+    }
+    return createEditorDocument(tree, {
+      coordinateBounds: { minX: 0, minY: 0, maxX: 200, maxY: 200 },
+    })
+  }
+
+  it('★★ os cinco validadores disparan e TODAS as mensaxes traen os dous idiomas', () => {
+    const doc = docEnfermo()
+    const issues = createDefaultValidators().flatMap((v) => v(doc))
+    // Se algún día un validador deixa de disparar aquí, este número
+    // avisa de que a proba xa non cobre o que di cubrir.
+    expect(issues.length).toBeGreaterThanOrEqual(5)
+    const senGl = issues
+      .filter((i) => {
+        const m = i.message as { gl?: string; en?: string }
+        return typeof m.gl !== 'string' || m.gl.length === 0
+      })
+      .map((i) => i.code)
+    expect(senGl).toEqual([])
+    const senEn = issues
+      .filter((i) => {
+        const m = i.message as { gl?: string; en?: string }
+        return typeof m.en !== 'string' || m.en.length === 0
+      })
+      .map((i) => i.code)
+    expect(senEn).toEqual([])
+  })
+
+  it('★ cóbrense os cinco códigos, non catro por casualidade', () => {
+    const codigos = new Set(
+      createDefaultValidators()
+        .flatMap((v) => v(docEnfermo()))
+        .map((i) => i.code),
+    )
+    expect(codigos).toContain('EXCL_ASYMMETRIC')
+    expect(codigos).toContain('PREREQ_CYCLE')
+    expect(codigos).toContain('LAYOUT_OVERFLOW')
+    expect(codigos).toContain('RES_DANGLING_COST_PER_TIER')
+    expect(codigos).toContain('FEATURE_UNSUPPORTED')
+  })
+})
 // ── FIN: tests soft validators ──

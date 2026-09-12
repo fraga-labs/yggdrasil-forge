@@ -20,7 +20,10 @@ export const uniqueIdsValidator: Validator = (doc: EditorDocument) => {
   }
   for (const [id, count] of nodeIdCounts) {
     if (count > 1) {
-      const message: LocalizedString = { en: `duplicate node id: '${id}' (appears ${count}x)` }
+      const message: LocalizedString = {
+        en: `duplicate node id: '${id}' (appears ${count}x)`,
+        gl: `id de nodo repetido: '${id}' (aparece ${count} veces)`,
+      }
       issues.push({ severity: 'error', code: 'YGG_ED_DUP_NODE_ID', message, nodeId: id })
     }
   }
@@ -32,7 +35,10 @@ export const uniqueIdsValidator: Validator = (doc: EditorDocument) => {
   }
   for (const [id, count] of edgeIdCounts) {
     if (count > 1) {
-      const message: LocalizedString = { en: `duplicate edge id: '${id}' (appears ${count}x)` }
+      const message: LocalizedString = {
+        en: `duplicate edge id: '${id}' (appears ${count}x)`,
+        gl: `id de aresta repetido: '${id}' (aparece ${count} veces)`,
+      }
       issues.push({ severity: 'error', code: 'YGG_ED_DUP_EDGE_ID', message, edgeId: id })
     }
   }

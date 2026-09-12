@@ -30,6 +30,7 @@ export const asymmetricExclusionValidator: Validator = (doc: EditorDocument) => 
       if (reverse === undefined || !reverse.has(a)) {
         const message: LocalizedString = {
           en: `node '${a}' excludes '${b}', but '${b}' does not exclude '${a}' (asymmetric)`,
+          gl: `o nodo '${a}' exclúe '${b}', pero '${b}' non exclúe '${a}' (asimétrica)`,
         }
         issues.push({
           severity: 'warning',

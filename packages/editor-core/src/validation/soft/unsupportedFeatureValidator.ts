@@ -85,6 +85,7 @@ export const unsupportedFeatureValidator: Validator = (doc: EditorDocument) => {
       if (!isEffectSupported(t)) {
         const message: LocalizedString = {
           en: `node '${node.id}' uses effect type '${t}' which this engine does not apply`,
+          gl: `o nodo '${node.id}' usa un efecto de tipo '${t}' que este motor non aplica`,
         }
         issues.push({
           severity: 'warning',
@@ -102,6 +103,7 @@ export const unsupportedFeatureValidator: Validator = (doc: EditorDocument) => {
       if (!isConditionSupported(t)) {
         const message: LocalizedString = {
           en: `node '${node.id}' uses prerequisite condition '${t}' which this engine does not evaluate`,
+          gl: `o nodo '${node.id}' usa a condición '${t}', que este motor non avalía`,
         }
         issues.push({
           severity: 'warning',

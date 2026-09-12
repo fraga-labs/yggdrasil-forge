@@ -21,6 +21,7 @@ export const layoutOverflowValidator: Validator = (doc: EditorDocument) => {
     if (pos.x < bounds.minX || pos.x > bounds.maxX || pos.y < bounds.minY || pos.y > bounds.maxY) {
       const message: LocalizedString = {
         en: `node '${node.id}' at (${pos.x}, ${pos.y}) is outside coordinateBounds (${bounds.minX},${bounds.minY})–(${bounds.maxX},${bounds.maxY})`,
+        gl: `o nodo '${node.id}' en (${pos.x}, ${pos.y}) queda fóra de coordinateBounds (${bounds.minX},${bounds.minY})–(${bounds.maxX},${bounds.maxY})`,
       }
       issues.push({
         severity: 'info',

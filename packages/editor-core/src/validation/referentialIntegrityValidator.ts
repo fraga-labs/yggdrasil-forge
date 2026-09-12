@@ -43,6 +43,7 @@ export const referentialIntegrityValidator: Validator = (doc: EditorDocument) =>
     if (!nodeIds.has(edge.source)) {
       const message: LocalizedString = {
         en: `edge '${edge.id}' has dangling source '${edge.source}'`,
+        gl: `a aresta '${edge.id}' sae dun nodo inexistente: '${edge.source}'`,
       }
       issues.push({
         severity: 'error',
@@ -54,6 +55,7 @@ export const referentialIntegrityValidator: Validator = (doc: EditorDocument) =>
     if (!nodeIds.has(edge.target)) {
       const message: LocalizedString = {
         en: `edge '${edge.id}' has dangling target '${edge.target}'`,
+        gl: `a aresta '${edge.id}' apunta a un nodo inexistente: '${edge.target}'`,
       }
       issues.push({
         severity: 'error',
@@ -73,6 +75,7 @@ export const referentialIntegrityValidator: Validator = (doc: EditorDocument) =>
       if (!nodeIds.has(ref)) {
         const message: LocalizedString = {
           en: `node '${node.id}' has dangling prerequisite '${ref}'`,
+          gl: `o nodo '${node.id}' ten un prerrequisito cara a un nodo inexistente: '${ref}'`,
         }
         issues.push({
           severity: 'error',
@@ -88,6 +91,7 @@ export const referentialIntegrityValidator: Validator = (doc: EditorDocument) =>
         if (!nodeIds.has(ref)) {
           const message: LocalizedString = {
             en: `node '${node.id}' has dangling exclusion '${ref}'`,
+            gl: `o nodo '${node.id}' exclúe un nodo inexistente: '${ref}'`,
           }
           issues.push({
             severity: 'error',

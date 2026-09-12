@@ -364,6 +364,45 @@ describe('★ MeshLayout — os corpos NON se solapan', () => {
     expect(r.ok).toBe(true)
   })
 
+  it('★★ os nodos SEN GRUPO tampouco se solapan (o anel exterior reparte por ángulo)', () => {
+    // Camiño que non tiña protección ningunha: os soltos colócanse nun
+    // anel exterior dividindo os 360° entre eles, sen mirar canto miden.
+    // Con vinte nodos de radio 44 o arco toca os 70 e precisan 88, así
+    // que se pisaban de tres en tres. Medido: 20 pares solapados, o
+    // peor por -19,8 unidades. O pase de separación é GLOBAL por isto:
+    // se fose só por blob, estes nodos non o verían nunca.
+    const nodes: unknown[] = []
+    for (let i = 0; i < 6; i++) {
+      nodes.push({ id: `g${i}`, type: 'small', label: { gl: `g${i}` }, group: 'g' })
+    }
+    for (let i = 0; i < 20; i++) {
+      nodes.push({ id: `s${i}`, type: 'ascendancy', label: { gl: `s${i}` }, size: 44 })
+    }
+    const tree = {
+      id: 'soltos',
+      schemaVersion: '1.0.0',
+      version: '1.0.0',
+      label: { gl: 'S' },
+      groups: [{ id: 'g', label: { gl: 'G' } }],
+      nodes,
+      edges: [],
+      layout: { type: 'mesh', spacing: 62, seed: 1 },
+    } as unknown as TreeDef
+    const { nodes: p } = pos(tree)
+    const soltos = [...p.keys()].filter((id) => id.startsWith('s'))
+    const malos: string[] = []
+    for (let i = 0; i < soltos.length; i++) {
+      for (let j = i + 1; j < soltos.length; j++) {
+        const a = p.get(soltos[i] ?? '')
+        const b = p.get(soltos[j] ?? '')
+        if (a === undefined || b === undefined) continue
+        const d = Math.hypot(a.x - b.x, a.y - b.y)
+        if (d < 88) malos.push(`${soltos[i]}↔${soltos[j]}: ${d.toFixed(1)} < 88`)
+      }
+    }
+    expect(malos).toEqual([])
+  })
+
   it('segue determinista tras o pase de separación: mesma semente, mesmas posicións', () => {
     const a = pos(arboreDesigual()).nodes
     const b = pos(arboreDesigual()).nodes

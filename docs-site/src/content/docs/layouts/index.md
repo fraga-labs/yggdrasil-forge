@@ -1,6 +1,6 @@
 ---
 title: Layouts
-description: Os seis motores de colocación — radial, árbore, capas, radial por grupos, constelación e custom — e cando usar cada un.
+description: Os seis motores de colocación — radial, árbore, capas, radial por grupos, constelación e malla — máis `custom`, e cando usar cada un.
 ---
 
 Un **layout** decide onde vai cada nodo. En Yggdrasil Forge hai dúas formas de usalo:

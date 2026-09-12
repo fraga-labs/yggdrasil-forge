@@ -1,6 +1,6 @@
 ---
 title: Layouts
-description: The six placement engines — radial, tree, layered, clustered radial, constellation and custom — and when to use each.
+description: The six placement engines — radial, tree, layered, clustered radial, constellation and mesh — plus `custom`, and when to use each.
 ---
 
 A **layout** decides where each node goes. In Yggdrasil Forge there are two ways to use one:

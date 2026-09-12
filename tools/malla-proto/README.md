@@ -13,7 +13,7 @@ npx ygg render saida.json --out saida.svg --dark --width 1400
 ## Por que existe
 
 Os mockups fundacionais (`atlas.png`) piden un estilo que **ningún dos
-cinco motores de layout sabe facer**: comarcas como mallas planares
+cinco motores de layout sabía facer**: comarcas como mallas planares
 densas e irregulares, con nodos de grao 3-4, arestas curtas, **lazos
 pechados** e portas entre comarcas veciñas. `clustered-radial` coloca os
 membros nun anel sen mirar o grafo, así que calquera cadea de
@@ -21,10 +21,15 @@ prerrequisitos se converte nunha corda que cruza o círculo; con seis
 comarcas iso lese a espagueti.
 
 Pechouse aquí primeiro, fóra de `packages/`, para non meter no motor un
-algoritmo antes de saber que o resultado se parece ao obxectivo. Hoxe
-escribe as `position` no documento (layout `custom`); cando o algoritmo
-viva en `@core`, un documento poderá pedir `layout: { type: 'mesh' }` e
-non levar coordenadas, coma xa pasa con `clustered-radial`.
+algoritmo antes de saber que o resultado se parece ao obxectivo. Este
+script escribe as `position` no documento (layout `custom`).
+
+**Xa non é a vía recomendada**: o algoritmo vive en `@core` como
+`MeshLayout`, así que un documento pide `layout: { type: 'mesh' }` e non
+leva coordenadas ningunhas — vai colocado ao pintar. O exemplo de
+verdade é [`tools/galeria/atlas-fisterra.mjs`](../galeria/). Este
+directorio queda como rexistro de como se buscou a xeometría, e segue
+sendo o sitio onde probar unha idea nova antes de tocar `packages/`.
 
 ## O algoritmo
 

@@ -18,6 +18,8 @@
 //   4. Relaxación: atracción pola aresta (só dentro do grupo) +
 //      repulsión local + tirón suave cara ao centro do blob, con
 //      arrefriado.
+//   5. Separación final, e esta é GLOBAL: ningún par de corpos queda
+//      solapado, nin dentro dunha comarca nin entre dúas veciñas.
 //
 // **Le o TAMAÑO dos nodos** (19.10). Ao principio non: todos eran
 // puntos co mesmo hueco `spacing`, e nunha árbore real (a do atlas ten
@@ -133,6 +135,14 @@ export class MeshLayout implements LayoutEngine {
       })
     }
 
+    // ── Separación GLOBAL ──
+    //
+    // A relaxación traballa blob a blob, así que por si soa garante que
+    // non se solapan os nodos DA MESMA comarca. Aquí péchase para todo o
+    // documento: tamén entre comarcas veciñas, que é o que permite
+    // acercar os blobs sen que se toquen os corpos.
+    this.separar(positions, radioDe, s)
+
     const edges = new Map<string, EdgePath>()
     for (const edge of treeDef.edges) {
       const a = positions.get(edge.source)
@@ -147,6 +157,96 @@ export class MeshLayout implements LayoutEngine {
       layoutType: 'mesh',
     }
     return ok({ ...parcial, bounds: computeBounds(parcial, { padding: s }) })
+  }
+
+  /**
+   * Empurra os nodos ata que **ningún par de corpos se solapa**, sobre
+   * as posicións xa relaxadas.
+   *
+   * **Por que fai falta un pase aparte.** A relaxación arrefría: o tope
+   * de paso remata en `s * 0.02` (1,2 unidades ao espazado do atlas),
+   * así que un solape de 10 xa non se pode desfacer por moitas pasadas
+   * que queden. Medido no atlas da galería: con 220 iteracións quedaban
+   * tres pares solapados (o peor, -10,6). Chegar a cero subindo
+   * `iterations` pide 1.200, e iso son 2,65 s a 1.500 nodos en vez de
+   * 0,74 s; este pase custa o mesmo que unha iteración e dá unha
+   * garantía DURA en vez de estatística.
+   *
+   * Pide só o TOQUE (`r₁ + r₂`), non o hueco estético completo, así que
+   * non pelexa co que a relaxación acaba de compoñer. Determinista: a
+   * orde de visita sae das posicións, non do rng.
+   */
+  private separar(
+    positions: Map<string, Position>,
+    radioDe: ReadonlyMap<string, number>,
+    s: number,
+  ): void {
+    const ids = [...positions.keys()]
+    const n = ids.length
+    if (n < 2) return
+    const xs = new Float64Array(n)
+    const ys = new Float64Array(n)
+    const rs = new Float64Array(n)
+    ids.forEach((id, k) => {
+      const p = positions.get(id)
+      xs[k] = p?.x ?? 0
+      ys[k] = p?.y ?? 0
+      rs[k] = radioDe.get(id) ?? 0
+    })
+    // A cela ten que cubrir o par máis grande posible; se non, dous
+    // nodos grandes en celas non veciñas nunca se verían.
+    const rMax = Math.max(...Array.from(rs))
+    const cela = Math.max(s, 2 * rMax + s * 0.35) * 1.05
+
+    for (let pase = 0; pase < 30; pase++) {
+      const balde = new Map<string, number[]>()
+      for (let k = 0; k < n; k++) {
+        const chave = `${Math.floor((xs[k] ?? 0) / cela)}:${Math.floor((ys[k] ?? 0) / cela)}`
+        const lista = balde.get(chave)
+        if (lista === undefined) balde.set(chave, [k])
+        else lista.push(k)
+      }
+      let movido = false
+      for (let k = 0; k < n; k++) {
+        const cx = Math.floor((xs[k] ?? 0) / cela)
+        const cy = Math.floor((ys[k] ?? 0) / cela)
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            for (const m of balde.get(`${cx + dx}:${cy + dy}`) ?? []) {
+              // Só un sentido do par: senón a corrección aplícase dúas
+              // veces e sobrepasa.
+              if (m <= k) continue
+              const need = ((rs[k] ?? 0) + (rs[m] ?? 0)) * 1.02
+              let vx = (xs[k] ?? 0) - (xs[m] ?? 0)
+              let vy = (ys[k] ?? 0) - (ys[m] ?? 0)
+              let d = Math.hypot(vx, vy)
+              if (d >= need) continue
+              if (d < 1e-6) {
+                // Coincidentes: sepáranse nunha dirección FIXA derivada
+                // dos índices, para non perder o determinismo.
+                vx = (k % 2 === 0 ? 1 : -1) * 1e-3
+                vy = 1e-3
+                d = Math.hypot(vx, vy)
+              }
+              const empuxe = (need - d) / 2 / d
+              xs[k] = (xs[k] ?? 0) + vx * empuxe
+              ys[k] = (ys[k] ?? 0) + vy * empuxe
+              xs[m] = (xs[m] ?? 0) - vx * empuxe
+              ys[m] = (ys[m] ?? 0) - vy * empuxe
+              movido = true
+            }
+          }
+        }
+      }
+      if (!movido) break
+    }
+
+    ids.forEach((id, k) => {
+      positions.set(id, {
+        x: Math.round((xs[k] ?? 0) * 10) / 10,
+        y: Math.round((ys[k] ?? 0) * 10) / 10,
+      })
+    })
   }
 
   /**
@@ -372,63 +472,6 @@ export class MeshLayout implements LayoutEngine {
         xs[k] = (xs[k] ?? 0) + gx * escala
         ys[k] = (ys[k] ?? 0) + gy * escala
       }
-    }
-
-    // ── 3. Pase final de SEPARACIÓN ──
-    //
-    // A relaxación arrefría: o tope de paso remata en `s * 0.02` (1,2
-    // unidades ao espazado do atlas), así que un solape de 10 unidades
-    // xa non se pode desfacer por moitas pasadas que queden. Medido no
-    // atlas: con 220 iteracións quedaban 3 pares solapados (o peor,
-    // -10,6); facían falta 1.200 para chegar a cero, e iso son 2,65 s a
-    // 1.500 nodos en vez de 0,74 s.
-    //
-    // Este pase custa o mesmo que unha iteración e dá unha garantía
-    // DURA en vez de estatística: os corpos non se solapan. Pide só o
-    // toque (`r₁ + r₂`), non o hueco estético completo, así que non
-    // pelexa co que a relaxación acaba de compoñer.
-    for (let pase = 0; pase < 30; pase++) {
-      const balde = new Map<string, number[]>()
-      for (let k = 0; k < n; k++) {
-        const chave = `${Math.floor((xs[k] ?? 0) / cela)}:${Math.floor((ys[k] ?? 0) / cela)}`
-        const lista = balde.get(chave)
-        if (lista === undefined) balde.set(chave, [k])
-        else lista.push(k)
-      }
-      let movido = false
-      for (let k = 0; k < n; k++) {
-        const cx = Math.floor((xs[k] ?? 0) / cela)
-        const cy = Math.floor((ys[k] ?? 0) / cela)
-        for (let dx = -1; dx <= 1; dx++) {
-          for (let dy = -1; dy <= 1; dy++) {
-            for (const m of balde.get(`${cx + dx}:${cy + dy}`) ?? []) {
-              // Só un dos dous sentidos do par: senón a corrección
-              // aplícase dúas veces e sobrepasa.
-              if (m <= k) continue
-              const need = ((rs[k] ?? 0) + (rs[m] ?? 0)) * 1.02
-              let vx = (xs[k] ?? 0) - (xs[m] ?? 0)
-              let vy = (ys[k] ?? 0) - (ys[m] ?? 0)
-              let d = Math.hypot(vx, vy)
-              if (d >= need) continue
-              if (d < 1e-6) {
-                // Coincidentes: sepáranse nunha dirección FIXA
-                // derivada dos índices, para non perder o
-                // determinismo nin depender do rng.
-                vx = (k % 2 === 0 ? 1 : -1) * 1e-3
-                vy = 1e-3
-                d = Math.hypot(vx, vy)
-              }
-              const empuxe = (need - d) / 2 / d
-              xs[k] = (xs[k] ?? 0) + vx * empuxe
-              ys[k] = (ys[k] ?? 0) + vy * empuxe
-              xs[m] = (xs[m] ?? 0) - vx * empuxe
-              ys[m] = (ys[m] ?? 0) - vy * empuxe
-              movido = true
-            }
-          }
-        }
-      }
-      if (!movido) break
     }
 
     blob.memberIds.forEach((id, k) => {

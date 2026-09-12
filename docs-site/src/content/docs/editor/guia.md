@@ -86,7 +86,7 @@ A **barra de estado** de abaixo mostra nodos, arestas, modo e tamaño do mundo (
 
 - **Arrastra un nodo** → móvese (con varios seleccionados, móvense todos xuntos, e un só *desfacer* os devolve).
 - **Arrastra o fondo** → pan. **Roda do rato** → zoom cara ao cursor. Os botóns **− +** da barra superior fan o mesmo.
-- Nas árbores **grandes** (40 nodos ou máis) aparece un **minimapa** na esquina inferior esquerda: amosa a árbore enteira, o rectángulo do que estás a ver, e **premendo nel vas alí**. Nas pequenas non sae, porque a árbore cabe na pantalla e só quitaría sitio.
+- Nas árbores **grandes** (40 nodos ou máis) aparece un **minimapa** na esquina inferior esquerda: amosa a árbore enteira e **premendo nel vas alí**. Cando hai zoom aparece tamén o rectángulo do que estás a ver; se cabe todo na pantalla non o pinta, porque coincidiría co marco e non diría nada. Nas pequenas non sae, porque a árbore cabe na pantalla e só quitaría sitio.
 - **Estrutura → clic nun nodo** → a vista céntrase nel (útil en árbores grandes).
 
 ### Dispor — colocar todos os nodos automaticamente

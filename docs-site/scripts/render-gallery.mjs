@@ -87,11 +87,11 @@ for (const file of files) {
   const textColor = doc.editor?.theme?.textColor
   const wantsDarkGround = typeof textColor === 'string' && isLightColor(textColor)
   // Minimapa nas árbores GRANDES. Non é dato do documento: é mobiliario
-  // do visor, así que decídeo quen renderiza. A partir de ~50 nodos a
-  // ficha xa non cabe dun ollo e o minimapa dá o mapa do mapa — é o que
-  // fan os dous mockups fundacionais que o levan. Nas árbores pequenas
-  // sería un adorno que rouba espazo.
-  const minimapa = tree.nodes.length >= 50 ? ['--minimap'] : []
+  // do visor, así que decídeo quen renderiza. O limiar é o MESMO que usa
+  // o editor (`MINIMAP_DESDE` en EditorCanvas): dous números distintos
+  // para a mesma decisión só crean a dúbida de cal manda. Nas árbores
+  // pequenas sería un adorno que rouba espazo.
+  const minimapa = tree.nodes.length >= 40 ? ['--minimap'] : []
   for (const [suffix, extra] of [
     ['.svg', wantsDarkGround ? ['--dark'] : []],
     ['.dark.svg', ['--dark']],

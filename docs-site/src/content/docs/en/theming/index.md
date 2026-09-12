@@ -105,6 +105,16 @@ Body (`nodeFills`) and ring (`nodeRings`) are independent on purpose. A theme ca
 | `pergamino` | Warm earthy parchment lights, sepia-ink text. |
 | `neon` | Deep dark fills with saturated accents (made for dark chrome). |
 | `bosque` | Deep forest greens and muted golds, ivory text. |
+| `forxa` | **The North Star**: obsidian and gold over deep blue, serif with air. The body stays dark and progression lives in the ring. |
+| `gotico` | Blackened iron, crimson and brass; heavy uppercase serif; edges like dried blood veins. |
+| `sci-fi` | Holographic matrix: near-black body with all the neon in the thin ring (cyan → magenta), wide-tracked labels. |
+| `escolar` | The only light one: friendly greens, sunny yellow and sky blue over cream, rounded type. For curricula and learning paths. |
+
+The last four (19.0) are the project's **founding mockup** styles and the first to use `nodeRings`, `edges` and `typography`: copying one of those specs is the fastest way to make a generated document look finished.
+
+:::caution[Fonts are not bundled]
+The named families (Cinzel, Orbitron, Nunito…) do not ship with the package. Every stack ends in a real generic (`serif`/`sans-serif`), so a consumer without them sees the fallback — never a failure. If you want the real thing, load it on your own page.
+:::
 
 For an AI or a pipeline, the robust recipe is to **copy the preset's full spec** (the one in `gaia-cards.json` in the gallery carries `neon`); emitting only `{ "preset": "neon" }` lets a human press the chip in the editor.
 

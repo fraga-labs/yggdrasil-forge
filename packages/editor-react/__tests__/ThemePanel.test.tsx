@@ -269,11 +269,35 @@ describe('★ 7.8.2 — control directo de cor de texto', () => {
 })
 
 describe('★ ThemePanel — fichas desde o rexistro (7.19)', () => {
-  it('renderiza as 5 fichas de THEME_PRESETS na súa orde', () => {
+  it('renderiza unha ficha por preset do rexistro, na súa orde', () => {
     render(<ThemePanel editorEngine={buildEngine()} />)
-    for (const label of ['Tintado', 'Neutro', 'Pergamiño', 'Néon', 'Bosque']) {
+    for (const label of [
+      'Tintado',
+      'Neutro',
+      'Pergamiño',
+      'Néon',
+      'Bosque',
+      // 19.0 — os catro dos mockups.
+      'Forxa',
+      'Gótico',
+      'Sci-fi',
+      'Escolar',
+    ]) {
       expect(screen.getByRole('button', { name: label })).toBeDefined()
     }
+  })
+
+  it('★ 19.0 — clic en «Gótico» dispatcha tamén anel, arestas e fonte', () => {
+    const engine = buildEngine()
+    render(<ThemePanel editorEngine={engine} />)
+    act(() => {
+      fireEvent.click(screen.getByRole('button', { name: 'Gótico' }))
+    })
+    const theme = engine.getDocument().meta.theme
+    expect(theme).toEqual(getThemePreset('gotico')?.spec)
+    expect(theme?.nodeRings?.maxed).toBe('#c1272d')
+    expect(theme?.edges?.active).toBe('#a02a24')
+    expect(theme?.typography?.textTransform).toBe('uppercase')
   })
 
   it('clic en «Pergamiño» → dispatch do spec completo do rexistro, chip activo', () => {

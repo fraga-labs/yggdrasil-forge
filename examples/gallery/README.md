@@ -122,6 +122,22 @@ does exactly this; the `preset` field is the id). Available presets, from
 | `pergamino` | Warm earthy parchment lights, sepia-ink text. |
 | `neon` | Deep dark fills with saturated accents (made for dark chrome). |
 | `bosque` | Deep forest greens and muted golds, ivory text. |
+| `forxa` | Obsidian and gold over deep blue, serif with air — the project's North Star mockup. |
+| `gotico` | Blackened iron, crimson and brass; heavy uppercase serif; dried-blood edges. |
+| `sci-fi` | Near-black body, all the neon in the thin ring (cyan → magenta), wide-tracked labels. |
+| `escolar` | Friendly greens, sunny yellow and sky blue over cream, rounded type — the only light one. |
+
+The last four ship since 19.0 and are the first presets to exercise the
+three axes the document learned to carry that release — `nodeRings` (the
+node **outline** per state, sibling of `nodeFills`, which paints the
+body), `edges` (`color` + `active` for lit paths) and `typography`
+(`fontFamily`, `fontWeight`, `letterSpacing`, `textTransform`). If you
+are generating a document and want it to look finished, copy one of
+those specs verbatim: type and outline carry as much identity as color.
+
+Named font families are **not bundled**; every stack ends in a real
+generic, so a consumer without the font sees the fallback, never a
+failure.
 
 The easiest robust recipe for generators: set
 `"editor": { "theme": { "preset": "<id>", ...full spec... } }` by copying

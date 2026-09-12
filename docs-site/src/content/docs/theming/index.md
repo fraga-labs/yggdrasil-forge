@@ -105,6 +105,16 @@ O corpo (`nodeFills`) e o anel (`nodeRings`) son independentes a propósito. Un 
 | `pergamino` | Claros cálidos terrosos, texto tinta sepia. |
 | `neon` | Fills escuros profundos con acentos saturados (pensado para chrome escuro). |
 | `bosque` | Verdes profundos e dourados apagados, texto marfil. |
+| `forxa` | **O North Star**: obsidiana e ouro sobre azul profundo, serif con aire. O corpo queda escuro e a progresión vive no anel. |
+| `gotico` | Ferro negro, carmesí e latón; serif pesada en maiúsculas; arestas como vetas de sangue seca. |
+| `sci-fi` | Matriz holográfica: corpo case negro e todo o neon no anel fino (cian → maxenta), rótulos tracking ancho. |
+| `escolar` | O único claro: verdes amables, amarelo sol e azul ceo sobre creme, con redonda. Para currículos e itinerarios. |
+
+Os catro últimos (19.0) son os estilos dos **mockups fundacionais** do proxecto e os primeiros que usan `nodeRings`, `edges` e `typography`: copiar un deses specs é a forma máis rápida de que un documento xerado se vexa terminado.
+
+:::caution[As fontes non van empaquetadas]
+As familias nomeadas (Cinzel, Orbitron, Nunito…) non se distribúen co paquete. Cada stack remata nun xenérico real (`serif`/`sans-serif`), así que un consumidor que non as teña ve a reserva — nunca un fallo. Se as queres de verdade, cárgaas ti na túa páxina.
+:::
 
 Para unha IA ou un pipeline, a receita robusta é **copiar o spec completo** do preset (o de `gaia-cards.json` na galería leva `neon`); emitir só `{ "preset": "neon" }` deixa que un humano prema a ficha no editor.
 

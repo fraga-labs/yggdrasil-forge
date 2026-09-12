@@ -1,6 +1,10 @@
 // ── INICIO: tests themePresets (7.19, Cambio 2) ──
-// O tema como dato reutilizable: rexistro con 5 presets, specs
-// completos, ids únicos, round-trip por serialización.
+// O tema como dato reutilizable: rexistro de presets, specs completos,
+// ids únicos, round-trip por serialización.
+//
+// 19.0: o rexistro pasa de 5 a 9 — os catro novos (forxa, gotico,
+// sci-fi, escolar) son os estilos dos mockups fundacionais e os
+// primeiros que usan nodeRings/edges/typography.
 
 import { describe, expect, it } from 'vitest'
 import { createEditorDocument } from '../src/document/EditorDocument.js'
@@ -10,13 +14,17 @@ import { THEME_PRESETS, getThemePreset } from '../src/document/themePresets.js'
 const NODE_STATES = ['locked', 'unlockable', 'unlocked', 'maxed', 'inProgress'] as const
 
 describe('THEME_PRESETS — rexistro (7.19)', () => {
-  it('contén exactamente 5 presets cos ids esperados, en orde', () => {
+  it('contén exactamente 9 presets cos ids esperados, en orde', () => {
     expect(THEME_PRESETS.map((p) => p.id)).toEqual([
       'tintado',
       'neutro',
       'pergamino',
       'neon',
       'bosque',
+      'forxa',
+      'gotico',
+      'sci-fi',
+      'escolar',
     ])
   })
 
@@ -72,6 +80,31 @@ describe('THEME_PRESETS — rexistro (7.19)', () => {
         inProgress: '#e6c98a',
       },
     })
+  })
+
+  // ── 19.0 ──
+  const PRESETS_MOCKUP = ['forxa', 'gotico', 'sci-fi', 'escolar'] as const
+
+  it('★ os presets dos mockups exercen os TRES eixes novos (anel, aresta, fonte)', () => {
+    for (const id of PRESETS_MOCKUP) {
+      const spec = getThemePreset(id)?.spec
+      expect(spec, id).toBeDefined()
+      // Anel completo: os cinco estados, igual que o corpo.
+      for (const state of NODE_STATES) {
+        expect(spec?.nodeRings?.[state], `${id}.nodeRings.${state}`).toMatch(/^#[0-9a-f]{6}$/i)
+      }
+      // Aresta base e acesa: sen a segunda non hai camiño luminoso.
+      expect(spec?.edges?.color, `${id}.edges.color`).toMatch(/^#[0-9a-f]{6}$/i)
+      expect(spec?.edges?.active, `${id}.edges.active`).toMatch(/^#[0-9a-f]{6}$/i)
+      expect(spec?.typography?.fontFamily, `${id}.typography`).toBeDefined()
+    }
+  })
+
+  it('★ toda familia nomeada remata nun xenérico real (o consumidor pode non tela)', () => {
+    for (const id of PRESETS_MOCKUP) {
+      const stack = getThemePreset(id)?.spec.typography?.fontFamily ?? ''
+      expect(stack, id).toMatch(/(serif|sans-serif|monospace)\s*$/)
+    }
   })
 
   it('★ round-trip: un doc cun preset aplicado sobrevive serializar→deserializar', () => {

@@ -99,6 +99,139 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
       textColor: '#f4efdf',
     },
   },
+  // ── 19.0: os catro dos mockups fundacionais ──
+  // Estes son os primeiros presets que usan os eixes que o documento
+  // aprendeu a levar no 19.0 (`nodeRings`, `edges`, `typography`), e
+  // por iso son tamén o corpus de referencia: un xerador que copie un
+  // destes specs emite un documento que se ve *terminado* sen tocar un
+  // só píxel.
+  //
+  // Nota de fontes: as familias nomeadas (Cinzel, Orbitron, Nunito) NON
+  // van empaquetadas — cada stack remata nun xenérico real, así que un
+  // consumidor sen elas ve a fonte de reserva, nunca un fallo.
+  {
+    id: 'forxa',
+    label: { gl: 'Forxa', en: 'Forge' },
+    // O North Star: obsidiana e ouro sobre azul profundo. O corpo queda
+    // escuro e a progresión vive no ANEL — o marco dourado do mockup.
+    spec: {
+      preset: 'forxa',
+      nodeFills: {
+        locked: '#11131c',
+        unlockable: '#1c2436',
+        unlocked: '#2a2416',
+        maxed: '#3d3018',
+        inProgress: '#1f2130',
+      },
+      nodeRings: {
+        locked: '#3a3a44',
+        unlockable: '#d8b15a',
+        unlocked: '#e6c77a',
+        maxed: '#f2e2b0',
+        inProgress: '#8a7a4a',
+      },
+      edges: { color: '#4a4433', active: '#d8b15a' },
+      textColor: '#f0e6d2',
+      typography: {
+        fontFamily: "'Cinzel', 'Trajan Pro', Georgia, serif",
+        fontWeight: 600,
+        letterSpacing: '0.06em',
+      },
+    },
+  },
+  {
+    id: 'gotico',
+    label: { gl: 'Gótico', en: 'Gothic' },
+    // Ferro negro, carmesí e latón (latón, NON ouro: é o que separa o
+    // gótico da forxa). Arestas como vetas de sangue seca.
+    spec: {
+      preset: 'gotico',
+      nodeFills: {
+        locked: '#14110f',
+        unlockable: '#2a1613',
+        unlocked: '#3f1a18',
+        maxed: '#5c1f1c',
+        inProgress: '#231614',
+      },
+      nodeRings: {
+        locked: '#3a3634',
+        unlockable: '#8c6239',
+        unlocked: '#a02a24',
+        maxed: '#c1272d',
+        inProgress: '#6b4a32',
+      },
+      edges: { color: '#43302b', active: '#a02a24' },
+      textColor: '#d9cfc4',
+      typography: {
+        fontFamily: "'Cardinal', 'Trajan Pro', 'Times New Roman', serif",
+        fontWeight: 700,
+        letterSpacing: '0.10em',
+        textTransform: 'uppercase',
+      },
+    },
+  },
+  {
+    id: 'sci-fi',
+    label: { gl: 'Sci-fi', en: 'Sci-fi' },
+    // Matriz holográfica: corpo case negro e o neon TODO no anel fino
+    // (cian → maxenta), como os hexágonos do mockup.
+    spec: {
+      preset: 'sci-fi',
+      nodeFills: {
+        locked: '#12131f',
+        unlockable: '#1a1b33',
+        unlocked: '#102a33',
+        maxed: '#2a1030',
+        inProgress: '#161a2e',
+      },
+      nodeRings: {
+        locked: '#2f3350',
+        unlockable: '#7c4dff',
+        unlocked: '#00f0ff',
+        maxed: '#ff00aa',
+        inProgress: '#4dd0e1',
+      },
+      edges: { color: '#26304d', active: '#00f0ff' },
+      textColor: '#d8f6ff',
+      typography: {
+        fontFamily: "'Orbitron', 'Rajdhani', 'Segoe UI', system-ui, sans-serif",
+        fontWeight: 500,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+      },
+    },
+  },
+  {
+    id: 'escolar',
+    label: { gl: 'Escolar', en: 'Classroom' },
+    // O único CLARO da fornada: verdes amables, amarelo sol e azul ceo
+    // sobre creme, con redonda. Pensado para currículos e itinerarios,
+    // onde intimidar é un fallo de deseño.
+    spec: {
+      preset: 'escolar',
+      nodeFills: {
+        locked: '#e4e4e0',
+        unlockable: '#ffd166',
+        unlocked: '#57c785',
+        maxed: '#2e9e63',
+        inProgress: '#7cc7f0',
+      },
+      nodeRings: {
+        locked: '#c2c2bc',
+        unlockable: '#e0a92e',
+        unlocked: '#3aa869',
+        maxed: '#1f7a4a',
+        inProgress: '#4aa3d6',
+      },
+      edges: { color: '#cfd6cf', active: '#57c785' },
+      textColor: '#2f3b33',
+      typography: {
+        fontFamily: "'Nunito', 'Quicksand', 'Segoe UI', system-ui, sans-serif",
+        fontWeight: 700,
+        letterSpacing: '0.01em',
+      },
+    },
+  },
 ]
 
 /** Busca un preset polo seu id. `undefined` se non existe. */

@@ -15,11 +15,26 @@ pnpm add -D @yggdrasil-forge/cli
 |---|---|---|
 | `ygg validate [f \| -] [--json]` | Schema + validadores duros — **a mesma validación que importar no editor**. Sen ficheiro ou con `-` le stdin. `--json` emite `{ ok, issues[] }`. | 0 ok · 1 inválido · 2 uso |
 | `ygg layout <f \| -> --algo <a> [--out f]` | Coloca **todos** os nodos co motor (`radial`, `tree`, `layered`, `clustered-radial`, `constellation`) e coce o encadre. | documento ao stdout ou a `--out` |
-| `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | SVG **autocontido** (sen CSS externo nin variables), cos estados iniciais e o tema do documento. `--dark` usa a base escura. | ficheiro SVG |
+| `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | SVG **autocontido** (sen CSS externo nin variables), co tema do documento. `--dark` usa a base escura. | ficheiro SVG |
+| `ygg render … [--grant r=N,…] [--unlock id[:N],…]` | **Xoga antes de pintar**: concede recursos e desbloquea nodos para que a foto amose varios estados á vez. `id:N` sobe N rangos. | ficheiro SVG |
 | `ygg schema [--out f]` | O JSON Schema publicado. | JSON Schema |
 | `ygg new [--id x] [--label "…"]` | Un documento baleiro válido. | documento |
 
 Os erros son **dato**: cun `--json` o modelo ou o script sabe exactamente que arranxar.
+
+### Xogar antes de pintar (`--unlock`)
+
+Sen guión, `ygg render` pinta a árbore **no día cero**: todo bloqueado. E `locked` é, por deseño, o estado máis apagado — así que a foto non ensina nin a paleta nin o camiño. Con `--grant` e `--unlock` a foto amosa o que amosaban os mockups fundacionais: varios estados á vez.
+
+```bash
+npx ygg render arbore.json --out foto.svg --dark   --grant "saga=30,sangue=6"   --unlock "espertar,corazon,furia,machado:3"
+```
+
+- Aplícase en orde: primeiro os `--grant`, logo os `--unlock` tal como se listan (un nodo pode ser porta doutro).
+- `id:N` sobe **N rangos** seguidos: útil para chegar a `maxed`, ou para deixar un multi-rango a medias e que se pinte *en progreso*.
+- **Falla en alto**: se o motor di que un desbloqueo non se pode (custo, prerrequisito, exclusión), o comando dá erro coa razón dentro en vez de sacar unha foto distinta da que pediches.
+
+As fichas da galería deste sitio xéranse así; os guións viven en [`examples/gallery-showcase.json`](https://github.com/fraga-labs/yggdrasil-forge/blob/main/examples/gallery-showcase.json), **fóra** da carpeta `gallery/` a propósito: eses documentos son o corpus de *few-shot* e non deben levar campos de escenificación.
 
 ## A galería de ouro
 

@@ -15,11 +15,26 @@ pnpm add -D @yggdrasil-forge/cli
 |---|---|---|
 | `ygg validate [f \| -] [--json]` | Schema + hard validators — **the same validation as importing in the editor**. Without a file or with `-` it reads stdin. `--json` emits `{ ok, issues[] }`. | 0 ok · 1 invalid · 2 usage |
 | `ygg layout <f \| -> --algo <a> [--out f]` | Places **every** node with the engine (`radial`, `tree`, `layered`, `clustered-radial`, `constellation`) and bakes the framing. | document to stdout or `--out` |
-| `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | A **self-contained** SVG (no external CSS or variables), with the initial states and the document theme. `--dark` uses the dark base. | SVG file |
+| `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | A **self-contained** SVG (no external CSS or variables), with the document theme. `--dark` uses the dark base. | SVG file |
+| `ygg render … [--grant r=N,…] [--unlock id[:N],…]` | **Play before painting**: grant resources and unlock nodes so the picture shows several states at once. `id:N` takes N tiers. | SVG file |
 | `ygg schema [--out f]` | The published JSON Schema. | JSON Schema |
 | `ygg new [--id x] [--label "…"]` | A valid empty document. | document |
 
 Errors are **data**: with `--json` the model or the script knows exactly what to fix.
+
+### Play before painting (`--unlock`)
+
+Without a script, `ygg render` paints the tree on **day zero**: everything locked. And `locked` is, by design, the dimmest state — so the picture shows neither the palette nor the path. With `--grant` and `--unlock` the picture shows what the project's founding mockups showed: several states at once.
+
+```bash
+npx ygg render tree.json --out shot.svg --dark   --grant "saga=30,blood=6"   --unlock "awaken,heart,fury,axe:3"
+```
+
+- Applied in order: `--grant` first, then `--unlock` exactly as listed (one node can be another's gate).
+- `id:N` takes **N tiers** in a row: useful to reach `maxed`, or to leave a multi-tier node half-way so it paints as *in progress*.
+- **It fails loudly**: if the engine says an unlock cannot happen (cost, prerequisite, exclusion), the command errors with the reason instead of quietly producing a different picture than you asked for.
+
+This site's gallery cards are generated this way; the scripts live in [`examples/gallery-showcase.json`](https://github.com/fraga-labs/yggdrasil-forge/blob/main/examples/gallery-showcase.json), **outside** the `gallery/` folder on purpose: those documents are the few-shot corpus and must not carry staging fields.
 
 ## The gold gallery
 

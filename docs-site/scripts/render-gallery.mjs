@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..', '..')
 const galleryDir = join(root, 'examples', 'gallery')
+const showcasePath = join(root, 'examples', 'gallery-showcase.json')
 const cliBin = join(root, 'packages', 'cli', 'dist', 'bin.js')
 const outDir = join(here, '..', 'public', 'gallery')
 const dataDir = join(here, '..', 'src', 'data')
@@ -49,6 +50,26 @@ function isLightColor(hex) {
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.6
 }
 
+// 19.1: guións de xogo. Sen eles as fichas saían todas no día cero
+// (todo `locked`), que é o estado máis apagado por deseño — catro dos
+// cinco estados non se vían nunca. Viven fóra de gallery/ porque eses
+// *.json son o corpus de few-shot e non levan campos de escenificación.
+const showcase = existsSync(showcasePath)
+  ? (JSON.parse(readFileSync(showcasePath, 'utf8')).trees ?? {})
+  : {}
+
+/** Bandeiras --grant/--unlock para un id, ou [] se non ten guión. */
+function playFlags(id) {
+  const guion = showcase[id]
+  if (guion === undefined) return []
+  const flags = []
+  const grant = Object.entries(guion.grant ?? {})
+  if (grant.length > 0) flags.push('--grant', grant.map(([k, v]) => `${k}=${v}`).join(','))
+  const unlock = guion.unlock ?? []
+  if (unlock.length > 0) flags.push('--unlock', unlock.join(','))
+  return flags
+}
+
 const files = readdirSync(galleryDir)
   .filter((f) => f.endsWith('.json'))
   .sort()
@@ -71,9 +92,13 @@ for (const file of files) {
   ]) {
     const out = join(outDir, `${id}${suffix}`)
     // Falla con stack se o render non sae: é o gate.
-    execFileSync(process.execPath, [cliBin, 'render', src, '--out', out, ...extra], {
-      stdio: ['ignore', 'ignore', 'inherit'],
-    })
+    execFileSync(
+      process.execPath,
+      [cliBin, 'render', src, '--out', out, ...extra, ...playFlags(id)],
+      {
+        stdio: ['ignore', 'ignore', 'inherit'],
+      },
+    )
   }
   entries.push({
     id,
@@ -87,7 +112,8 @@ for (const file of files) {
     light: `gallery/${id}.svg`,
     dark: `gallery/${id}.dark.svg`,
   })
-  console.log(`render-gallery: ${id} (${tree.nodes.length} nodos) → claro + escuro`)
+  const xogada = showcase[id] !== undefined ? ' · xogada' : ''
+  console.log(`render-gallery: ${id} (${tree.nodes.length} nodos) → claro + escuro${xogada}`)
 }
 writeFileSync(join(dataDir, 'gallery.json'), `${JSON.stringify(entries, null, 2)}\n`, 'utf8')
 console.log(`render-gallery: ${entries.length} documentos, src/data/gallery.json escrito`)

@@ -14,7 +14,7 @@ import { resolve } from 'node:path'
 import { renderDocumentJsonSchema } from './documentSchema.js'
 import { isAutoLayoutAlgo, layoutDocumentText } from './layoutCmd.js'
 import { newDocumentJson } from './newDocument.js'
-import { renderDocumentText } from './renderCmd.js'
+import { type PlayOptions, renderPlayedDocumentText } from './renderCmd.js'
 import { validateDocumentText } from './validate.js'
 
 export interface CliIO {
@@ -34,7 +34,10 @@ Uso:
                                        radial | tree | layered | clustered-radial |
                                        constellation (layered: para DAGs con multi-pai).
   ygg render <ficheiro|-> --out <f.svg>  Renderiza a árbore a un SVG autocontido.
-       [--dark] [--locale gl] [--width N]
+       [--dark] [--locale gl] [--width N]  Sen --unlock pinta o día cero (todo bloqueado).
+       [--grant recurso=N,...]             Concede recursos antes de xogar.
+       [--unlock id[:N],...]               Desbloquea eses nodos (N rangos) para que a foto
+                                           amose varios estados á vez. Falla se o motor di que non.
   ygg schema [--out ficheiro]          Emite o JSON Schema do documento.
   ygg new [--id x] [--label "..."]     Emite un documento baleiro válido polo stdout.
 
@@ -51,6 +54,15 @@ function takeOption(
   const value = args[idx + 1]
   if (value === undefined || value.startsWith('--')) return [undefined, args]
   return [value, [...args.slice(0, idx), ...args.slice(idx + 2)]]
+}
+
+/** Parte unha lista `a,b,c` en entradas limpas. Sen valor → lista baleira. */
+function splitLista(raw: string | undefined): readonly string[] {
+  if (raw === undefined) return []
+  return raw
+    .split(',')
+    .map((x) => x.trim())
+    .filter((x) => x.length > 0)
 }
 
 async function cmdValidate(args: readonly string[], io: CliIO): Promise<number> {
@@ -142,8 +154,10 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
   const [out, rest1] = takeOption(args, '--out')
   const [locale, rest2] = takeOption(rest1, '--locale')
   const [width, rest3] = takeOption(rest2, '--width')
-  const dark = rest3.includes('--dark')
-  const positional = rest3.filter((a) => !a.startsWith('--'))
+  const [grantRaw, rest4] = takeOption(rest3, '--grant')
+  const [unlockRaw, rest5] = takeOption(rest4, '--unlock')
+  const dark = rest5.includes('--dark')
+  const positional = rest5.filter((a) => !a.startsWith('--'))
   if (out === undefined) {
     io.stderr('ygg render: falta --out <saida.svg>\n')
     return 2
@@ -165,10 +179,30 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
     return 1
   }
   const parsedWidth = width !== undefined ? Number.parseInt(width, 10) : undefined
-  const result = renderDocumentText(text, {
+  let play: PlayOptions | undefined
+  if (grantRaw !== undefined || unlockRaw !== undefined) {
+    const grant: Record<string, number> = {}
+    for (const par of splitLista(grantRaw)) {
+      const igual = par.indexOf('=')
+      const cantidade = igual === -1 ? Number.NaN : Number(par.slice(igual + 1))
+      if (igual <= 0 || !Number.isFinite(cantidade)) {
+        io.stderr(`ygg render: --grant agarda «recurso=N», recibín «${par}»
+`)
+        return 2
+      }
+      grant[par.slice(0, igual)] = cantidade
+    }
+    const unlock = splitLista(unlockRaw)
+    play = {
+      ...(Object.keys(grant).length > 0 && { grant }),
+      ...(unlock.length > 0 && { unlock }),
+    }
+  }
+  const result = await renderPlayedDocumentText(text, {
     dark,
     ...(locale !== undefined && { locale: locale as never }),
     ...(parsedWidth !== undefined && Number.isFinite(parsedWidth) && { width: parsedWidth }),
+    ...(play !== undefined && { play }),
   })
   if (!result.ok || result.output === undefined) {
     io.stderr(`✗ non se puido renderizar: ${result.error ?? 'erro descoñecido'}

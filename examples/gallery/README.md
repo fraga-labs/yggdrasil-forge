@@ -104,6 +104,26 @@ the friendly data never touches:
   `logic-*` icon (12 distinct ids) and the document applies the `neon`
   theme preset — write two declarative fields, get a dressed tree.
 
+## Showcase states (how the doc-site cards are rendered)
+
+`ygg render` paints a tree on **day zero** — everything `locked` — unless
+you play it first. Since `locked` is by design the dimmest state, a
+day-zero picture shows neither the palette nor the path.
+
+The play scripts for the doc-site cards live in
+[`../gallery-showcase.json`](../gallery-showcase.json), deliberately
+**outside** this folder: the `*.json` files in here are the few-shot
+corpus, and a staging field inside them would teach generators to emit
+it. (Several tools also glob `gallery/*.json` as documents.)
+
+```bash
+ygg render lobo-de-inverno.json --out shot.svg --dark   --grant "saga=30,sangue=6" --unlock "espertar,corazon,machado:3"
+```
+
+A failed unlock is an **error**, not a quieter picture — so if a node id
+in a script ever goes stale, the doc-site build fails instead of shipping
+a wrong showcase.
+
 ## Aesthetics by declaration
 
 Two orthogonal knobs make a generated tree look finished **without

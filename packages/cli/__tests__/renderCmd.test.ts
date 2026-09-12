@@ -4,7 +4,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { renderDocumentText } from '../src/renderCmd.js'
+import { renderDocumentText, renderPlayedDocumentText } from '../src/renderCmd.js'
 
 const GALLERY = join(__dirname, '..', '..', '..', 'examples', 'gallery')
 const galleryText = (f: string) => readFileSync(join(GALLERY, f), 'utf8')
@@ -68,3 +68,72 @@ describe('ygg render — opcións', () => {
   })
 })
 // ── FIN: tests ygg render ──
+
+// ── 19.1: o modo xogado ──
+// Sen isto, TODA foto saía no día cero (todo `locked`) e catro dos cinco
+// estados non aparecían nunca — nin a aresta acesa.
+describe('ygg render --unlock/--grant — a foto amosa a árbore viva', () => {
+  const panadeiro = () => galleryText('panadeiro.json')
+
+  it('★ sen xogar, todo segue bloqueado (cero regresión)', async () => {
+    const r = await renderPlayedDocumentText(panadeiro())
+    expect(r.ok, r.error).toBe(true)
+    const sync = renderDocumentText(panadeiro())
+    // A porta async sen `play` ten que dar EXACTAMENTE o mesmo ficheiro
+    // que a síncrona de sempre.
+    expect(r.output).toBe(sync.output)
+  })
+
+  it('★ desbloquear cambia o estado pintado dalgún nodo', async () => {
+    const cero = await renderPlayedDocumentText(panadeiro())
+    const xogado = await renderPlayedDocumentText(panadeiro(), {
+      play: { grant: { fariña: 20 }, unlock: ['pan_básico'] },
+    })
+    expect(xogado.ok, xogado.error).toBe(true)
+    expect(xogado.output).not.toBe(cero.output)
+    expect(xogado.output).toContain('data-state="unlocked"')
+  })
+
+  it('`id:N` sobe N rangos (un multi-rango chega a maxed)', async () => {
+    const r = await renderPlayedDocumentText(panadeiro(), {
+      play: { grant: { fariña: 99 }, unlock: ['pan_básico', 'masa_dulce:3'] },
+    })
+    expect(r.ok, r.error).toBe(true)
+    expect(r.output).toContain('data-state="maxed"')
+  })
+
+  it('★ falla en ALTO: un desbloqueo imposible é erro, non outra foto', async () => {
+    // `masa_dulce` custa fariña e o recurso empeza a 0: sen `grant` non
+    // hai con que pagalo. O render NON debe saír cunha foto distinta.
+    const r = await renderPlayedDocumentText(panadeiro(), {
+      play: { unlock: ['masa_dulce'] },
+    })
+    expect(r.ok).toBe(false)
+    expect(r.error).toContain('masa_dulce')
+    expect(r.output).toBeUndefined()
+  })
+
+  it('★ e falla tamén a metade dun `id:N`, dicindo en que rango', async () => {
+    // Chega para o rango 1 (custa 1) pero non para o 2 (custa 2).
+    const r = await renderPlayedDocumentText(panadeiro(), {
+      play: { grant: { fariña: 1 }, unlock: ['masa_dulce:3'] },
+    })
+    expect(r.ok).toBe(false)
+    expect(r.error).toContain('rango 2 de 3')
+  })
+
+  it('recurso descoñecido tamén é erro, co seu nome dentro', async () => {
+    const r = await renderPlayedDocumentText(panadeiro(), {
+      play: { grant: { inexistente: 1 } },
+    })
+    expect(r.ok).toBe(false)
+    expect(r.error).toContain('inexistente')
+  })
+
+  it('determinista: mesmo guión → mesmo ficheiro', async () => {
+    const guion = { play: { grant: { fariña: 20 }, unlock: ['pan_básico'] } }
+    const a = await renderPlayedDocumentText(panadeiro(), guion)
+    const b = await renderPlayedDocumentText(panadeiro(), guion)
+    expect(a.output).toBe(b.output)
+  })
+})

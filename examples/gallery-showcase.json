@@ -1,9 +1,12 @@
 {
-  "note": "Guións de xogo para as FOTOS da galería (19.1). NON forman parte do formato do documento: viven FÓRA da carpeta gallery/ a propósito: por unha banda, porque os *.json desta carpeta son o corpus de few-shot e meterlles un campo de escenificación ensinaríalle ás IAs a emitilo; pola outra, varios globs len gallery/*.json como documentos e este ficheiro non o é. `ygg render` aplícaos con --grant/--unlock; docs-site/scripts/render-gallery.mjs lelos. Se un id de nodo cambia, o render falla en alto e o build do site cae — a garda de podrecemento segue en pé. Criterio: acender entre un terzo e a metade da árbore, deixar o cume bloqueado (ten que quedar a onde ir) e que entre todas as fichas se vexan os catro estados gardados (locked, unlockable, unlocked, maxed) máis o visual derivado in_progress (un multi-rango a medias, que o motor segue contando como unlocked).",
+  "note": "Guións de xogo para as FOTOS da galería (19.1). NON forman parte do formato do documento: viven FÓRA da carpeta gallery/ a propósito: por unha banda, porque os *.json desta carpeta son o corpus de few-shot e meterlles un campo de escenificación ensinaríalle ás IAs a emitilo; pola outra, varios globs len gallery/*.json como documentos e este ficheiro non o é. `ygg render` aplícaos con --grant/--unlock; docs-site/scripts/render-gallery.mjs lelos. Se un id de nodo cambia, o render falla en alto e o build do site cae — a garda de podrecemento segue en pé. Criterio: acender entre un terzo e a metade da árbore e deixar o cume bloqueado (ten que quedar a onde ir). Entre todas as fichas vénse `locked`, `unlocked`, `maxed` e o visual derivado `in_progress` (un multi-rango a medias, que o motor segue contando como unlocked). `unlockable` NON aparece en ningunha, e non é culpa dos guións: o motor só garda ese estado se un documento o forza cun efecto `modify_node_state`, e o renderer non o deriva preguntando `canUnlock`. Mentres siga así, o brillo do «seguinte paso» — a afordancia central dos mockups — non sae en ningunha imaxe.",
   "trees": {
     "lobo-de-inverno": {
       "why": "Acende a rama GUERRA enteira co tronco; SAGA e ESPÍRITO quedan no escuro e Ragnarök bloqueado. O machado chega a maxed e o bordón queda a 2 de 3 (in_progress).",
-      "grant": { "saga": 30, "sangue": 6 },
+      "grant": {
+        "saga": 30,
+        "sangue": 6
+      },
       "unlock": [
         "espertar",
         "corazon",
@@ -18,28 +21,47 @@
     },
     "congoxa-netrunner": {
       "why": "Rama HARDWARE acesa seguindo a cadea real (conexion → cortadeixas → brazo-ciber → sobrecarga). Ao quedar sobrecarga e verme-negro abertos, `espectro` píntase UNLOCKABLE: o seguinte paso brilla, e o Deus Ex segue lonxe.",
-      "grant": { "ram": 24, "cred": 12 },
+      "grant": {
+        "ram": 24,
+        "cred": 12
+      },
       "unlock": ["conexion", "cortadeixas", "brazo-ciber:3", "sobrecarga", "verme-negro"]
     },
     "escola-de-gaita": {
       "why": "Primeiro trimestre do curso: postura, fol e sopro dominado. Dixitación e repertorio, por diante.",
-      "grant": { "horas": 24 },
+      "grant": {
+        "horas": 24
+      },
       "unlock": ["postura", "fol", "soplo-continuo:3", "afinado", "escala"]
     },
     "gaia-cards": {
       "why": "Vista de tarxetas: insignias en varios estados á vez (0/3, 2/3, 3/3) para que os contadores non saian todos a cero.",
-      "grant": { "luz": 20 },
+      "grant": {
+        "luz": 20
+      },
       "unlock": ["dubhe", "merak", "alioth:3", "betelxeuse", "rigel", "alphecca"]
     },
     "panadeiro": {
       "why": "A árbore amable é a que ensina IN_PROGRESS: a masa doce queda a 2 de 3.",
-      "grant": { "fariña": 10 },
+      "grant": {
+        "fariña": 10
+      },
       "unlock": ["pan_básico", "masa_dulce:2"]
     },
     "adversarial": {
       "why": "A incómoda amosa unha escolla exclusiva xa feita: ao subir `exclusivo-a`, o seu par `con-tier` queda fóra. Non se pinta como DISABLED — as exclusións son portas no momento de desbloquear, non invariantes continuos, así que o estado gardado do par segue sendo `locked` (doutrina 2.4.b). O que si fai o motor é impedilo: se alguén engade con-tier a este guión, o render falla en alto.",
-      "grant": { "ouro": 20, "cristal": 5 },
+      "grant": {
+        "ouro": 20,
+        "cristal": 5
+      },
       "unlock": ["raiz", "exclusivo-a"]
+    },
+    "a-vixilia": {
+      "why": "A ruta fiel acesa (claustro + campanario) coa ladaiña a 3/3, o osario enteiro no escuro e as dúas saídas sen tocar. `alba` ten xa os prerrequisitos e os recursos, pero píntase apagada: o renderer non deriva `unlockable`, e vese aquí mellor ca en ningures.",
+      "grant": {
+        "vixilia": 12
+      },
+      "unlock": ["candea", "cruz", "sal", "ladaina:3", "man-limpa", "campa", "ollo", "lua", "corvo"]
     }
   }
 }

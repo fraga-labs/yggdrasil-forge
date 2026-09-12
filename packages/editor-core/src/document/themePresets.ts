@@ -156,11 +156,14 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
       nodeRings: {
         locked: '#3a3634',
         unlockable: '#8c6239',
-        unlocked: '#a02a24',
+        unlocked: '#8e3a2a',
         maxed: '#c1272d',
         inProgress: '#6b4a32',
       },
-      edges: { color: '#43302b', active: '#a02a24' },
+      // O anel de `unlocked` e a aresta acesa NON poden ser a mesma cor:
+      // probado sobre a-vixilia, deixaba a arbore nun vermello plano onde
+      // non se distinguia o camiño do premio. Ferro oxidado -> carmesi.
+      edges: { color: '#43302b', active: '#6e2620' },
       textColor: '#d9cfc4',
       typography: {
         fontFamily: "'Cardinal', 'Trajan Pro', 'Times New Roman', serif",

@@ -296,7 +296,7 @@ describe('★ ThemePanel — fichas desde o rexistro (7.19)', () => {
     const theme = engine.getDocument().meta.theme
     expect(theme).toEqual(getThemePreset('gotico')?.spec)
     expect(theme?.nodeRings?.maxed).toBe('#c1272d')
-    expect(theme?.edges?.active).toBe('#a02a24')
+    expect(theme?.edges?.active).toBe('#6e2620')
     expect(theme?.typography?.textTransform).toBe('uppercase')
   })
 

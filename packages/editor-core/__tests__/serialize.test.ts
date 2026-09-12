@@ -258,6 +258,36 @@ describe('deserializeDocument — namespace editor (documentMetaSchema, 7.15)', 
     expect(r.error.message).toMatch(/editor\.theme\.typography\.textTransform/)
   })
 
+  it('★ 19.1 — unha regra de desbloqueo ANIÑADA é rexeitada na porta', () => {
+    // O avaliador do motor non recorre regras: pasaríalle a regra interna
+    // a `evaluateCondition`, cuxo switch non a recoñece, e devolvería
+    // `undefined` (falso) — o nodo quedaría mudo para sempre SEN erro.
+    // A validación é a barreira que impide que ese documento entre.
+    const conNido = {
+      ...validTree,
+      nodes: [
+        ...validTree.nodes,
+        {
+          id: 'aniñado',
+          type: 'small',
+          label: { gl: 'Aniñado' },
+          position: { x: 999, y: 999 },
+          prerequisites: {
+            type: 'all',
+            conditions: [
+              { type: 'node_unlocked', nodeId: validTree.nodes[0]?.id },
+              { type: 'none', conditions: [{ type: 'node_unlocked', nodeId: 'x' }] },
+            ],
+          },
+        },
+      ],
+    }
+    const r = deserializeDocument(JSON.stringify({ tree: conNido }))
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.error.message).toMatch(/prerequisites/)
+  })
+
   it('compat: TreeDef pelado (sen namespace editor) segue cargando', () => {
     const r = deserializeDocument(JSON.stringify(validTree))
     expect(r.ok).toBe(true)

@@ -47,9 +47,18 @@ export type UnlockCondition =
 /**
  * Regra de desbloqueo: combinación lóxica de condicións.
  *
- * Recursiva: as condicións dentro de "all"/"any"/"none" poden ser tamén
- * UnlockCondition simples (caso máis común) OU outras UnlockRules aniñadas
- * via `as UnlockCondition[]`.
+ * **UN só nivel — as regras NON aniñan** (verificado en 19.1). As
+ * condicións dentro de "all"/"any"/"none" teñen que ser `UnlockCondition`
+ * atómicas. Meter alí outra regra non dá erro: `UnlockResolver.evaluate`
+ * chama a `evaluateCondition` por elemento e ese `switch` non recoñece
+ * "all"/"any"/"none", co que devolve `undefined` — falso — e o nodo
+ * queda **mudo para sempre**. O schema publicado tampouco a acepta
+ * (`ygg validate` e a importación do editor rexéitana, que é a barreira
+ * que salva a quen a intente).
+ *
+ * Para «A e B pero NON C» hai dúas vías reais, ambas de un nivel:
+ *   - `exclusions` no `NodeDef` (exclusión mutua entre nodos), ou
+ *   - un nodo intermedio que leve a parte `none` por separado.
  *
  * @example AND simple
  * { type: 'all', conditions: [

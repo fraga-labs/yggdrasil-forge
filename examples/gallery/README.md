@@ -89,6 +89,32 @@ Exercises:
 - Varied `maxTier` (1/2/3) so card badges show `0/1`, `0/3`… and fill up
   as you play in Proba mode.
 
+### `a-vixilia.json` — the gothic showcase (19.1)
+
+*"The Vigil"* — one night's watch in a besieged church: hold until dawn,
+or go down to the ossuary and stop having to hold. The first document to
+use the theme axes that started travelling in 19.0, and the reference for
+**how a named preset is applied by a generator**: `editor.theme` carries
+the `gotico` spec verbatim, id included. Exercises:
+
+- **`nodeRings`, `edges` and `typography` as data** — blackened-iron rings
+  that rust to crimson with progression, dried-blood edges, heavy
+  uppercase serif. Copy this `editor.theme` and any tree looks gothic.
+- **A pure `none` prerequisite group** (`man-limpa`, "The Clean Hand"):
+  available only while you have *not* taken the pact. It is also the
+  clearest demo of doctrine 2.4.b — unlock it early, take the pact after,
+  and it **stays** unlocked: prerequisites are gates at unlock time, not
+  continuous invariants.
+- **A symmetric `exclusions` pair with narrative weight**: `alba` (dawn)
+  and `pacto` (the bargain) veto each other, so the engine — not the prose
+  — enforces that you cannot have both endings.
+- **`resource_min` in a real tree** (the pact demands you actually hold a
+  relic), not just in `adversarial`.
+- **`ascendancy` nodes** (octagon shape) and a tree that grows *downward*
+  as well as upward: the crypt descends below the root.
+- Icons from **three different official sets at once** (`logic-*`,
+  `norse-*`, `forge-*`) — they coexist in one document.
+
 ### `adversarial.json` — the deliberately awkward tree
 Generated from `adversarialDocument()` (`@yggdrasil-forge/editor-core`)
 with `serializeDocument` — never edited by hand. Exercises the paths

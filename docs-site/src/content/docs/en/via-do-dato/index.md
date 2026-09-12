@@ -48,6 +48,7 @@ This site's gallery cards are generated this way; the scripts live in [`examples
 | `gaia-cards.json` | The pattern for the **cards view** and the **aesthetics-by-declaration** showcase: 12 `logic-*` icons and the `neon` preset. |
 | `adversarial.json` | The awkward case (nodes without position, edge-case references) to test robustness. |
 | `escola-de-gaita.json`, `congoxa-netrunner.json` | Two more themes (educational and cyberpunk) for few-shot variety. |
+| `a-vixilia.json` | The gothic showcase: a named preset copied whole, `nodeRings`/`edges`/`typography` as data, a pure `none` group, narrative `exclusions` and `resource_min` in a real tree. |
 
 All rendered in [Examples](../exemplos/galeria/). Detailed README (in English, for an external audience): [`examples/gallery/README.md`](https://github.com/fraga-labs/yggdrasil-forge/blob/main/examples/gallery/README.md).
 

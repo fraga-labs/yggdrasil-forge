@@ -1,0 +1,763 @@
+{
+  "tree": {
+    "id": "a-vixilia",
+    "schemaVersion": "1.0.0",
+    "version": "1.0.0",
+    "label": {
+      "gl": "A Vixilia",
+      "en": "The Vigil"
+    },
+    "description": {
+      "gl": "Unha noite de garda nunha igrexa sitiada: aguantar ata a alba, ou baixar ao osario e deixar de ter que aguantar.",
+      "en": "One night's watch in a besieged church: hold until dawn, or go down to the ossuary and stop having to hold."
+    },
+    "groups": [],
+    "resources": [
+      {
+        "id": "vixilia",
+        "label": {
+          "gl": "Vixilia",
+          "en": "Vigil"
+        },
+        "icon": "logic-flame",
+        "color": "#c9a227",
+        "initial": 16
+      },
+      {
+        "id": "reliquia",
+        "label": {
+          "gl": "Reliquia",
+          "en": "Relic"
+        },
+        "icon": "logic-key",
+        "color": "#9aa0ab",
+        "initial": 2
+      }
+    ],
+    "nodes": [
+      {
+        "id": "candea",
+        "type": "root",
+        "label": {
+          "gl": "A Candea",
+          "en": "The Candle"
+        },
+        "position": {
+          "x": 0,
+          "y": 60
+        },
+        "icon": "logic-flame",
+        "description": {
+          "gl": "Acéndese ao solpor. Mentres arda, a vixilia conta.",
+          "en": "Lit at dusk. While it burns, the vigil counts."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 1
+            }
+          ]
+        ],
+        "size": 42
+      },
+      {
+        "id": "cruz",
+        "type": "notable",
+        "label": {
+          "gl": "A Cruz de Ferro",
+          "en": "The Iron Cross"
+        },
+        "position": {
+          "x": -260,
+          "y": -60
+        },
+        "icon": "logic-cross",
+        "description": {
+          "gl": "Ferro frío contra a porta. Non salva: retarda.",
+          "en": "Cold iron against the door. It does not save: it delays."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "candea"
+            }
+          ]
+        },
+        "tags": ["claustro"]
+      },
+      {
+        "id": "sal",
+        "type": "notable",
+        "label": {
+          "gl": "Círculo de Sal",
+          "en": "Circle of Salt"
+        },
+        "position": {
+          "x": -380,
+          "y": -180
+        },
+        "icon": "forge-wall",
+        "description": {
+          "gl": "Unha liña que ninguén cruza sen ser convidado.",
+          "en": "A line none may cross uninvited."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruz"
+            }
+          ]
+        },
+        "tags": ["claustro"]
+      },
+      {
+        "id": "ladaina",
+        "type": "notable",
+        "label": {
+          "gl": "A Ladaiña",
+          "en": "The Litany"
+        },
+        "position": {
+          "x": -180,
+          "y": -180
+        },
+        "icon": "logic-scroll",
+        "description": {
+          "gl": "Repetida ata que as palabras deixan de significar e empezan a protexer.",
+          "en": "Repeated until the words stop meaning and start protecting."
+        },
+        "maxTier": 3,
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 1
+            }
+          ],
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ],
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 3
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "cruz"
+            }
+          ]
+        },
+        "tags": ["claustro"]
+      },
+      {
+        "id": "man-limpa",
+        "type": "notable",
+        "label": {
+          "gl": "A Man Limpa",
+          "en": "The Clean Hand"
+        },
+        "position": {
+          "x": -440,
+          "y": 60
+        },
+        "icon": "logic-check",
+        "description": {
+          "gl": "Só para quen aínda non pactou. O que se dá antes, non se quita despois.",
+          "en": "Only for those who have not yet bargained. What is given before is not taken after."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "none",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "pacto"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "carne"
+            }
+          ]
+        },
+        "tags": ["claustro"]
+      },
+      {
+        "id": "campa",
+        "type": "notable",
+        "label": {
+          "gl": "A Campá",
+          "en": "The Bell"
+        },
+        "position": {
+          "x": 260,
+          "y": -60
+        },
+        "icon": "forge-cadence",
+        "description": {
+          "gl": "Un toque por hora. Se para, alguén parou.",
+          "en": "One toll per hour. If it stops, someone stopped it."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "candea"
+            }
+          ]
+        },
+        "tags": ["campanario"]
+      },
+      {
+        "id": "ollo",
+        "type": "notable",
+        "label": {
+          "gl": "O Ollo do Vixía",
+          "en": "The Watchman's Eye"
+        },
+        "position": {
+          "x": 260,
+          "y": -180
+        },
+        "icon": "logic-eye-closed",
+        "description": {
+          "gl": "Mirar sen ser visto é a metade do oficio.",
+          "en": "To watch unseen is half the trade."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "campa"
+            }
+          ]
+        },
+        "tags": ["campanario"]
+      },
+      {
+        "id": "lua",
+        "type": "notable",
+        "label": {
+          "gl": "Ler a Lúa",
+          "en": "Reading the Moon"
+        },
+        "position": {
+          "x": 170,
+          "y": -290
+        },
+        "icon": "norse-moon",
+        "description": {
+          "gl": "Saber cantas horas quedan é saber canto hai que aguantar.",
+          "en": "Knowing how many hours remain is knowing how long to hold."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "ollo"
+            }
+          ]
+        },
+        "tags": ["campanario"]
+      },
+      {
+        "id": "corvo",
+        "type": "notable",
+        "label": {
+          "gl": "O Corvo Mensaxeiro",
+          "en": "The Messenger Crow"
+        },
+        "position": {
+          "x": 370,
+          "y": -290
+        },
+        "icon": "norse-raven",
+        "description": {
+          "gl": "Leva aviso ao val. Non sempre chega.",
+          "en": "Carries word to the valley. It does not always arrive."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "ollo"
+            }
+          ]
+        },
+        "tags": ["campanario"]
+      },
+      {
+        "id": "osario",
+        "type": "notable",
+        "label": {
+          "gl": "Baixar ao Osario",
+          "en": "Down to the Ossuary"
+        },
+        "position": {
+          "x": 0,
+          "y": 200
+        },
+        "icon": "logic-gate",
+        "description": {
+          "gl": "A escaleira está seca. Iso xa debería dicir algo.",
+          "en": "The stair is dry. That alone should tell you something."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "candea"
+            }
+          ]
+        },
+        "tags": ["osario"]
+      },
+      {
+        "id": "nomes",
+        "type": "notable",
+        "label": {
+          "gl": "Os Nomes Escritos",
+          "en": "The Written Names"
+        },
+        "position": {
+          "x": 0,
+          "y": 320
+        },
+        "icon": "logic-rune",
+        "description": {
+          "gl": "Están todos. Tamén o teu, nunha letra que aínda non aprendiches.",
+          "en": "They are all here. Yours too, in a script you have not yet learned."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "osario"
+            }
+          ]
+        },
+        "tags": ["osario"]
+      },
+      {
+        "id": "pacto",
+        "type": "keystone",
+        "label": {
+          "gl": "O Pacto",
+          "en": "The Pact"
+        },
+        "position": {
+          "x": 0,
+          "y": 440
+        },
+        "icon": "logic-forbidden",
+        "description": {
+          "gl": "Ofrécese barato porque o caro págase despois.",
+          "en": "Offered cheap because the dear part is paid later."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 3
+            },
+            {
+              "resourceId": "reliquia",
+              "amount": 1
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "nomes"
+            },
+            {
+              "type": "resource_min",
+              "resourceId": "reliquia",
+              "amount": 1
+            }
+          ]
+        },
+        "tags": ["osario"],
+        "exclusions": ["alba"],
+        "color": "#8c1c1c",
+        "size": 38
+      },
+      {
+        "id": "carne",
+        "type": "notable",
+        "label": {
+          "gl": "A Carne Obediente",
+          "en": "The Obedient Flesh"
+        },
+        "position": {
+          "x": 0,
+          "y": 570
+        },
+        "icon": "norse-serpent",
+        "description": {
+          "gl": "Xa non hai que pedirlle as cousas dúas veces.",
+          "en": "It no longer needs to be asked twice."
+        },
+        "maxTier": 3,
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 1
+            }
+          ],
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 2
+            }
+          ],
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 3
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "pacto"
+            }
+          ]
+        },
+        "tags": ["osario"]
+      },
+      {
+        "id": "alba",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Ver a Alba",
+          "en": "To See the Dawn"
+        },
+        "position": {
+          "x": 0,
+          "y": -420
+        },
+        "icon": "logic-crown",
+        "description": {
+          "gl": "Chegar enteiro á luz. Non é premio: é só que rematou.",
+          "en": "To reach the light whole. Not a prize: merely an ending."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 3
+            },
+            {
+              "resourceId": "reliquia",
+              "amount": 2
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_unlocked",
+              "nodeId": "sal"
+            },
+            {
+              "type": "node_maxed",
+              "nodeId": "ladaina"
+            },
+            {
+              "type": "node_unlocked",
+              "nodeId": "lua"
+            }
+          ]
+        },
+        "exclusions": ["pacto"],
+        "size": 46
+      },
+      {
+        "id": "senlleiro",
+        "type": "ascendancy",
+        "label": {
+          "gl": "Quedar Senlleiro",
+          "en": "To Remain Alone"
+        },
+        "position": {
+          "x": 0,
+          "y": 710
+        },
+        "icon": "logic-star",
+        "description": {
+          "gl": "A campá segue tocando. Xa non é para ti.",
+          "en": "The bell still tolls. It is no longer for you."
+        },
+        "costPerTier": [
+          [
+            {
+              "resourceId": "vixilia",
+              "amount": 4
+            }
+          ]
+        ],
+        "prerequisites": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "node_maxed",
+              "nodeId": "carne"
+            }
+          ]
+        },
+        "size": 44
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-candea-cruz",
+        "source": "candea",
+        "target": "cruz",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruz-sal",
+        "source": "cruz",
+        "target": "sal",
+        "type": "dependency"
+      },
+      {
+        "id": "e-cruz-ladaina",
+        "source": "cruz",
+        "target": "ladaina",
+        "type": "dependency"
+      },
+      {
+        "id": "e-candea-campa",
+        "source": "candea",
+        "target": "campa",
+        "type": "dependency"
+      },
+      {
+        "id": "e-campa-ollo",
+        "source": "campa",
+        "target": "ollo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-ollo-lua",
+        "source": "ollo",
+        "target": "lua",
+        "type": "dependency"
+      },
+      {
+        "id": "e-ollo-corvo",
+        "source": "ollo",
+        "target": "corvo",
+        "type": "dependency"
+      },
+      {
+        "id": "e-candea-osario",
+        "source": "candea",
+        "target": "osario",
+        "type": "dependency"
+      },
+      {
+        "id": "e-osario-nomes",
+        "source": "osario",
+        "target": "nomes",
+        "type": "dependency"
+      },
+      {
+        "id": "e-nomes-pacto",
+        "source": "nomes",
+        "target": "pacto",
+        "type": "dependency"
+      },
+      {
+        "id": "e-pacto-carne",
+        "source": "pacto",
+        "target": "carne",
+        "type": "dependency"
+      },
+      {
+        "id": "e-sal-alba",
+        "source": "sal",
+        "target": "alba",
+        "type": "dependency"
+      },
+      {
+        "id": "e-ladaina-alba",
+        "source": "ladaina",
+        "target": "alba",
+        "type": "dependency"
+      },
+      {
+        "id": "e-lua-alba",
+        "source": "lua",
+        "target": "alba",
+        "type": "dependency"
+      },
+      {
+        "id": "e-carne-senlleiro",
+        "source": "carne",
+        "target": "senlleiro",
+        "type": "dependency"
+      }
+    ],
+    "layout": {
+      "type": "custom"
+    }
+  },
+  "editor": {
+    "formatVersion": "1.0.0",
+    "coordinateBounds": {
+      "minX": -520,
+      "minY": -500,
+      "maxX": 460,
+      "maxY": 790
+    },
+    "theme": {
+      "preset": "gotico",
+      "nodeFills": {
+        "locked": "#14110f",
+        "unlockable": "#2a1613",
+        "unlocked": "#3f1a18",
+        "maxed": "#5c1f1c",
+        "inProgress": "#231614"
+      },
+      "nodeRings": {
+        "locked": "#3a3634",
+        "unlockable": "#8c6239",
+        "unlocked": "#8e3a2a",
+        "maxed": "#c1272d",
+        "inProgress": "#6b4a32"
+      },
+      "edges": {
+        "color": "#43302b",
+        "active": "#6e2620"
+      },
+      "textColor": "#d9cfc4",
+      "typography": {
+        "fontFamily": "'Cardinal', 'Trajan Pro', 'Times New Roman', serif",
+        "fontWeight": 700,
+        "letterSpacing": "0.10em",
+        "textTransform": "uppercase"
+      },
+      "regions": [
+        {
+          "id": "r-claustro",
+          "label": "Claustro",
+          "tag": "claustro",
+          "color": "#6b5a3a"
+        },
+        {
+          "id": "r-campanario",
+          "label": "Campanario",
+          "tag": "campanario",
+          "color": "#3a4a5c"
+        },
+        {
+          "id": "r-osario",
+          "label": "Osario",
+          "tag": "osario",
+          "color": "#6b2320"
+        }
+      ]
+    }
+  }
+}

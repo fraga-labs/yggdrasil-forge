@@ -1,5 +1,5 @@
 {
-  "note": "Guións de xogo para as FOTOS da galería (19.1). NON forman parte do formato do documento: viven FÓRA da carpeta gallery/ a propósito: por unha banda, porque os *.json desta carpeta son o corpus de few-shot e meterlles un campo de escenificación ensinaríalle ás IAs a emitilo; pola outra, varios globs len gallery/*.json como documentos e este ficheiro non o é. `ygg render` aplícaos con --grant/--unlock; docs-site/scripts/render-gallery.mjs lelos. Se un id de nodo cambia, o render falla en alto e o build do site cae — a garda de podrecemento segue en pé. Criterio: acender entre un terzo e a metade da árbore e deixar o cume bloqueado (ten que quedar a onde ir). Entre todas as fichas vénse `locked`, `unlocked`, `maxed` e o visual derivado `in_progress` (un multi-rango a medias, que o motor segue contando como unlocked). `unlockable` NON aparece en ningunha, e non é culpa dos guións: o motor só garda ese estado se un documento o forza cun efecto `modify_node_state`, e o renderer non o deriva preguntando `canUnlock`. Mentres siga así, o brillo do «seguinte paso» — a afordancia central dos mockups — non sae en ningunha imaxe.",
+  "note": "Guións de xogo para as FOTOS da galería (19.1). NON forman parte do formato do documento: viven FÓRA da carpeta gallery/ a propósito: por unha banda, porque os *.json desta carpeta son o corpus de few-shot e meterlles un campo de escenificación ensinaríalle ás IAs a emitilo; pola outra, varios globs len gallery/*.json como documentos e este ficheiro non o é. `ygg render` aplícaos con --grant/--unlock; docs-site/scripts/render-gallery.mjs lelos. Se un id de nodo cambia, o render falla en alto e o build do site cae — a garda de podrecemento segue en pé. Criterio: acender entre un terzo e a metade da árbore e deixar o cume bloqueado (ten que quedar a onde ir). Entre todas as fichas vénse `locked`, `unlocked`, `maxed` e o visual derivado `in_progress` (un multi-rango a medias, que o motor segue contando como unlocked). Desde o 19.2 tamén `unlockable`: o `SkillTree` pregunta `canUnlock` polos nodos bloqueados e publícao en `data-visual-state`, así que o brillo do «seguínte paso» — a afordancia central dos mockups — sae por fin nas fotos.",
   "trees": {
     "lobo-de-inverno": {
       "why": "Acende a rama GUERRA enteira co tronco; SAGA e ESPÍRITO quedan no escuro e Ragnarök bloqueado. O machado chega a maxed e o bordón queda a 2 de 3 (in_progress).",
@@ -57,7 +57,7 @@
       "unlock": ["raiz", "exclusivo-a"]
     },
     "a-vixilia": {
-      "why": "A ruta fiel acesa (claustro + campanario) coa ladaiña a 3/3, o osario enteiro no escuro e as dúas saídas sen tocar. `alba` ten xa os prerrequisitos e os recursos, pero píntase apagada: o renderer non deriva `unlockable`, e vese aquí mellor ca en ningures.",
+      "why": "A ruta fiel acesa (claustro + campanario) coa ladaiña a 3/3 e o osario no escuro. As dúas escollas que quedan diante — `alba` e `osario` — píntanse UNLOCKABLE en latón: a historia enteira da árbore núlha soa foto.",
       "grant": {
         "vixilia": 12
       },

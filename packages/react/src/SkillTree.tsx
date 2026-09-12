@@ -375,6 +375,31 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
       }),
     [edgePaths, edgeMap, state, nodeRadius, onEdgeClick],
   )
+  // ── 19.2: quen está desbloqueable AGORA ──
+  //
+  // `unlockable` non é un estado que o motor garde (só o escribe se un
+  // documento o forza cun efecto `modify_node_state`): é unha PREGUNTA,
+  // `canUnlock`, que inclúe prerrequisitos, exclusións E afordabilidade.
+  // Antes disto ninguén a facía ao pintar, así que o recheo `unlockable`
+  // do tema, o seu anel e o pulso de `animations.ts` eran tinta morta e
+  // o brillo do «seguinte paso» non saía nin no editor nin en
+  // `ygg render`.
+  //
+  // Custo: só se pregunta polos nodos `locked`, e o memo depende de
+  // `state`, así que corre ao cambiar o estado — non por frame, nin ao
+  // arrastrar ou facer zoom. Medido no core: ~9 ms para unha pasada
+  // completa de 1500 nodos, por baixo do re-render que ese mesmo cambio
+  // xa dispara.
+  const unlockableIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const node of treeDef.nodes) {
+      if ((state.nodes[node.id]?.state ?? 'locked') !== 'locked') continue
+      const check = engine.canUnlock(node.id)
+      if (check.ok && check.value.allowed) ids.add(node.id)
+    }
+    return ids
+  }, [engine, treeDef, state])
+
   const nodeElements = useMemo(
     () =>
       treeDef.nodes.map((node) => {
@@ -393,6 +418,7 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
             {...(isSelected && { selected: true })}
             {...(onNodeHover !== undefined && { onHover: onNodeHover })}
             {...(showTierBadge !== undefined && { showTierBadge })}
+            {...(unlockableIds.has(node.id) && { unlockable: true })}
           />
         )
       }),
@@ -405,6 +431,7 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
       selectedNodeId,
       onNodeHover,
       showTierBadge,
+      unlockableIds,
     ],
   )
 

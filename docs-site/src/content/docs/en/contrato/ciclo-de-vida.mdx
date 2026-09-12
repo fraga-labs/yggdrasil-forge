@@ -17,7 +17,7 @@ A node is always in exactly one of these states (`NodeState`). The names are the
 
 The detail that most confuses a new dev, said upfront: **the stored `state` is only ever mutated by `unlock` / `lock` / `respec` / `tick` / `applyChanges`** (MASTER decision 2.4.b — exclusive responsibility). The other two states in the vocabulary are **derived**:
 
-- **`unlockable` is a question, not a datum**: you ask with `canUnlock(id)` (synchronous and pure), which returns `{ allowed, reason }` evaluating prerequisites, exclusions, resources and stats on the spot. An untouched node reads `locked` in the state; if `canUnlock` says yes, the UI paints it unlockable.
+- **`unlockable` is a question, not a datum**: you ask with `canUnlock(id)` (synchronous and pure), which returns `{ allowed, reason }` evaluating prerequisites, exclusions, resources and stats on the spot. An untouched node reads `locked` in the state; if `canUnlock` says yes, the UI paints it unlockable. **Since 19.2 `SkillTree` does this for you**: it asks for every `locked` node whenever the state changes and publishes the answer in `data-visual-state` (the attribute the "press me" pulse hangs off). `data-state` keeps carrying the engine’s raw state.
 - **`in_progress` is derived**: the renderer shows it for multi-tier nodes midway (`0 < currentTier < maxTier`), and the `progress` datum (0–100, via `setProgress`) carries educational progress. `setProgress(id, 100)` does **not** unlock by itself (zero auto-unlock, also 2.4.b): the consumer combines `setProgress` + `canUnlock` + `unlock` — unlocking is always an explicit decision.
 
 ## What drives each transition

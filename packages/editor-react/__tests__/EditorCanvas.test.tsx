@@ -189,11 +189,19 @@ describe('EditorCanvas — 19.0: aneis, arestas e tipografía do documento', () 
       .filter((s) => s !== '')
   }
 
-  it('nodeRings.locked pinta o anel dos nodos (todos locked na fixture)', () => {
+  it('★ nodeRings por estado: a fixture sen custo nin portas é UNLOCKABLE (19.2)', () => {
+    // Antes do 19.2 estes nodos pintábanse `locked` e este test pedía a
+    // cor de `locked`. Agora o renderer pregunta `canUnlock`, e un nodo
+    // sen prerrequisitos nin custo pódese abrir: o anel correcto é o de
+    // `unlockable`. O cambio de expectativa É a funcionalidade.
     const { container } = render(
-      <EditorCanvas editorEngine={withTheme({ nodeRings: { locked: '#c1272d' } })} />,
+      <EditorCanvas
+        editorEngine={withTheme({ nodeRings: { locked: '#111111', unlockable: '#c1272d' } })}
+      />,
     )
-    expect(strokesOf(container)).toContain('#c1272d')
+    const strokes = strokesOf(container)
+    expect(strokes).toContain('#c1272d')
+    expect(strokes).not.toContain('#111111')
   })
 
   it('edges.color pinta as liñas', () => {

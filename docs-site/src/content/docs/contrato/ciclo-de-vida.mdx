@@ -17,7 +17,7 @@ Un nodo está sempre en exactamente un destes estados (`NodeState`). Os nomes so
 
 O detalle que máis confunde a un dev novo, dito de fronte: **o `state` gardado só o mutan `unlock` / `lock` / `respec` / `tick` / `applyChanges`** (decisión 2.4.b do MASTER — responsabilidade exclusiva). Os outros dous estados do vocabulario son **derivados**:
 
-- **`unlockable` é unha pregunta, non un dato**: pregúntase con `canUnlock(id)` (síncrono e puro), que devolve `{ allowed, reason }` avaliando prerrequisitos, exclusións, recursos e stats no momento. Un nodo sen tocar lese `locked` no estado; se `canUnlock` di que si, a UI píntao desbloqueable.
+- **`unlockable` é unha pregunta, non un dato**: pregúntase con `canUnlock(id)` (síncrono e puro), que devolve `{ allowed, reason }` avaliando prerrequisitos, exclusións, recursos e stats no momento. Un nodo sen tocar lese `locked` no estado; se `canUnlock` di que si, a UI píntao desbloqueable. **Desde o 19.2 fáino o `SkillTree` por ti**: pregunta polos nodos `locked` cada vez que cambia o estado e publica a resposta en `data-visual-state` (o atributo do que tira o pulso de «prémeme»). `data-state` segue levando o estado cru do motor.
 - **`in_progress` derívase**: o renderer amósao para nodos multi-rango a medio camiño (`0 < currentTier < maxTier`), e o dato `progress` (0–100, via `setProgress`) leva o progreso educativo. `setProgress(id, 100)` **non** desbloquea só (cero auto-unlock, tamén 2.4.b): o consumidor combina `setProgress` + `canUnlock` + `unlock` — o desbloqueo é sempre unha decisión explícita.
 
 ## Que move cada transición

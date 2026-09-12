@@ -85,6 +85,17 @@ export interface SkillNodeProps {
    * (segue visible aínda que o icon id caia ao fallback de texto).
    */
   readonly showTierBadge?: boolean
+
+  /**
+   * O motor di que este nodo se pode desbloquear AGORA (19.2).
+   *
+   * `unlockable` nunca é un estado gardado: o motor só o escribe se un
+   * documento o forza cun efecto `modify_node_state`. É unha PREGUNTA
+   * (`canUnlock`), e quen a fai é o `SkillTree`, que ten o motor á man.
+   * Aquí chega xa respondida para que o nodo se pinte co seu recheo,
+   * o seu anel e o pulso de «prémeme».
+   */
+  readonly unlockable?: boolean
 }
 
 const DEFAULT_LONG_PRESS_MS = 700
@@ -99,6 +110,7 @@ function SkillNodeImpl({
   selected,
   onHover,
   showTierBadge,
+  unlockable,
 }: SkillNodeProps): JSX.Element {
   const state = instance?.state ?? 'locked'
   const tier = instance?.currentTier ?? 0
@@ -118,7 +130,7 @@ function SkillNodeImpl({
   // para multi-tier a medias) + fill por estado + override `node.color`.
   // Cero regresión: sen tokens de fill por estado nin `node.color`, o
   // resultado é `theme.colors.nodeFill` (idéntico ao previo).
-  const visualState = visualStateFor(state, tier, node.maxTier)
+  const visualState = visualStateFor(state, tier, node.maxTier, unlockable)
   const fill: string =
     theme !== null ? fillColorForState(theme, visualState, node.color) : (node.color ?? '#f4f4ef')
   const ring: string | undefined =
@@ -362,7 +374,16 @@ function SkillNodeImpl({
     <g
       className="yf-skill-node"
       data-node-id={node.id}
+      // `data-state` é o estado CRU do motor — contrato estable desde
+      // 1.0, e a verdade do dominio.
       data-state={state}
+      // `data-visual-state` (19.2) é o que se VE: engade `in_progress`
+      // para os multi-rango a medias e `unlockable` cando o motor di que
+      // se pode abrir agora. Existe porque os dous non coinciden e antes
+      // só se publicaba un: o pulso de `animations.ts` apuntaba a
+      // `[data-state="unlockable"]`, un valor que o motor non garda
+      // nunca, así que non disparaba xamais.
+      data-visual-state={visualState}
       data-tier={tier}
       {...(selected === true && { 'data-selected': 'true' })}
       {...(isHovering && { 'data-hover': 'true' })}
@@ -572,9 +593,17 @@ export function visualStateFor(
   state: NodeState,
   currentTier: number,
   maxTier: number | undefined,
+  unlockable?: boolean,
 ): NodeState {
   if (maxTier !== undefined && maxTier > 1 && currentTier > 0 && currentTier < maxTier) {
     return 'in_progress'
+  }
+  // 19.2: `unlockable` é derivado, igual que `in_progress`. Só se aplica
+  // sobre `locked`: un nodo xa aberto non volve a «prémeme», e un
+  // multi-rango a medias xa gañou arriba (ten rango > 0, logo non é
+  // locked). Sen a resposta do motor, comportamento idéntico ao previo.
+  if (state === 'locked' && unlockable === true) {
+    return 'unlockable'
   }
   return state
 }

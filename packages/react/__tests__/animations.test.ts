@@ -14,9 +14,13 @@ describe('buildAnimationsCSS', () => {
     expect(css).toContain('[data-theme-id="my-theme-123"]')
   })
 
-  it('contén regra de pulse para data-state="unlockable"', () => {
+  it('★ 19.2 — o pulse apunta ao estado VISUAL, non ao cru do motor', () => {
     const css = buildAnimationsCSS('t')
-    expect(css).toContain('[data-state="unlockable"]')
+    // `data-state` leva o estado gardado, que NUNCA vale "unlockable"
+    // (o motor só o escribe cun efecto modify_node_state). Mentres o
+    // selector apuntou alí, este pulso non disparou nin unha vez.
+    expect(css).toContain('[data-visual-state="unlockable"]')
+    expect(css).not.toContain('[data-state="unlockable"]')
     expect(css).toContain('animation: yf-pulse')
   })
 

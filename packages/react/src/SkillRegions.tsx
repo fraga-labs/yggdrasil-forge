@@ -14,6 +14,7 @@
 import type { NodeDef } from '@yggdrasil-forge/core'
 import type { JSX } from 'react'
 import { useTheme } from './ThemeProvider.js'
+import { CONTRASTE_MINIMO, corLexible } from './colorContrast.js'
 import { resolveRadius } from './nodeGeometry.js'
 
 /**
@@ -387,6 +388,9 @@ export function SkillRegions({
   if (computed.length === 0) return null
 
   const textColor = theme?.colors.text ?? '#666666'
+  // Lenzo efectivo, mesma cadea que o halo do rótulo en SkillNode:
+  // `background` é opcional e ningún tema base o define.
+  const fondo = theme?.colors.background ?? theme?.colors.mesh
 
   return (
     <g className="yf-skill-regions" data-testid="skill-regions" pointerEvents="none">
@@ -448,7 +452,15 @@ export function SkillRegions({
                       fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      fill: spec.color ?? textColor,
+                      // A cor da comarca SÓ se xa se le sobre o lenzo.
+                      // As cores de rexión decláranse para tinguir un
+                      // fondo ao 12%, e unha que vale para iso pode non
+                      // valer para escribir: no showcase gótico
+                      // «CLAUSTRO» (#3a2a2a) desaparecía.
+                      // O 0.8 vai no cálculo: un texto translúcido ten
+                      // o contraste da cor MESTURADA co fondo, non o da
+                      // sólida.
+                      fill: corLexible(spec.color, fondo, textColor, CONTRASTE_MINIMO, 0.8),
                       fillOpacity: 0.8,
                     }
               }

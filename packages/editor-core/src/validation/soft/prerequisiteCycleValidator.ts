@@ -1,115 +1,104 @@
 // ── INICIO: prerequisiteCycleValidator ──
-// Aviso (NON-bloqueante) por ciclos no grafo de prerequisites.
+// Aviso (NON-bloqueante) por nodos que **non se poden desbloquear
+// nunca** porque os seus prerrequisitos dependen, directa ou
+// indirectamente, deles mesmos.
 //
-// Constrúe o grafo direccionado: aresta A → B cando "para A poder
-// desbloquearse, B tense que cumprir" (B vén nas condicións de A).
-// Iso inclúe condicións simples (`node_unlocked`, `tier_min`, ...)
-// e composables (`all`/`any`/`none`) que se camiñan recursivamente.
+// **Reescrito en 19.10.** A versión anterior construía un grafo
+// «A → B se B aparece nas condicións de A» ACHATANDO `all`, `any` e
+// `none`, e despois buscaba ciclos cun DFS de tres cores. Iso daba
+// falsos positivos en canto un documento usaba un `any`: no atlas da
+// galería, cada comarca é un anel de doce nodos onde cada un pide
+// `any(porta, anterior)`. O anel é un ciclo formal, pero a porta é
+// alternativa sempre dispoñible, así que ningún nodo queda bloqueado —
+// e aínda así saltaban **72 avisos** sobre un documento correcto. Un
+// aviso que berra en documentos sans ensina a ignorar os avisos.
 //
-// Despois DFS con detección de back-edge. Cada nodo nun ciclo recibe
-// un warning. Algoritmo: três cores (white/gray/black); back-edge a
-// gris = ciclo.
+// Semántica nova, a mesma que aplica o motor ao desbloquear
+// (`UnlockResolver`): punto fixo de SATISFACIBILIDADE.
+//
+//   - Un nodo sen prerrequisitos é satisfacible.
+//   - `all`: precisa que TODAS as condicións o sexan.
+//   - `any`: abonda UNHA.
+//   - `none`: sempre satisfacible — cúmprese NON desbloqueando, así
+//     que pode condicionar a orde, nunca a alcanzabilidade.
+//   - Condición que fala doutro nodo (`node_unlocked`, `node_maxed`,
+//     `tier_min`, `progress_min`, `node_state`): precisa que ese nodo
+//     sexa satisfacible.
+//   - Condición que NON fala de nodos (`resource_min`, `stat_min`,
+//     `time_after`…): satisfacible. É unha porta de recursos ou de
+//     tempo, non de topoloxía, e este validador fala de topoloxía.
+//
+// Itérase ata que non se engade ningún nodo máis. Os que quedan fóra
+// son os que nunca poderán abrirse: eses son os que se avisan.
+//
+// Consérvase o código `PREREQ_CYCLE` (hai consumidores que o miran) e
+// a severidade `warning`, pero a mensaxe di o que de verdade pasa.
 
 import type { LocalizedString } from '@yggdrasil-forge/common'
 import type { EditorDocument } from '../../document/EditorDocument.js'
 import type { ValidationIssue, Validator } from '../Validator.js'
 
-interface PrereqMaybe {
+interface RegraMaybe {
   type?: string
   nodeId?: string
-  conditions?: readonly PrereqMaybe[]
+  conditions?: readonly RegraMaybe[]
 }
 
 /**
- * Camiña un prerequisito (composable) e devolve **só** os nodeIds
- * referenciados (sin tipos non-nodo como `resource_min`, `stat_min`).
+ * Avalía se unha regra se pode satisfacer dado o conxunto de nodos xa
+ * considerados alcanzables.
+ *
+ * `undefined` (sen prerrequisitos) = satisfacible.
  */
-function collectNodeRefs(prereq: unknown, out: Set<string>): void {
-  if (prereq === null || prereq === undefined || typeof prereq !== 'object') return
-  const p = prereq as PrereqMaybe
-  if (typeof p.nodeId === 'string') out.add(p.nodeId)
-  if (Array.isArray(p.conditions)) {
-    for (const c of p.conditions) collectNodeRefs(c, out)
+function satisfacible(regra: unknown, alcanzables: ReadonlySet<string>): boolean {
+  if (regra === null || regra === undefined || typeof regra !== 'object') return true
+  const r = regra as RegraMaybe
+
+  if (r.type === 'all') {
+    return (r.conditions ?? []).every((c) => satisfacible(c, alcanzables))
   }
+  if (r.type === 'any') {
+    const cs = r.conditions ?? []
+    // Un `any` sen condicións non se pode cumprir con nada: iso é un
+    // documento roto, e o aviso é correcto.
+    return cs.length > 0 && cs.some((c) => satisfacible(c, alcanzables))
+  }
+  if (r.type === 'none') {
+    // Cúmprese NON desbloqueando. Nunca bloquea a alcanzabilidade.
+    return true
+  }
+  // Folla: só condiciona se fala doutro NODO.
+  if (typeof r.nodeId === 'string') return alcanzables.has(r.nodeId)
+  return true
 }
 
-type Color = 'white' | 'gray' | 'black'
-
 export const prerequisiteCycleValidator: Validator = (doc: EditorDocument) => {
-  // Construír grafo: A → B se A depende de B (B aparece nas prereqs de A).
-  const graph = new Map<string, string[]>()
-  const validIds = new Set<string>(doc.tree.nodes.map((n) => n.id))
-  for (const node of doc.tree.nodes) {
-    const refs = new Set<string>()
-    collectNodeRefs(node.prerequisites, refs)
-    // Só seguimos aristas para ids reais (dangling vai ao
-    // referentialIntegrityValidator).
-    const adj: string[] = []
-    for (const r of refs) {
-      if (validIds.has(r)) adj.push(r)
+  const nodos = doc.tree.nodes
+  const existentes = new Set<string>(nodos.map((n) => n.id))
+  const alcanzables = new Set<string>()
+
+  // Punto fixo. Como máximo hai `n` roldas úteis (cada rolda engade
+  // polo menos un nodo, ou remátase).
+  for (let rolda = 0; rolda < nodos.length; rolda++) {
+    let engadiu = false
+    for (const n of nodos) {
+      if (alcanzables.has(n.id)) continue
+      if (satisfacible(n.prerequisites, alcanzables)) {
+        alcanzables.add(n.id)
+        engadiu = true
+      }
     }
-    graph.set(node.id, adj)
-  }
-
-  const color = new Map<string, Color>()
-  for (const id of validIds) color.set(id, 'white')
-
-  const cycleNodes = new Set<string>()
-
-  // DFS iterativa con stack para evitar recursión profunda.
-  function visit(start: string): void {
-    // [nodeId, índiceFillo seguinte]
-    const stack: { id: string; childIdx: number; pathPos: number }[] = []
-    const pathStack: string[] = []
-    stack.push({ id: start, childIdx: 0, pathPos: 0 })
-    color.set(start, 'gray')
-    pathStack.push(start)
-
-    while (stack.length > 0) {
-      const frame = stack[stack.length - 1]
-      if (frame === undefined) break // unreachable, asegurándose
-      const adj = graph.get(frame.id) ?? []
-      if (frame.childIdx >= adj.length) {
-        // Procesado todo: marcar negro e pop.
-        color.set(frame.id, 'black')
-        pathStack.pop()
-        stack.pop()
-        continue
-      }
-      const child = adj[frame.childIdx]
-      frame.childIdx += 1
-      if (child === undefined) continue
-      const c = color.get(child)
-      if (c === 'gray') {
-        // Back-edge → ciclo. Marcar nodos no camiño desde child ata o final.
-        const startIdx = pathStack.indexOf(child)
-        if (startIdx >= 0) {
-          for (let i = startIdx; i < pathStack.length; i += 1) {
-            const n = pathStack[i]
-            if (n !== undefined) cycleNodes.add(n)
-          }
-        }
-        continue
-      }
-      if (c === 'white') {
-        color.set(child, 'gray')
-        pathStack.push(child)
-        stack.push({ id: child, childIdx: 0, pathPos: pathStack.length - 1 })
-      }
-      // c === 'black': xa visitado completamente; saltar.
-    }
-  }
-
-  for (const id of validIds) {
-    if (color.get(id) === 'white') visit(id)
+    if (!engadiu) break
   }
 
   const issues: ValidationIssue[] = []
-  for (const nodeId of cycleNodes) {
+  for (const id of existentes) {
+    if (alcanzables.has(id)) continue
     const message: LocalizedString = {
-      en: `node '${nodeId}' is part of a prerequisite cycle`,
+      gl: `o nodo '${id}' non se poderá desbloquear nunca: os seus prerrequisitos dependen del mesmo`,
+      en: `node '${id}' can never be unlocked: its prerequisites depend on itself`,
     }
-    issues.push({ severity: 'warning', code: 'PREREQ_CYCLE', message, nodeId })
+    issues.push({ severity: 'warning', code: 'PREREQ_CYCLE', message, nodeId: id })
   }
   return issues
 }

@@ -418,22 +418,31 @@ export const SkillTree = forwardRef<SkillTreeHandle, SkillTreeProps>(function Sk
     return ids
   }, [engine, treeDef, state])
 
-  // ── 19.10: os nodos GRANDES pintan enriba ──
+  // ── 19.10: a orde de pintado ──
   //
-  // En SVG non hai z-index: manda a orde do documento. Coa orde do
-  // ficheiro, un nodo pequeno emitido despois tápalle o RÓTULO a un
-  // grande emitido antes — vísteo no atlas, con «Mestre de Ribeira»
-  // cortado por dous smalls.
+  // En SVG non hai z-index: manda a orde do documento. E o RÓTULO dun
+  // nodo píntase POR DEBAIXO do seu corpo, así que calquera nodo
+  // emitido despois e situado máis abaixo cómello. Vísteo dúas veces
+  // nas fichas da galería: «Mestre de Ribeira» cortado por dous smalls
+  // no atlas, e «Dubhe» tapado por «Merak» en gaia-cards.
   //
-  // A regra é «o fito pinta enriba»: ordénase por radio ascendente, así
-  // que os grandes (que son, pola regra de `labelMinRadius`, xustamente
-  // os que levan texto) quedan ao final. `sort` de V8 é estable, así que
-  // entre iguais consérvase a orde do documento e o render segue sendo
-  // determinista.
-  const nodosPintados = useMemo(
-    () => [...treeDef.nodes].sort((a, b) => resolveRadius(a) - resolveRadius(b)),
-    [treeDef],
-  )
+  // Dúas regras, nesta orde:
+  //
+  //   1. **Radio ascendente**: o fito pinta enriba. Os grandes son,
+  //      pola regra de `labelMinRadius`, xustamente os que levan texto.
+  //   2. **De abaixo a arriba** (y descendente) entre iguais: é a regra
+  //      clásica do pintor para etiquetas colgadas debaixo. Se o rótulo
+  //      de A vai cara a B, que está máis abaixo, entón B ten que
+  //      pintarse ANTES.
+  //
+  // `sort` de V8 é estable, así que con radio e y iguais consérvase a
+  // orde do documento: o render segue sendo determinista.
+  const nodosPintados = useMemo(() => {
+    const y = (id: string): number => nodePositions.get(id)?.y ?? 0
+    return [...treeDef.nodes].sort(
+      (a, b) => resolveRadius(a) - resolveRadius(b) || y(b.id) - y(a.id),
+    )
+  }, [treeDef, nodePositions])
 
   const nodeElements = useMemo(
     () =>

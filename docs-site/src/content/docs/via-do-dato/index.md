@@ -13,7 +13,7 @@ pnpm add -D @yggdrasil-forge/cli
 
 | Comando | Que fai | Saída |
 |---|---|---|
-| `ygg validate [f \| -] [--json]` | Schema + validadores duros — **a mesma validación que importar no editor**. Sen ficheiro ou con `-` le stdin. `--json` emite `{ ok, issues[] }`. | 0 ok · 1 inválido · 2 uso |
+| `ygg validate [f \| -] [--json]` | Schema + validadores duros + a **conciencia** (os soft: ciclos, exclusións asimétricas, recursos inexistentes…) — **a mesma validación que importar no editor**. Sen ficheiro ou con `-` le stdin. `--json` emite `{ ok, issues[] }`. | 0 ok · 1 inválido · 2 uso |
 | `ygg layout <f \| -> --algo <a> [--out f]` | Coloca **todos** os nodos co motor (`radial`, `tree`, `layered`, `clustered-radial`, `constellation`) e coce o encadre. | documento ao stdout ou a `--out` |
 | `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | SVG **autocontido** (sen CSS externo nin variables), co tema do documento. `--dark` usa a base escura. | ficheiro SVG |
 | `ygg render … [--minimap]` | Debuxa o **minimapa** na esquina. Non é dato do documento: é mobiliario do visor. | ficheiro SVG |
@@ -70,7 +70,7 @@ Cada paso é **determinista** (mesma entrada, mesma saída) e **idempotente** (p
 ## Por que está deseñado así
 
 - **Erro como dato**, non como texto: un validador que só fala para humanos rompe o bucle automático.
-- **Unha soa validación**: `ygg validate` e *Importar* son a mesma función. Se pasa un, pasa o outro.
+- **Unha soa validación**: `ygg validate` e *Importar* son a mesma función. Se pasa un, pasa o outro. Desde 19.10 o CLI corre tamén os validadores **soft** (o que o editor amosa no panel Problemas): imprímense despois do `✓` e **non** cambian o código de saída, porque un aviso é información para mellorar e non un muro para o bucle.
 - **Posicións opcionais**: un xerador non ten por que saber xeometría; os motores si.
 - **Render autocontido**: o SVG de `ygg render` funciona sen o sitio, sen CSS, sen fontes externas — pódese mandar por correo ou metelo nun PDF.
 

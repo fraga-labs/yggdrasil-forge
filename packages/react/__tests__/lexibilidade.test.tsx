@@ -69,7 +69,45 @@ describe('★ 19.10 — os nodos grandes pintan ENRIBA', () => {
     expect(ids(container)).toEqual(['p1', 'p2', 'grande'])
   })
 
-  it('entre nodos do MESMO radio consérvase a orde do documento (render determinista)', () => {
+  it('★★ entre iguais pinta de ABAIXO a ARRIBA: o de abaixo non tapa o rótulo do de arriba', () => {
+    // O rótulo colga por debaixo do nodo, así que o veciño de abaixo é
+    // quen llo come. Defecto visto na ficha `gaia-cards`, con «Dubhe»
+    // cortado polo nodo «Merak», que está xusto debaixo.
+    const tree = {
+      id: 'vertical',
+      schemaVersion: '1.0.0',
+      version: '1.0.0',
+      label: 'V',
+      nodes: [
+        { id: 'arriba', type: 'small', label: 'Arriba', size: 16, position: { x: 0, y: 0 } },
+        { id: 'abaixo', type: 'small', label: 'Abaixo', size: 16, position: { x: 8, y: 40 } },
+      ],
+      edges: [{ id: 'e', source: 'arriba', target: 'abaixo', type: 'dependency' }],
+      layout: { type: 'custom' },
+    } as unknown as TreeDef
+    const { container } = render(<SkillTree engine={new TreeEngine(tree)} />)
+    // `abaixo` primeiro; así o rótulo de `arriba` píntase despois e gaña.
+    expect(ids(container)).toEqual(['abaixo', 'arriba'])
+  })
+
+  it('con radio e y iguais consérvase a orde do documento (render determinista)', () => {
+    const tree = {
+      id: 'empate',
+      schemaVersion: '1.0.0',
+      version: '1.0.0',
+      label: 'E',
+      nodes: [
+        { id: 'un', type: 'small', label: 'un', size: 16, position: { x: 0, y: 0 } },
+        { id: 'dous', type: 'small', label: 'dous', size: 16, position: { x: 60, y: 0 } },
+      ],
+      edges: [],
+      layout: { type: 'custom' },
+    } as unknown as TreeDef
+    const { container } = render(<SkillTree engine={new TreeEngine(tree)} />)
+    expect(ids(container)).toEqual(['un', 'dous'])
+  })
+
+  it('entre nodos do MESMO radio a orde é estable (render determinista)', () => {
     const { container } = render(<SkillTree engine={new TreeEngine(arboreConGrande())} />)
     const orde = ids(container)
     expect(orde.indexOf('p1')).toBeLessThan(orde.indexOf('p2'))

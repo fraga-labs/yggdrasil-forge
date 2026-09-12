@@ -125,8 +125,8 @@
         "id": "furia",
         "type": "small",
         "label": {
-          "gl": "Furia ᚢ",
-          "en": "Fury ᚢ"
+          "gl": "Furia",
+          "en": "Fury"
         },
         "position": {
           "x": -130,
@@ -156,8 +156,8 @@
         "id": "pel-de-oso",
         "type": "small",
         "label": {
-          "gl": "Pel de Oso ᚦ",
-          "en": "Bearhide ᚦ"
+          "gl": "Pel de Oso",
+          "en": "Bearhide"
         },
         "position": {
           "x": -215,
@@ -236,8 +236,8 @@
         "id": "ouveo",
         "type": "small",
         "label": {
-          "gl": "Ouveo de Guerra ᛉ",
-          "en": "War Howl ᛉ"
+          "gl": "Ouveo de Guerra",
+          "en": "War Howl"
         },
         "position": {
           "x": -215,
@@ -312,8 +312,8 @@
         "id": "alento",
         "type": "small",
         "label": {
-          "gl": "Alento ᚨ",
-          "en": "Breath ᚨ"
+          "gl": "Alento",
+          "en": "Breath"
         },
         "position": {
           "x": 0,
@@ -388,8 +388,8 @@
         "id": "vision",
         "type": "small",
         "label": {
-          "gl": "Visión ᛏ",
-          "en": "Sight ᛏ"
+          "gl": "Visión",
+          "en": "Sight"
         },
         "position": {
           "x": -75,
@@ -419,8 +419,8 @@
         "id": "presaxio",
         "type": "small",
         "label": {
-          "gl": "Presaxio ᛗ",
-          "en": "Omen ᛗ"
+          "gl": "Presaxio",
+          "en": "Omen"
         },
         "position": {
           "x": 75,
@@ -494,8 +494,8 @@
         "id": "verba",
         "type": "small",
         "label": {
-          "gl": "Verba ᚹ",
-          "en": "Word ᚹ"
+          "gl": "Verba",
+          "en": "Word"
         },
         "position": {
           "x": 130,
@@ -525,8 +525,8 @@
         "id": "memoria",
         "type": "small",
         "label": {
-          "gl": "Memoria ᛚ",
-          "en": "Memory ᛚ"
+          "gl": "Memoria",
+          "en": "Memory"
         },
         "position": {
           "x": 215,
@@ -601,8 +601,8 @@
         "id": "xuramento",
         "type": "small",
         "label": {
-          "gl": "Xuramento ᛒ",
-          "en": "Oath ᛒ"
+          "gl": "Xuramento",
+          "en": "Oath"
         },
         "position": {
           "x": 215,
@@ -682,7 +682,7 @@
         },
         "position": {
           "x": 0,
-          "y": -330
+          "y": -380
         },
         "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHBhdGggZmlsbD0iI2U4ZGNjMCIgZD0iTTMyIDZjNCAxMCAxNCAxNCAxNCAyNmExNCAxNCAwIDExLTI4IDBjMC03IDQtMTAgNi0xNiAzIDQgNiA2IDggNS0yLTUtMi0xMCAwLTE1eiIvPjxwYXRoIGZpbGw9IiMxNDFhMjYiIGQ9Ik0zMiAzMGMyIDUgNiA2IDYgMTJhNiA2IDAgMTEtMTIgMGMwLTQgMi02IDMtOSAxIDIgMiAzIDMgMy0xLTItMS00IDAtNnoiLz48L3N2Zz4=",
         "shape": "hexagon",

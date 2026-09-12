@@ -118,6 +118,109 @@ describe('prerequisiteCycleValidator', () => {
     const issues = prerequisiteCycleValidator(doc)
     expect(issues.length).toBe(2)
   })
+
+  // ── 19.10: semántica de satisfacibilidade ──
+  //
+  // O validador vello achataba `all`/`any`/`none` nun só grafo e
+  // buscaba ciclos. Iso daba 72 avisos no atlas da galería, que é
+  // correcto: as súas comarcas son aneis onde cada nodo pide
+  // `any(porta, anterior)`, un ciclo formal cunha saída sempre aberta.
+
+  it('★★ un `any` cunha SAÍDA non é un bloqueo: cero avisos', () => {
+    const doc = docWith((tree) => {
+      // O patrón exacto do atlas: child pide «a porta OU o anterior», e
+      // aquí o anterior é el mesmo (o anel). A porta (root) está aberta.
+      const b = tree.nodes.find((n) => n.id === 'child')
+      if (b !== undefined) {
+        ;(b as { prerequisites?: unknown }).prerequisites = {
+          type: 'any',
+          conditions: [
+            { type: 'node_unlocked', nodeId: 'root' },
+            { type: 'node_unlocked', nodeId: 'child' },
+          ],
+        }
+      }
+    })
+    expect(prerequisiteCycleValidator(doc)).toEqual([])
+  })
+
+  it('★ un `none` nunca bloquea: cúmprese NON desbloqueando', () => {
+    const doc = docWith((tree) => {
+      const b = tree.nodes.find((n) => n.id === 'child')
+      if (b !== undefined) {
+        ;(b as { prerequisites?: unknown }).prerequisites = {
+          type: 'none',
+          conditions: [{ type: 'node_unlocked', nodeId: 'child' }],
+        }
+      }
+    })
+    expect(prerequisiteCycleValidator(doc)).toEqual([])
+  })
+
+  it('★ unha condición que non fala de nodos (recursos) non bloquea', () => {
+    const doc = docWith((tree) => {
+      const b = tree.nodes.find((n) => n.id === 'child')
+      if (b !== undefined) {
+        ;(b as { prerequisites?: unknown }).prerequisites = {
+          type: 'all',
+          conditions: [{ type: 'resource_min', resourceId: 'ouro', amount: 10 }],
+        }
+      }
+    })
+    expect(prerequisiteCycleValidator(doc)).toEqual([])
+  })
+
+  it('★ un `any` SEN condicións si é un bloqueo: nada o pode cumprir', () => {
+    const doc = docWith((tree) => {
+      const b = tree.nodes.find((n) => n.id === 'child')
+      if (b !== undefined) {
+        ;(b as { prerequisites?: unknown }).prerequisites = { type: 'any', conditions: [] }
+      }
+    })
+    const issues = prerequisiteCycleValidator(doc)
+    expect(issues.map((i) => i.nodeId)).toEqual(['child'])
+  })
+
+  it('★★ tamén avisa de quen PENDE dun bloqueo, non só dos do ciclo', () => {
+    // Mellora sobre o DFS anterior, que marcaba os membros do ciclo e
+    // deixaba fóra os que colgaban del: eses tampouco poden abrirse.
+    const tree = minimalTreeDef()
+    tree.nodes.push({
+      id: 'neto',
+      type: 'small',
+      label: 'Neto',
+      position: { x: 200, y: 0 },
+      prerequisites: { type: 'node_unlocked', nodeId: 'child' },
+    } as never)
+    const a = tree.nodes.find((n) => n.id === 'root')
+    const b = tree.nodes.find((n) => n.id === 'child')
+    if (a !== undefined) {
+      ;(a as { prerequisites?: unknown }).prerequisites = {
+        type: 'node_unlocked',
+        nodeId: 'child',
+      }
+    }
+    if (b !== undefined) {
+      ;(b as { prerequisites?: unknown }).prerequisites = { type: 'node_unlocked', nodeId: 'root' }
+    }
+    const ids = new Set(prerequisiteCycleValidator(createEditorDocument(tree)).map((i) => i.nodeId))
+    expect(ids).toEqual(new Set(['root', 'child', 'neto']))
+  })
+
+  it('a mensaxe vai nos dous idiomas (a saída do CLI resólvea)', () => {
+    const doc = docWith((tree) => {
+      const b = tree.nodes.find((n) => n.id === 'child')
+      if (b !== undefined) {
+        ;(b as { prerequisites?: unknown }).prerequisites = {
+          type: 'node_unlocked',
+          nodeId: 'child',
+        }
+      }
+    })
+    const m = prerequisiteCycleValidator(doc)[0]?.message as { gl?: string; en?: string }
+    expect(m.gl).toBeTruthy()
+    expect(m.en).toBeTruthy()
+  })
 })
 
 describe('layoutOverflowValidator', () => {

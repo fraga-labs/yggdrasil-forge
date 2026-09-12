@@ -157,6 +157,95 @@ describe('validateDocumentText — API directa', () => {
     expect(report.stats?.nodes).toBeGreaterThan(0)
   })
 })
+// ── 19.10: `ygg validate` corre tamén a CONCIENCIA ──
+//
+// Ata 19.10 isto só deserializaba, así que un documento cun ciclo de
+// prerrequisitos — os nodos do ciclo quedan bloqueados PARA SEMPRE —
+// saía por aquí como «✓ documento válido» e nada máis. O editor si
+// avisaba; a IA que itera co CLI non se enteraba.
+
+/** Documento que carga ben pero ten tres problemas semánticos. */
+const ENFERMO = JSON.stringify({
+  tree: {
+    id: 'enfermo',
+    schemaVersion: '1.0.0',
+    version: '1.0.0',
+    label: 'Con problemas',
+    resources: [{ id: 'ouro', label: 'Ouro', initial: 10 }],
+    nodes: [
+      {
+        id: 'a',
+        type: 'small',
+        label: 'A',
+        position: { x: 0, y: 0 },
+        costPerTier: [[{ resourceId: 'prata', amount: 2 }]],
+        prerequisites: { type: 'node_unlocked', nodeId: 'b' },
+      },
+      {
+        id: 'b',
+        type: 'small',
+        label: 'B',
+        position: { x: 80, y: 0 },
+        prerequisites: { type: 'node_unlocked', nodeId: 'a' },
+      },
+      { id: 'c', type: 'small', label: 'C', position: { x: 160, y: 0 }, exclusions: ['a'] },
+    ],
+    edges: [{ id: 'e1', source: 'a', target: 'b', type: 'dependency' }],
+    layout: { type: 'custom' },
+  },
+  editor: { formatVersion: '1.0.0' },
+})
+
+describe('★ ygg validate — a conciencia (19.10)', () => {
+  it('★★ un ciclo de prerrequisitos xa NON pasa en silencio', async () => {
+    const io = makeIO(ENFERMO)
+    await run(['validate', '--json'], io)
+    const report = JSON.parse(io.out()) as {
+      issues: readonly { code: string; nodeId?: string }[]
+    }
+    expect(report.issues.map((i) => i.code)).toContain('PREREQ_CYCLE')
+  })
+
+  it('★★ pero un aviso NON invalida: ok segue true e o exit code 0', async () => {
+    // Contrato deliberado: `ok` significa «o documento cárgase», que é
+    // o que un pipeline precisa para decidir se continúa. Un warning é
+    // información para mellorar, non un muro.
+    const io = makeIO(ENFERMO)
+    const code = await run(['validate', '--json'], io)
+    expect(code).toBe(0)
+    expect((JSON.parse(io.out()) as { ok: boolean }).ok).toBe(true)
+  })
+
+  it('★ ve os tres tipos de problema: ciclo, exclusión asimétrica e recurso inexistente', async () => {
+    const report = validateDocumentText(ENFERMO)
+    const codigos = new Set(report.issues.map((i) => i.code))
+    expect(codigos).toContain('PREREQ_CYCLE')
+    expect(codigos).toContain('EXCL_ASYMMETRIC')
+    expect(codigos).toContain('RES_DANGLING_COST_PER_TIER')
+  })
+
+  it('★ cada aviso sinala ONDE: id de nodo (ou de aresta)', async () => {
+    const report = validateDocumentText(ENFERMO)
+    const cycle = report.issues.filter((i) => i.code === 'PREREQ_CYCLE')
+    expect(cycle.length).toBeGreaterThan(0)
+    for (const i of cycle) expect(i.nodeId).toBeDefined()
+  })
+
+  it('a saída humana imprime os avisos DESPOIS do ✓', async () => {
+    const io = makeIO(ENFERMO)
+    await run(['validate'], io)
+    const texto = io.out()
+    expect(texto).toMatch(/✓ documento válido/)
+    expect(texto.indexOf('PREREQ_CYCLE')).toBeGreaterThan(texto.indexOf('✓'))
+  })
+
+  it('un documento limpo segue sen avisos (cero ruído na galería)', async () => {
+    for (const f of ['minimal.json', 'panadeiro.json', 'atlas-de-fisterra.json']) {
+      const report = validateDocumentText(readFileSync(join(GALLERY, f), 'utf8'))
+      expect(report.issues, f).toEqual([])
+    }
+  })
+})
 // ── FIN: tests do CLI ──
 
 // ── 19.1: as bandeiras de xogo non poden fallar caladas ──

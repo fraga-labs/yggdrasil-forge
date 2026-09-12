@@ -104,6 +104,15 @@ async function cmdValidate(args: readonly string[], io: CliIO): Promise<number> 
     io.stdout(
       `✓ documento válido (${report.stats?.nodes ?? 0} nodos, ${report.stats?.edges ?? 0} arestas)\n`,
     )
+    // Os avisos da conciencia (19.10). Non fan fallar: van despois do ✓
+    // para que un bucle que só mira o código de saída siga igual, e
+    // quen le a saída se enteire.
+    for (const issue of report.issues) {
+      const onde = issue.nodeId ?? issue.edgeId
+      io.stdout(
+        `  [${issue.severity}] ${issue.code}${onde !== undefined ? ` (${onde})` : ''}: ${issue.message}\n`,
+      )
+    }
   } else {
     io.stderr('✗ documento inválido:\n')
     for (const issue of report.issues) {

@@ -13,7 +13,7 @@ pnpm add -D @yggdrasil-forge/cli
 
 | Command | What it does | Output |
 |---|---|---|
-| `ygg validate [f \| -] [--json]` | Schema + hard validators — **the same validation as importing in the editor**. Without a file or with `-` it reads stdin. `--json` emits `{ ok, issues[] }`. | 0 ok · 1 invalid · 2 usage |
+| `ygg validate [f \| -] [--json]` | Schema + hard validators + the **conscience** (the soft ones: cycles, asymmetric exclusions, dangling resources…) — **the same validation as importing in the editor**. Without a file or with `-` it reads stdin. `--json` emits `{ ok, issues[] }`. | 0 ok · 1 invalid · 2 usage |
 | `ygg layout <f \| -> --algo <a> [--out f]` | Places **every** node with the engine (`radial`, `tree`, `layered`, `clustered-radial`, `constellation`) and bakes the framing. | document to stdout or `--out` |
 | `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | A **self-contained** SVG (no external CSS or variables), with the document theme. `--dark` uses the dark base. | SVG file |
 | `ygg render … [--minimap]` | Draws the **minimap** in the corner. Not document data: it is viewer furniture. | SVG file |
@@ -70,7 +70,7 @@ Every step is **deterministic** (same input, same output) and **idempotent** (yo
 ## Why it is designed this way
 
 - **Error as data**, not as prose: a validator that only talks to humans breaks the automatic loop.
-- **One single validation**: `ygg validate` and *Importar* are the same function. If one passes, so does the other.
+- **One single validation**: `ygg validate` and *Importar* are the same function. If one passes, so does the other. Since 19.10 the CLI also runs the **soft** validators (what the editor shows in its Problemas panel): they print after the `✓` and do **not** change the exit code, because a warning is information to improve on, not a wall for the loop.
 - **Optional positions**: a generator has no business knowing geometry; the engines do.
 - **Self-contained render**: the SVG from `ygg render` works without the site, without CSS, without external fonts — you can email it or put it in a PDF.
 

@@ -151,9 +151,10 @@ is measured, not taste: a name like *"Mestre de Temporais"* is about 157
 viewBox units wide and a shire's node spacing is 62, so at this density
 labels cannot sit beside their nodes no matter how far the layout
 separates them. The founding atlas mockup does the same thing: it names
-the landmarks and leaves the rest as icons. Every name is still in the
-document (tooltip, `aria-label`, editor) — what is dropped is the
-painted glyph.
+the landmarks and leaves the rest as icons. Every name is still there: each node
+emits a `<title>` with its full name (the native hover tooltip, and the
+SVG accessible name), and interactive nodes carry an `aria-label` too.
+What is dropped is the painted glyph.
 
 Read this one for **breadth**; for **depth**, read `lobo-de-inverno`,
 `escola-de-gaita` or `a-vixilia`.

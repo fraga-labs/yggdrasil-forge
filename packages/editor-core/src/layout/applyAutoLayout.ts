@@ -29,7 +29,7 @@ import {
   ok,
 } from '@yggdrasil-forge/core'
 import type { Command } from '../command/Command.js'
-import { moveNode, setMetaField } from '../command/commands/index.js'
+import { moveNode, setMetaField, setTreeField } from '../command/commands/index.js'
 import type { EditorDocument } from '../document/EditorDocument.js'
 import { type AutoLayoutAlgo, defaultLayoutConfig } from './defaultLayoutConfigs.js'
 
@@ -78,7 +78,12 @@ export function applyAutoLayout(
 ): Result<readonly Command[]> {
   const locale: Locale = options?.locale ?? 'gl'
   // TreeDef efémero co layout do algoritmo — o documento NON se toca.
-  const ephemeral: TreeDef = { ...doc.tree, layout: defaultLayoutConfig(algo, doc.tree) }
+  // Se o documento xa pedía ESTE algoritmo, mándase a súa config.
+  const propia = doc.tree.layout.type === algo ? doc.tree.layout : undefined
+  const ephemeral: TreeDef = {
+    ...doc.tree,
+    layout: propia ?? defaultLayoutConfig(algo, doc.tree),
+  }
   const computed = computeLayout(ephemeral, createEditorLayoutRegistry(), locale)
   if (!computed.ok) return computed
 
@@ -98,6 +103,13 @@ export function applyAutoLayout(
       )
     }
     commands.push(moveNode(node.id, position))
+  }
+
+  // Cocer: o documento pasa a `custom`, que é o que honra as posicións
+  // que acabamos de gardar. Só se fai falta, para non meter unha orde
+  // inerte na transacción do caso normal (o documento xa era `custom`).
+  if (doc.tree.layout.type !== 'custom') {
+    commands.push(setTreeField('layout', { type: 'custom' }))
   }
 
   // Encadre: coordinateBounds segue o layout (con marxe para labels).

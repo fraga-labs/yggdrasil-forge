@@ -301,6 +301,17 @@ function SkillNodeImpl({
   const displayLabel = labelTruncated
     ? `${fullLabel.slice(0, maxLabelChars).trimEnd()}…`
     : fullLabel
+  // 19.10: `<title>` sempre que o texto NON estea enteiro á vista, e
+  // iso inclúe o caso de `labelMinRadius` (rótulo oculto), non só o
+  // truncado.
+  //
+  // Faltaba, e era grave nun render estático: no atlas da galería, 90
+  // dos 97 nodos quedaban SEN nome ningún — nin tooltip nin nome
+  // accesible. O `aria-label` só se emite nos nodos interactivos, así
+  // que un `ygg render` saía cun único `aria-label` (o do `<svg>`) para
+  // a árbore enteira. En SVG o `<title>` é o mecanismo estándar de nome
+  // accesible, e ademais dá o tooltip nativo ao pasar o rato.
+  const levaTitle = labelTruncated || !mereceRotulo
 
   const handleClick =
     onClick !== undefined ? (_e: MouseEvent<SVGGElement>) => onClick(node.id) : undefined
@@ -455,7 +466,7 @@ function SkillNodeImpl({
         onPointerCancel: handlePointerEnd,
       })}
     >
-      {labelTruncated && <title>{fullLabel}</title>}
+      {levaTitle && <title>{fullLabel}</title>}
       {overlay}
       {levaMarco &&
         renderNodeShape(

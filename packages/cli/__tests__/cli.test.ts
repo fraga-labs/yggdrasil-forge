@@ -208,6 +208,23 @@ describe('★ ygg layout — a lista de algoritmos sae do rexistro (19.10)', () 
     expect(io.err()).toContain('clustered-radial')
   })
 
+  it('★★ o documento cocido queda en `custom`: o que se escribe é o que se pinta', async () => {
+    // Antes quedaba co layout vivo, así que as posicións escritas
+    // ignorábanse ao renderizar. Medido co atlas: mediana de 49
+    // unidades de desfase entre a posición escrita e a pintada.
+    const io = makeIO()
+    const code = await run(
+      ['layout', join(GALLERY, 'atlas-de-fisterra.json'), '--algo', 'mesh'],
+      io,
+    )
+    expect(code).toBe(0)
+    const doc = JSON.parse(io.out()) as {
+      tree: { layout: { type: string }; nodes: readonly { position?: unknown }[] }
+    }
+    expect(doc.tree.layout.type).toBe('custom')
+    expect(doc.tree.nodes.every((n) => n.position !== undefined)).toBe(true)
+  })
+
   it('`--algo mesh` funciona de verdade, non só na mensaxe', async () => {
     const io = makeIO()
     const code = await run(['layout', join(GALLERY, 'minimal.json'), '--algo', 'mesh'], io)

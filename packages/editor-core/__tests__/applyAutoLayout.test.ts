@@ -73,6 +73,67 @@ describe('applyAutoLayout — determinismo e cocido', () => {
     expect(engine.getDocument().tree.layout.type).toBe('custom')
   })
 
+  // ── 19.10: cocer significa cocer ──
+  //
+  // Ata agora o `layout.type` non se tocaba. Se o documento declaraba un
+  // layout VIVO, as posicións gardábanse e o renderer IGNORÁBAAS, porque
+  // volve calcular ao pintar. Medido co atlas: `ygg layout --algo mesh`
+  // escribía posicións afastadas unha mediana de 49 unidades (ata 163)
+  // das que logo se pintaban. E no editor, arrastrar un nodo nun
+  // documento así non facía nada visible.
+
+  /** Documento co `layout` que se lle pase (vivo ou custom). */
+  function docCon(layout: Record<string, unknown>): EditorDocument {
+    const base = galleryDoc('panadeiro.json')
+    return {
+      ...base,
+      tree: { ...base.tree, layout: layout as never },
+    }
+  }
+
+  it('★★ cun layout VIVO, cocer deixa o documento en `custom`', () => {
+    const doc = docCon({ type: 'mesh', spacing: 66, seed: 1 })
+    const { engine } = positionsAfter(doc, 'mesh')
+    expect(engine.getDocument().tree.layout.type).toBe('custom')
+  })
+
+  it('★ e un undo devolve o layout vivo xunto coas posicións (unha soa transacción)', () => {
+    const doc = docCon({ type: 'mesh', spacing: 66, seed: 1 })
+    const { engine } = positionsAfter(doc, 'mesh')
+    engine.undo()
+    expect(engine.getDocument().tree.layout.type).toBe('mesh')
+  })
+
+  it('cun documento xa `custom` NON se engade unha orde inerte', () => {
+    const doc = galleryDoc('panadeiro.json')
+    const r = applyAutoLayout(doc, 'radial')
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    // Un moveNode por nodo + o setMetaField do encadre. Nada máis.
+    expect(r.value).toHaveLength(doc.tree.nodes.length + 1)
+  })
+
+  it('cun layout vivo si se engade: unha orde máis', () => {
+    const doc = docCon({ type: 'mesh', spacing: 66, seed: 1 })
+    const r = applyAutoLayout(doc, 'mesh')
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(r.value).toHaveLength(doc.tree.nodes.length + 2)
+  })
+
+  it('★★ redispor co MESMO algoritmo respecta a afinación do autor', () => {
+    // Se o documento xa pedía `mesh` cun `spacing` grande, «Dispor →
+    // Malla» non pode significar «esquece o que axustaches»: antes
+    // colléndose sempre os defaults (spacing 66).
+    const apertado = positionsAfter(docCon({ type: 'mesh', spacing: 40, seed: 1 }), 'mesh')
+    const amplo = positionsAfter(docCon({ type: 'mesh', spacing: 200, seed: 1 }), 'mesh')
+    const extensión = (m: ReadonlyMap<string, Position | undefined>): number => {
+      const xs = [...m.values()].flatMap((p) => (p === undefined ? [] : [p.x]))
+      return Math.max(...xs) - Math.min(...xs)
+    }
+    expect(extensión(amplo.positions)).toBeGreaterThan(extensión(apertado.positions) * 2)
+  })
+
   it('★ o nodo SEN posición da adversarial queda colocado; un undo restaura TODO', () => {
     const doc = adversarialDocument()
     const before = mapPositions(doc)

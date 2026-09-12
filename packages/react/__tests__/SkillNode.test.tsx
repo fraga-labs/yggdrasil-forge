@@ -278,4 +278,21 @@ describe('★ 19.4 — os nodos pequenos non levan rótulo', () => {
     const g = container.querySelector('[data-node-id="n"]')
     expect(g?.getAttribute('aria-label') ?? '').toContain('Sal Mariña')
   })
+
+  it('★★ 19.10: e nun render ESTÁTICO o nome vai nun <title>', () => {
+    // O `aria-label` só sae nos nodos interactivos, así que nun
+    // `ygg render` (cero handlers) o texto oculto desaparecía por
+    // completo: medido no atlas da galería, 90 dos 97 nodos quedaban sen
+    // nome ningún, nin tooltip nin nome accesible. En SVG o `<title>` é
+    // o mecanismo estándar para iso, e dá tamén o tooltip nativo.
+    const { container } = pinta(13, 20)
+    expect(container.querySelector('.yf-skill-node__label')).toBeNull()
+    expect(container.querySelector('title')?.textContent).toBe('Sal Mariña')
+  })
+
+  it('★ cun rótulo á vista NON se engade <title>: markup de máis é markup de máis', () => {
+    const { container } = pinta(42, 20)
+    expect(container.querySelector('.yf-skill-node__label')?.textContent).toBe('Sal Mariña')
+    expect(container.querySelector('title')).toBeNull()
+  })
 })

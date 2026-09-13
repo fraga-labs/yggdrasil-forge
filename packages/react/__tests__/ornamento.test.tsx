@@ -200,17 +200,20 @@ function duasPegadas() {
   const nodos: NodeDef[] = [
     { id: 'a1', type: 'small', label: 'a1', tags: ['costa'] } as NodeDef,
     { id: 'a2', type: 'small', label: 'a2', tags: ['costa'] } as NodeDef,
+    { id: 'a3', type: 'small', label: 'a3', tags: ['costa'] } as NodeDef,
     { id: 'b1', type: 'small', label: 'b1', tags: ['mar'] } as NodeDef,
     { id: 'b2', type: 'small', label: 'b2', tags: ['mar'] } as NodeDef,
   ]
-  // A comarca de abaixo empeza a y=140, e a de arriba chega a y=120 con
-  // nodos ao longo de todo o ancho: o bordo superior de `mar` está
-  // ocupado polos corpos de `costa`.
+  // `a3` é a peza que fai a proba: está no MEDIO do ancho e ao fondo de
+  // `costa`, xusto onde `mar` poría o seu nome. Sen el —e así o
+  // escribín a primeira vez— o bordo superior de `mar` queda libre, a
+  // regra correcta é non mover nada, e a proba fallaba por ter razón.
   const pos = new Map([
     ['a1', { x: 0, y: 0 }],
-    ['a2', { x: 300, y: 120 }],
-    ['b1', { x: 0, y: 140 }],
-    ['b2', { x: 300, y: 320 }],
+    ['a2', { x: 300, y: 40 }],
+    ['a3', { x: 150, y: 120 }],
+    ['b1', { x: 0, y: 150 }],
+    ['b2', { x: 300, y: 330 }],
   ])
   return render(
     <ThemeProvider theme={minimalDark}>

@@ -47,3 +47,13 @@ un mapa. É o caso de «O MAR ABERTO».
 
 Empate → arriba, que é o de sempre: un documento cunha soa comarca, ou
 cunha centrada, queda exactamente coma antes.
+
+**O sitio de sempre gaña se está limpo.** A primeira versión do buscador
+probaba primeiro o lado exterior, así que unha comarca co bordo de
+arriba xa libre movíase igual só por estar na metade de abaixo do mapa.
+Cazouno comparar as cinco fichas da galería que levan comarcas antes e
+despois: catro saían idénticas e `lobo-de-inverno` —que é a foto do
+escaparate— baixaba dous dos seus tres nomes sen motivo. Agora o centro
+do bordo de arriba próbase o primeiro de todos, e o buscador só entra
+cando ese sitio non vale.
+

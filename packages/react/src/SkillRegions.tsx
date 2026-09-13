@@ -461,7 +461,14 @@ function ancoraDoRotulo(
       y: l.y === arriba.y ? bbox.minY - desprazamento : bbox.maxY + desprazamento,
     })),
   )
-  const candidatos = [...dentro, ...fora]
+  // O sitio DE SEMPRE —centro do bordo de arriba— vai o primeiro de
+  // todos, por riba mesmo da orde de fóra cara a dentro. Sen isto, unha
+  // comarca que xa tiña o seu bordo limpo movíase igual só por estar na
+  // metade de abaixo do mapa: pasoulle a `lobo-de-inverno`, que é a foto
+  // do escaparate, e dous dos seus tres nomes baixaron sen motivo. O
+  // buscador só ten que actuar cando o de sempre NON vale.
+  const deSempre = { x: cx, y: bbox.minY + 18 }
+  const candidatos = [deSempre, ...dentro, ...fora]
 
   let mellor = candidatos[0] ?? { x: cx, y: bbox.minY + 18 }
   let mellorFolgo = Number.NEGATIVE_INFINITY

@@ -13,7 +13,7 @@ The edit-side core that [@yggdrasil-forge/editor-react](https://www.npmjs.com/pa
 - **Document model** — `{ tree, editor }` with `serializeDocument` / `deserializeDocument`: guaranteed round-trip, versioned format.
 - **EditorEngine + commands** — every edit is a `Command` with undo/redo; the engine keeps the document consistent.
 - **Live validation** — structural validators (unique ids, dangling edges, cycles…) producing issues as data.
-- **Auto-layout** — drives the layout engines from `@yggdrasil-forge/core` (radial, tree, layered DAGs, clustered-radial, constellation) and bakes the framing.
+- **Auto-layout** — drives the layout engines from `@yggdrasil-forge/core` (radial, tree, layered DAGs, clustered-radial, constellation, mesh) and bakes the framing.
 - **Theme presets** — named looks (`neon`, …) applied by declaration, plus `standaloneSvg` for self-contained SVG export.
 
 ## Where it sits in the stability contract

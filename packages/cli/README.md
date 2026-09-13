@@ -12,12 +12,15 @@ npx ygg --help
 | Command | What it does |
 |---|---|
 | `ygg validate [file \| -] [--json]` | Schema + hard validators — the exact same validation as the editor's import. `--json` emits `{ ok, issues[] }` (errors as data, for closed-loop generation). |
-| `ygg layout <file \| -> --algo <a> [--out f]` | Places **every** node with a layout engine (`radial`, `tree`, `layered` for DAGs, `clustered-radial`, `constellation`) and bakes the framing. Deterministic. |
-| `ygg render <file \| -> --out f.svg [--dark] [--locale gl] [--width N]` | Renders the tree to a **self-contained SVG** (theme, states and icons included — no external CSS). |
+| `ygg layout <file \| -> --algo <a> [--out f]` | Places **every** node with a layout engine (`radial`, `tree`, `layered` for DAGs, `clustered-radial`, `constellation`, and `mesh` — the only one that reads the **edges**, for dense graphs) and bakes the framing. Deterministic. |
+| `ygg render <file \| -> --out f.svg [--dark] [--locale gl] [--width N] [--minimap]` | Renders the tree to a **self-contained SVG** (theme, states and icons included — no external CSS). `--minimap` draws the minimap in the corner. |
+| `ygg render … [--grant r=N,…] [--unlock id[:N],…]` | **Plays before painting**: grants resources and unlocks nodes (`id:N` takes N tiers) so one picture shows several node states instead of a fully-locked day zero. |
 | `ygg schema [--out f]` | Emits the published JSON Schema of the document format. |
 | `ygg new [--id x] [--label "…"]` | Emits a valid empty document to start from. |
 
 Exit codes: `0` ok · `1` validation failed or error · `2` usage.
+
+No flag fails quietly: an unknown or value-less option (a mistyped `--drak`, a `--out` with the filename forgotten) is a usage error, never a silently different picture.
 
 ## The AI loop
 

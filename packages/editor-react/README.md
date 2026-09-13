@@ -1,6 +1,6 @@
 # @yggdrasil-forge/editor-react
 
-The **Yggdrasil Forge Studio** — the full visual editor for progression trees (skill trees), as a React component library. This is the application layer of [Yggdrasil Forge](https://fraga-labs.github.io/yggdrasil-forge/): canvas with pan/zoom, inspector, live validation, auto-layout with five engines, cards view, play mode, icon picker, autosave with recovery, and a synchronized code panel.
+The **Yggdrasil Forge Studio** — the full visual editor for progression trees (skill trees), as a React component library. This is the application layer of [Yggdrasil Forge](https://fraga-labs.github.io/yggdrasil-forge/): canvas with pan/zoom, inspector, live validation, auto-layout with six engines, cards view, play mode, icon picker, autosave with recovery, and a synchronized code panel.
 
 ```bash
 pnpm add @yggdrasil-forge/editor-react @yggdrasil-forge/editor-core react react-dom

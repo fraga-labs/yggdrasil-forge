@@ -14,7 +14,7 @@ pnpm add -D @yggdrasil-forge/cli
 | Command | What it does | Output |
 |---|---|---|
 | `ygg validate [f \| -] [--json]` | Schema + hard validators + the **conscience** (the soft ones: cycles, asymmetric exclusions, dangling resources…) — **the same validation as importing in the editor**. Without a file or with `-` it reads stdin. `--json` emits `{ ok, issues[] }`. | 0 ok · 1 invalid · 2 usage |
-| `ygg layout <f \| -> --algo <a> [--out f]` | Places **every** node with the engine (`radial`, `tree`, `layered`, `clustered-radial`, `constellation`) and bakes the framing. | document to stdout or `--out` |
+| `ygg layout <f \| -> --algo <a> [--out f]` | Places **every** node with the engine (`radial`, `tree`, `layered`, `clustered-radial`, `constellation`, `mesh` — the only one that reads the **edges**) and bakes the framing. | document to stdout or `--out` |
 | `ygg render <f \| -> --out f.svg [--dark] [--locale gl] [--width N]` | A **self-contained** SVG (no external CSS or variables), with the document theme. `--dark` uses the dark base. | SVG file |
 | `ygg render … [--minimap]` | Draws the **minimap** in the corner. Not document data: it is viewer furniture. | SVG file |
 | `ygg render … [--grant r=N,…] [--unlock id[:N],…]` | **Play before painting**: grant resources and unlock nodes so the picture shows several states at once. `id:N` takes N tiers. | SVG file |

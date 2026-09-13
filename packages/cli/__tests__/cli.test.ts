@@ -4,7 +4,8 @@
 // EXACTA de --json, o pipe `ygg new | ygg validate`, a galería, e
 // JSON roto con campo sinalado.
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { type CliIO, run } from '../src/cli.js'
@@ -284,6 +285,80 @@ describe('★ ygg validate — a conciencia (19.10)', () => {
     }
   })
 })
+// ── 19.11: NINGUNHA bandeira pode fallar calada ──
+// Isto naceu de probar o CLI coas mans, non de ler o código: `ygg render
+// … --drak` (un `--dark` mal escrito) renderizaba en CLARO e saía con 0,
+// e `ygg layout … --out` co ficheiro esquecido cuspía o documento enteiro
+// polo stdout, tamén con 0. `--width lol` collía o ancho por defecto sen
+// dicir nada, e `--width 0` escribía un SVG dun PÍXEL anunciando éxito.
+//
+// O comentario de `--grant`/`--unlock` xa dicía que «o descarte silencioso
+// non o admitimos»; só que a regra valía para dúas bandeiras de cinco.
+describe('★ bandeiras mal escritas ou baleiras — uso incorrecto, nunca saída muda', () => {
+  const ARBORE = join(GALLERY, 'panadeiro.json')
+  const FORA = join(tmpdir(), 'ygg-bandeiras.svg')
+
+  it('★★ `--drak` non renderiza en claro: é erro de uso', async () => {
+    const io = makeIO()
+    const code = await run(['render', ARBORE, '--out', FORA, '--drak'], io)
+    expect(code).toBe(2)
+    expect(io.err()).toContain('--drak')
+    expect(io.out()).toBe('')
+  })
+
+  it('★★ `layout --out` sen ficheiro non cospe o documento polo stdout', async () => {
+    const io = makeIO()
+    const code = await run(
+      ['layout', join(GALLERY, 'minimal.json'), '--algo', 'radial', '--out'],
+      io,
+    )
+    expect(code).toBe(2)
+    expect(io.out()).toBe('')
+    expect(io.err()).toContain('precisa un valor')
+  })
+
+  it('unha bandeira descoñecida en `layout` tamén para', async () => {
+    const io = makeIO()
+    const code = await run(
+      ['layout', join(GALLERY, 'minimal.json'), '--algo', 'radial', '--xoga'],
+      io,
+    )
+    expect(code).toBe(2)
+    expect(io.err()).toContain('--xoga')
+  })
+
+  it('`validate --jsno` nomea a opción, non conta ficheiros', async () => {
+    const io = makeIO()
+    const code = await run(['validate', ARBORE, '--jsno'], io)
+    expect(code).toBe(2)
+    expect(io.err()).toContain('--jsno')
+    expect(io.err()).not.toContain('ficheiro')
+  })
+
+  it.each(['lol', '0', '-50', '12.5'])(
+    '★ `--width %s` rexéitase en vez de inventar un ancho',
+    async (v) => {
+      const io = makeIO()
+      const code = await run(['render', ARBORE, '--out', FORA, '--width', v], io)
+      expect(code).toBe(2)
+      expect(io.err()).toContain('--width')
+    },
+  )
+
+  it('★ e as bandeiras BOAS seguen pasando todas xuntas', async () => {
+    // A outra metade do contrato: se só se cumprise a primeira, a forma
+    // barata de «arranxar» isto sería rexeitar todo.
+    const io = makeIO()
+    const code = await run(
+      ['render', ARBORE, '--out', FORA, '--dark', '--minimap', '--width', '1200', '--locale', 'en'],
+      io,
+    )
+    expect(code).toBe(0)
+    expect(readFileSync(FORA, 'utf8')).toContain('width="1200"')
+    rmSync(FORA, { force: true })
+  })
+})
+
 // ── FIN: tests do CLI ──
 
 // ── 19.1: as bandeiras de xogo non poden fallar caladas ──

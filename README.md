@@ -90,9 +90,10 @@ The workflow:
    the exact same validation as the editor's import and reports errors *as
    data* (`--json`), so the AI can fix its own output in a tight loop.
 3. **Lay out** — the AI doesn't need to invent coordinates:
-   `ygg layout tree.json --algo layered` places every node (five engines:
+   `ygg layout tree.json --algo layered` places every node (six engines:
    `radial`, `tree`, `layered` for DAGs with multi-parent nodes,
-   `clustered-radial`, `constellation`). The editor offers the same menu
+   `clustered-radial`, `constellation`, and `mesh` — the only one that reads
+   the *edges*, for dense graphs). The editor offers the same menu
    (*Dispor*) and invites you to use it when a pasted tree has no positions.
 4. **Dress** — two plain strings make it look finished: a named theme
    preset (`"preset": "neon"` — five curated presets) and bundled icon ids

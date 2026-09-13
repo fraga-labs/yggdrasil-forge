@@ -58,6 +58,52 @@ function takeOption(
   return [value, [...args.slice(0, idx), ...args.slice(idx + 2)]]
 }
 
+/**
+ * Un exemplo de uso por bandeira, para que o erro ensine a forma correcta
+ * en vez de só dicir que algo está mal.
+ */
+const EXEMPLO_DE_BANDEIRA: Readonly<Record<string, string>> = {
+  '--algo': '--algo radial',
+  '--out': '--out saida.svg',
+  '--locale': '--locale en',
+  '--width': '--width 1200',
+  '--grant': '--grant "ouro=10"',
+  '--unlock': '--unlock "raiz,folla:2"',
+  '--id': '--id a-miña-arbore',
+  '--label': '--label "A miña árbore"',
+}
+
+/**
+ * Revisa as bandeiras que **sobraron** despois de consumir as coñecidas e
+ * devolve a mensaxe de erro, ou `undefined` se está todo ben.
+ *
+ * Existe porque `takeOption` só retira unha opción cando lle atopa valor,
+ * e `render`/`layout` filtraban os positional con `!a.startsWith('--')`:
+ * entre as dúas cousas, calquera `--` que non se recoñecese caía nun
+ * burato. `ygg render … --drak` renderizaba en CLARO e saía con 0, e
+ * `ygg layout … --out` (co ficheiro esquecido) cuspía o documento enteiro
+ * polo stdout tamén con 0. É o mesmo descarte silencioso que xa se lle
+ * negaba a `--grant`/`--unlock`; agora négaselle a todas.
+ *
+ * @param conValor bandeiras que esixen valor (se seguen aquí, foi sen el)
+ * @param soas bandeiras booleanas válidas
+ */
+function sobrasDeOpcions(
+  rest: readonly string[],
+  conValor: readonly string[],
+  soas: readonly string[],
+): string | undefined {
+  for (const a of rest) {
+    if (!a.startsWith('--')) continue
+    const exemplo = EXEMPLO_DE_BANDEIRA[a]
+    if (conValor.includes(a)) {
+      return `${a} precisa un valor${exemplo !== undefined ? ` (p.ex. ${exemplo})` : ''}`
+    }
+    if (!soas.includes(a)) return `opción descoñecida «${a}»`
+  }
+  return undefined
+}
+
 /** Parte unha lista `a,b,c` en entradas limpas. Sen valor → lista baleira. */
 function splitLista(raw: string | undefined): readonly string[] {
   if (raw === undefined) return []
@@ -69,6 +115,11 @@ function splitLista(raw: string | undefined): readonly string[] {
 
 async function cmdValidate(args: readonly string[], io: CliIO): Promise<number> {
   const json = args.includes('--json')
+  const sobraV = sobrasDeOpcions(args, [], ['--json'])
+  if (sobraV !== undefined) {
+    io.stderr(`ygg validate: ${sobraV}\n`)
+    return 2
+  }
   const positional = args.filter((a) => a !== '--json')
   if (positional.length > 1) {
     io.stderr(`ygg validate: agardaba un só ficheiro, recibín ${positional.length}\n`)
@@ -134,6 +185,11 @@ async function cmdLayout(args: readonly string[], io: CliIO): Promise<number> {
     io.stderr(`ygg layout: falta --algo (${AUTO_LAYOUT_ALGOS.join(' | ')})\n`)
     return 2
   }
+  const sobra = sobrasDeOpcions(rest2, ['--algo', '--out'], [])
+  if (sobra !== undefined) {
+    io.stderr(`ygg layout: ${sobra}\n`)
+    return 2
+  }
   if (positional.length > 1) {
     io.stderr(`ygg layout: agardaba un só ficheiro, recibín ${positional.length}\n`)
     return 2
@@ -175,15 +231,32 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
   // `takeOption` quita a bandeira SÓ se atopou valor; se segue aquí é que
   // se escribiu baleira (p.ex. `--unlock --dark`). Sen este control, o
   // render sairía no día cero calado: pediches xogar e daríasche outra
-  // foto sen dicir nada — o descarte silencioso que non admitimos.
-  for (const bandeira of ['--grant', '--unlock'] as const) {
-    if (rest5.includes(bandeira)) {
-      io.stderr(`ygg render: ${bandeira} precisa un valor (p.ex. ${
-        bandeira === '--grant' ? '--grant "ouro=10"' : '--unlock "raiz,folla:2"'
-      })
-`)
+  // foto sen dicir nada — o descarte silencioso que non admitimos. Desde
+  // 19.11 a mesma vara mide TODAS as bandeiras: un `--drak` mal escrito
+  // pintaba en claro e saía con 0, que é a mesma mentira.
+  const sobra = sobrasDeOpcions(
+    rest5,
+    ['--out', '--locale', '--width', '--grant', '--unlock'],
+    ['--dark', '--minimap'],
+  )
+  if (sobra !== undefined) {
+    io.stderr(`ygg render: ${sobra}\n`)
+    return 2
+  }
+  // `--width` medíase con `parseInt` e despois só se comprobaba que fose
+  // finito: `--width lol` caía calado no ancho por defecto, e `--width 0`
+  // (ou negativo) escribía un SVG dun píxel anunciando «svg escrito» con
+  // éxito. O recorte a 1 que fai `standaloneSvg` está ben na biblioteca
+  // —nunca emitir `width="0"`— pero aquí o que hai que facer é non
+  // aceptar a orde.
+  let parsedWidth: number | undefined
+  if (width !== undefined) {
+    const n = Number(width)
+    if (!Number.isInteger(n) || n < 1) {
+      io.stderr(`ygg render: --width agarda un enteiro positivo, recibín «${width}»\n`)
       return 2
     }
+    parsedWidth = n
   }
   if (out === undefined) {
     io.stderr('ygg render: falta --out <saida.svg>\n')
@@ -205,7 +278,6 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
 `)
     return 1
   }
-  const parsedWidth = width !== undefined ? Number.parseInt(width, 10) : undefined
   let play: PlayOptions | undefined
   if (grantRaw !== undefined || unlockRaw !== undefined) {
     const grant: Record<string, number> = {}
@@ -229,7 +301,7 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
     dark,
     ...(minimap && { minimap: true }),
     ...(locale !== undefined && { locale: locale as never }),
-    ...(parsedWidth !== undefined && Number.isFinite(parsedWidth) && { width: parsedWidth }),
+    ...(parsedWidth !== undefined && { width: parsedWidth }),
     ...(play !== undefined && { play }),
   })
   if (!result.ok || result.output === undefined) {
@@ -245,6 +317,11 @@ async function cmdRender(args: readonly string[], io: CliIO): Promise<number> {
 
 function cmdSchema(args: readonly string[], io: CliIO): number {
   const [out, rest] = takeOption(args, '--out')
+  const sobraS = sobrasDeOpcions(rest, ['--out'], [])
+  if (sobraS !== undefined) {
+    io.stderr(`ygg schema: ${sobraS}\n`)
+    return 2
+  }
   if (rest.length > 0) {
     io.stderr(`ygg schema: argumentos non recoñecidos: ${rest.join(' ')}\n`)
     return 2
@@ -262,6 +339,11 @@ function cmdSchema(args: readonly string[], io: CliIO): number {
 function cmdNew(args: readonly string[], io: CliIO): number {
   const [id, rest1] = takeOption(args, '--id')
   const [label, rest2] = takeOption(rest1, '--label')
+  const sobraN = sobrasDeOpcions(rest2, ['--id', '--label'], [])
+  if (sobraN !== undefined) {
+    io.stderr(`ygg new: ${sobraN}\n`)
+    return 2
+  }
   if (rest2.length > 0) {
     io.stderr(`ygg new: argumentos non recoñecidos: ${rest2.join(' ')}\n`)
     return 2

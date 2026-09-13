@@ -187,7 +187,7 @@ corpus, and a staging field inside them would teach generators to emit
 it. (Several tools also glob `gallery/*.json` as documents.)
 
 ```bash
-ygg render lobo-de-inverno.json --out shot.svg --dark   --grant "saga=30,sangue=6" --unlock "espertar,corazon,machado:3"
+ygg render lobo-de-inverno.json --out shot.svg --dark --grant "saga=30,sangue=6" --unlock "espertar,corazon,furia,pel-de-oso,machado:3,ouveo,berserkr,alento,bordon:2"
 ```
 
 A failed unlock is an **error**, not a quieter picture — so if a node id

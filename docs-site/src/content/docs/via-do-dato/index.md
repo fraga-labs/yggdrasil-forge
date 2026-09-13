@@ -28,7 +28,7 @@ Os erros son **dato**: cun `--json` o modelo ou o script sabe exactamente que ar
 Sen guión, `ygg render` pinta a árbore **no día cero**: todo bloqueado. E `locked` é, por deseño, o estado máis apagado — así que a foto non ensina nin a paleta nin o camiño. Con `--grant` e `--unlock` a foto amosa o que amosaban os mockups fundacionais: varios estados á vez.
 
 ```bash
-npx ygg render arbore.json --out foto.svg --dark   --grant "saga=30,sangue=6"   --unlock "espertar,corazon,furia,machado:3"
+npx ygg render lobo-de-inverno.json --out foto.svg --dark --grant "saga=30,sangue=6" --unlock "espertar,corazon,furia,pel-de-oso,machado:3,ouveo,berserkr,alento,bordon:2"
 ```
 
 - Aplícase en orde: primeiro os `--grant`, logo os `--unlock` tal como se listan (un nodo pode ser porta doutro).

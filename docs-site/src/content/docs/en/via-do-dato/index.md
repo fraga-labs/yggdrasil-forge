@@ -28,7 +28,7 @@ Errors are **data**: with `--json` the model or the script knows exactly what to
 Without a script, `ygg render` paints the tree on **day zero**: everything locked. And `locked` is, by design, the dimmest state — so the picture shows neither the palette nor the path. With `--grant` and `--unlock` the picture shows what the project's founding mockups showed: several states at once.
 
 ```bash
-npx ygg render tree.json --out shot.svg --dark   --grant "saga=30,blood=6"   --unlock "awaken,heart,fury,axe:3"
+npx ygg render lobo-de-inverno.json --out shot.svg --dark --grant "saga=30,sangue=6" --unlock "espertar,corazon,furia,pel-de-oso,machado:3,ouveo,berserkr,alento,bordon:2"
 ```
 
 - Applied in order: `--grant` first, then `--unlock` exactly as listed (one node can be another's gate).

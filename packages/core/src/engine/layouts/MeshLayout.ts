@@ -162,6 +162,23 @@ export class MeshLayout implements LayoutEngine {
       })
     }
 
+    // ── Compactación: de anel de illas a TEA ──
+    //
+    // `colocarBlobs` mide cada comarca polo seu círculo CIRCUNSCRITO, e
+    // unha tea irregular non é un círculo: sobreestima moitísimo. Medido
+    // no atlas da galería, os círculos case se tocaban (folgo 6–65) pero
+    // as teas de verdade quedaban a **61–121** unidades unhas doutras, e
+    // o centro era un oco de **164–216** arredor do nodo raíz. O
+    // resultado líase como seis illas nun mar negro, non como o tecido
+    // continuo do mockup fundacional.
+    //
+    // Aquí xa hai posicións REAIS (a relaxación correu), así que o anel
+    // encóllese contra a xeometría de verdade ata que algún par de nodos
+    // de comarcas distintas chega ao mesmo hueco que teñen os nodos DE
+    // DENTRO dunha comarca. Esa é a definición operativa de «tea
+    // continua»: a costura entre comarcas mide o mesmo que o interior.
+    this.compactar(blobs, positions, radioDe, s)
+
     // ── Separación GLOBAL ──
     //
     // A relaxación traballa blob a blob, así que por si soa garante que
@@ -203,6 +220,160 @@ export class MeshLayout implements LayoutEngine {
    * non pelexa co que a relaxación acaba de compoñer. Determinista: a
    * orde de visita sae das posicións, non do rng.
    */
+  /**
+   * Encolle o anel de comarcas contra a xeometría real ata que a costura
+   * entre dúas comarcas mide o mesmo que o interior dunha.
+   *
+   * Búscase UN factor para todo o anel (non un desprazamento por
+   * comarca) a propósito: a simetría do anel é parte do que fai que o
+   * atlas se lea como un mapa. Mover cada comarca por separado gaña uns
+   * poucos píxeles e rompe esa lectura.
+   *
+   * Bisección de 24 pasos sobre o factor. É determinista (nin rng nin
+   * reloxo) e o predicado é monótono: canto menor o factor, máis preto
+   * está todo. O resultado verifícase igual co pase `separar`, que segue
+   * dando a garantía dura de non-solapamento.
+   */
+  private compactar(
+    blobs: readonly Blob[],
+    positions: Map<string, Position>,
+    radioDe: ReadonlyMap<string, number>,
+    s: number,
+  ): void {
+    if (blobs.length < 2) return
+    const grupoDe = new Map<string, number>()
+    blobs.forEach((b, i) => {
+      for (const id of b.memberIds) grupoDe.set(id, i)
+    })
+    // O blob 0 é o central: queda quieto e é contra quen se pecha o oco.
+    const moviles = [...positions.keys()].filter((id) => (grupoDe.get(id) ?? 0) > 0)
+    if (moviles.length === 0) return
+
+    const ids = [...positions.keys()]
+    const orixinal = new Map<string, Position>()
+    for (const id of ids) {
+      const q = positions.get(id)
+      if (q !== undefined) orixinal.set(id, { x: q.x, y: q.y })
+    }
+    const centroDe = blobs.map((b) => ({ x: b.cx, y: b.cy }))
+
+    /** Coloca todo cun factor de anel dado. */
+    const aplicar = (f: number): void => {
+      for (const id of ids) {
+        const q = orixinal.get(id)
+        const g = grupoDe.get(id) ?? 0
+        if (q === undefined) continue
+        if (g === 0) {
+          positions.set(id, { x: q.x, y: q.y })
+          continue
+        }
+        const c = centroDe[g] ?? { x: 0, y: 0 }
+        positions.set(id, { x: q.x - c.x * (1 - f), y: q.y - c.y * (1 - f) })
+      }
+    }
+
+    /** ¿Segue habendo o hueco de dentro entre comarcas distintas? */
+    const cabe = (): boolean => {
+      const n = ids.length
+      const xs = new Float64Array(n)
+      const ys = new Float64Array(n)
+      const rs = new Float64Array(n)
+      const gs = new Int32Array(n)
+      ids.forEach((id, k) => {
+        const q = positions.get(id)
+        xs[k] = q?.x ?? 0
+        ys[k] = q?.y ?? 0
+        rs[k] = radioDe.get(id) ?? 0
+        gs[k] = grupoDe.get(id) ?? 0
+      })
+      const rMax = Math.max(...Array.from(rs))
+      const cela = Math.max(s, 2 * rMax + marxe(s)) * 1.05
+      const balde = new Map<string, number[]>()
+      for (let k = 0; k < n; k++) {
+        const chave = `${Math.floor((xs[k] ?? 0) / cela)}:${Math.floor((ys[k] ?? 0) / cela)}`
+        const lista = balde.get(chave)
+        if (lista === undefined) balde.set(chave, [k])
+        else lista.push(k)
+      }
+      for (let k = 0; k < n; k++) {
+        const cx = Math.floor((xs[k] ?? 0) / cela)
+        const cy = Math.floor((ys[k] ?? 0) / cela)
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            for (const m of balde.get(`${cx + dx}:${cy + dy}`) ?? []) {
+              if (m <= k) continue
+              if (gs[k] === gs[m]) continue
+              const need = hueco(rs[k] ?? 0, rs[m] ?? 0, s)
+              const d = Math.hypot((xs[k] ?? 0) - (xs[m] ?? 0), (ys[k] ?? 0) - (ys[m] ?? 0))
+              if (d < need) return false
+            }
+          }
+        }
+      }
+      return true
+    }
+
+    // ── Fase 1: encoller o anel enteiro ──
+    // Un só factor para todas: mentres se poida, a simetría do anel
+    // consérvase, e iso é parte de que o atlas se lea como un mapa.
+    aplicar(1)
+    if (!cabe()) return
+    let baixo = 0
+    let alto = 1
+    for (let i = 0; i < 24; i++) {
+      const medio = (baixo + alto) / 2
+      aplicar(medio)
+      if (cabe()) alto = medio
+      else baixo = medio
+    }
+    aplicar(alto)
+
+    // ── Fase 2: cada comarca acaba de entrar pola súa conta ──
+    //
+    // A fase 1 párase no par MÁIS APRETADO de todo o anel, así que unha
+    // soa costura estreita deixa as outras cinco abertas. Medido no
+    // atlas: coas seis movéndose xuntas quedaban costuras de 22 a 73
+    // unidades cando o interior dunha comarca anda por 12. Deixando que
+    // cada unha entre o que lle deixe a SÚA veciñanza, péchanse tamén as
+    // que tiñan folgo.
+    //
+    // Ordénase por índice de blob (non por distancia nin por rng) para
+    // que o resultado sexa o mesmo en toda máquina.
+    const factorDe = new Array<number>(blobs.length).fill(alto)
+    const colocarBlob = (g: number, f: number): void => {
+      const c = centroDe[g] ?? { x: 0, y: 0 }
+      const b = blobs[g]
+      if (b === undefined) return
+      for (const id of b.memberIds) {
+        const q = orixinal.get(id)
+        if (q === undefined) continue
+        positions.set(id, { x: q.x - c.x * (1 - f), y: q.y - c.y * (1 - f) })
+      }
+    }
+    for (let rolda = 0; rolda < 3; rolda++) {
+      for (let g = 1; g < blobs.length; g++) {
+        const partida = factorDe[g] ?? alto
+        let lo = 0
+        let hi = partida
+        for (let i = 0; i < 16; i++) {
+          const medio = (lo + hi) / 2
+          colocarBlob(g, medio)
+          if (cabe()) hi = medio
+          else lo = medio
+        }
+        factorDe[g] = hi
+        colocarBlob(g, hi)
+      }
+    }
+
+    for (const id of ids) {
+      const q = positions.get(id)
+      if (q !== undefined) {
+        positions.set(id, { x: Math.round(q.x * 10) / 10, y: Math.round(q.y * 10) / 10 })
+      }
+    }
+  }
+
   private separar(
     positions: Map<string, Position>,
     radioDe: ReadonlyMap<string, number>,

@@ -358,6 +358,129 @@ export function computeRegionHullPath(
   return catmullRomClosedPath(expanded)
 }
 
+/** Unha caixa que o rótulo dunha comarca non debe pisar. */
+interface Estorbo {
+  readonly x: number
+  readonly y: number
+  readonly metadeAncho: number
+  readonly metadeAlto: number
+}
+
+/**
+ * Os estorbos que hai no mapa: os nodos, e o NOME de cada nodo que o
+ * leva pintado.
+ *
+ * O nome é a metade que se esquece. Ao xuntar as comarcas nunha tea,
+ * baixei «A FRAGA» ao bordo de abaixo porque alí non había nodos… e
+ * caeu xusto enriba de «Espírito da Fraga», que é o nome dun nodo que
+ * está máis arriba. O texto pínta o renderer en `radius + 16`, así que
+ * aquí modélase igual.
+ *
+ * O ancho do nome non se coñece (resolvelo pediría a locale, que non
+ * chega ata aquí), así que se usa unha estimación xenerosa: equivocarse
+ * de máis só move o rótulo da comarca a outro sitio libre; equivocarse
+ * de menos déixao debaixo dun texto.
+ */
+function estorbosDoMapa(
+  nodes: readonly NodeDef[],
+  positions: ReadonlyMap<string, { readonly x: number; readonly y: number }>,
+  labelMinRadius: number,
+): Estorbo[] {
+  const fora: Estorbo[] = []
+  for (const node of nodes) {
+    const pos = positions.get(node.id)
+    if (pos === undefined) continue
+    const r = resolveRadius(node)
+    fora.push({ x: pos.x, y: pos.y, metadeAncho: r, metadeAlto: r })
+    const levaNome = labelMinRadius <= 0 || r >= labelMinRadius
+    if (levaNome) {
+      fora.push({ x: pos.x, y: pos.y + r + 16, metadeAncho: 70, metadeAlto: 12 })
+    }
+  }
+  return fora
+}
+
+/**
+ * Onde cabe o nome da comarca.
+ *
+ * O rótulo `'top'` ía sempre ao centro do bordo superior do bbox. Iso
+ * vale mentres as comarcas estean illadas; en canto o layout as xunta
+ * para formar unha tea —que é o que pedía o mockup do atlas— ese punto
+ * cae enriba da comarca de arriba. No atlas pasoulle a dúas das seis.
+ *
+ * O preset `atlas` deixa dito que `'center'` xa se probou e se
+ * rectificou: a malla enche o blob e o nome centrado sae cortado polos
+ * nodos. Así que o sitio segue sendo o bordo; o que cambia é CAL.
+ *
+ * Próbanse seis puntos do propio bordo, ordenados de fóra cara a dentro
+ * do mapa: nun anel de comarcas o lado exterior é o único que ninguén
+ * máis reclama. Gaña o primeiro que deixe o texto libre de estorbos
+ * —nodos, nomes de nodo e os rótulos xa colocados—, e se ningún está
+ * limpo, o de máis folgo. Empate → o primeiro, que é o de sempre: un
+ * documento con comarcas separadas queda exactamente coma antes.
+ */
+function ancoraDoRotulo(
+  bbox: ComputedRegion['bbox'],
+  etiqueta: string,
+  fontSize: number,
+  estorbos: readonly Estorbo[],
+  centroDoMapa: { readonly x: number; readonly y: number },
+): { readonly x: number; readonly y: number } {
+  const width = bbox.maxX - bbox.minX
+  // Aproximación da caixa do texto: as versaletas con `letterSpacing`
+  // andan por 0,62 em por carácter.
+  const metadeAncho = (etiqueta.length * fontSize * 0.62) / 2
+  const metadeAlto = fontSize * 0.6
+  const cx = bbox.minX + width / 2
+  const cy = (bbox.minY + bbox.maxY) / 2
+  // O empate vai para ARRIBA a propósito: cunha soa comarca —ou cunha
+  // centrada no mapa— non hai «lado exterior», e o de sempre é arriba.
+  // Cun `>=` aquí, un documento dunha soa rexión mandaba o nome abaixo:
+  // regresión pura, e a proba de «cero regresión» cazouna.
+  const arriba = { y: bbox.minY + 18, fora: cy <= centroDoMapa.y }
+  const abaixo = { y: bbox.maxY - 8, fora: cy > centroDoMapa.y }
+  const lados = arriba.fora ? [arriba, abaixo] : [abaixo, arriba]
+  const xs =
+    cx < centroDoMapa.x
+      ? [bbox.minX + width * 0.28, cx, bbox.minX + width * 0.72]
+      : [bbox.minX + width * 0.72, cx, bbox.minX + width * 0.28]
+  // O centro vai primeiro dentro de cada lado: é o de sempre, e só se
+  // abandona cando está ocupado.
+  const dentro = lados.flatMap((l) => [cx, xs[0] ?? cx, xs[2] ?? cx].map((x) => ({ x, y: l.y })))
+  // Segunda quenda, XUSTO FÓRA do bbox polo lado exterior. A banda de
+  // abaixo dunha comarca é precisamente onde o renderer pinta os NOMES
+  // dos nodos (`radius + 16`, dentro do padding), así que nunha comarca
+  // densa e chea de fitos non queda oco dentro: é o caso de «O MAR
+  // ABERTO», que caía enriba de «Dono do Mar Aberto». Saír un chisco ao
+  // lenzo aberto é o que fai un mapa, e polo lado exterior non hai
+  // ningunha outra comarca que reclame ese sitio.
+  const desprazamento = fontSize * 1.6
+  const fora = lados.flatMap((l) =>
+    [cx, xs[0] ?? cx, xs[2] ?? cx].map((x) => ({
+      x,
+      y: l.y === arriba.y ? bbox.minY - desprazamento : bbox.maxY + desprazamento,
+    })),
+  )
+  const candidatos = [...dentro, ...fora]
+
+  let mellor = candidatos[0] ?? { x: cx, y: bbox.minY + 18 }
+  let mellorFolgo = Number.NEGATIVE_INFINITY
+  for (const c of candidatos) {
+    let folgo = Number.POSITIVE_INFINITY
+    for (const e of estorbos) {
+      const dx = Math.abs(e.x - c.x) - metadeAncho - e.metadeAncho
+      const dy = Math.abs(e.y - c.y) - metadeAlto - e.metadeAlto
+      folgo = Math.min(folgo, Math.max(dx, dy))
+    }
+    if (folgo > 0) return c
+    if (folgo > mellorFolgo) {
+      mellorFolgo = folgo
+      mellor = c
+    }
+  }
+  return mellor
+}
+
 /**
  * Renderiza tintes de fondo por rexión. Aplícase dentro do `<g transform>`
  * do viewport e ANTES dos edges/nodos (z-order: rexións → edges → nodos).
@@ -387,6 +510,28 @@ export function SkillRegions({
   }
   if (computed.length === 0) return null
 
+  // Estorbos e centro do mapa: calcúlanse unha vez para todas as
+  // comarcas, e os rótulos xa colocados vanse engadindo, así que dúas
+  // comarcas veciñas non poñen o nome no mesmo sitio.
+  const estorbos = estorbosDoMapa(nodes, nodePositions, theme?.sizes.labelMinRadius ?? 0)
+  const centroDoMapa = {
+    x: computed.reduce((a, c) => a + (c.bbox.minX + c.bbox.maxX) / 2, 0) / computed.length,
+    y: computed.reduce((a, c) => a + (c.bbox.minY + c.bbox.maxY) / 2, 0) / computed.length,
+  }
+  const ancoras = new Map<string, { readonly x: number; readonly y: number }>()
+  for (const { spec, bbox } of computed) {
+    const w = bbox.maxX - bbox.minX
+    const tamano = Math.max(13, Math.min(24, w * 0.05))
+    const a = ancoraDoRotulo(bbox, spec.label, tamano, estorbos, centroDoMapa)
+    ancoras.set(spec.id, a)
+    estorbos.push({
+      x: a.x,
+      y: a.y,
+      metadeAncho: (spec.label.length * tamano * 0.62) / 2,
+      metadeAlto: tamano * 0.6,
+    })
+  }
+
   const textColor = theme?.colors.text ?? '#666666'
   // Lenzo efectivo, mesma cadea que o halo do rótulo en SkillNode:
   // `background` é opcional e ningún tema base o define.
@@ -397,6 +542,8 @@ export function SkillRegions({
       {computed.map(({ spec, bbox, hullPath }) => {
         const width = bbox.maxX - bbox.minX
         const height = bbox.maxY - bbox.minY
+        const tamanoRotulo = Math.max(13, Math.min(24, width * 0.05))
+        const ancora = ancoras.get(spec.id) ?? { x: bbox.minX + width / 2, y: bbox.minY + 18 }
         return (
           <g key={spec.id} className="yf-skill-region" data-region-id={spec.id}>
             {regionShape === 'hull' && hullPath !== null ? (
@@ -424,8 +571,8 @@ export function SkillRegions({
               />
             )}
             <text
-              x={bbox.minX + width / 2}
-              y={regionLabel === 'center' ? bbox.minY + height / 2 : bbox.minY + 18}
+              x={regionLabel === 'center' ? bbox.minX + width / 2 : ancora.x}
+              y={regionLabel === 'center' ? bbox.minY + height / 2 : ancora.y}
               textAnchor="middle"
               style={
                 regionLabel === 'center'
@@ -448,7 +595,7 @@ export function SkillRegions({
                       // é unha etiqueta de UI perdida, e non dicía a
                       // que comarca pertence. O clamp inferior deixa os
                       // documentos pequenos exactamente coma antes.
-                      fontSize: Math.max(13, Math.min(24, width * 0.05)),
+                      fontSize: tamanoRotulo,
                       fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',

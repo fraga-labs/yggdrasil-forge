@@ -61,6 +61,9 @@ const pos = (tree: TreeDef) => {
   return r.value
 }
 
+/** Alias lexible para as probas que xa usan `pos` como variable local. */
+const colocar = pos
+
 describe('parseMeshLayoutConfig', () => {
   it('tipo equivocado → err', () => {
     expect(parseMeshLayoutConfig({ type: 'radial' } as never).ok).toBe(false)
@@ -482,4 +485,141 @@ describe('★ MeshLayout — os corpos NON se solapan', () => {
     for (const [id, p] of a) expect(b.get(id)).toEqual(p)
   })
 })
+// ── 19.11: de anel de illas a TEA ──
+// O atlas da galería líase como seis illas nun mar negro, non como o
+// tecido continuo do mockup fundacional. A topoloxía xa estaba ben (o
+// grafo é conexo: seis raios desde a raíz e un anel entre comarcas). O
+// que fallaba era `colocarBlobs`, que mide cada comarca polo seu círculo
+// CIRCUNSCRITO — e unha tea irregular non é un círculo. Medido no
+// atlas: os círculos case se tocaban (folgo 6–65) pero as teas de
+// verdade quedaban a **61–121** unidades, e arredor da raíz había un oco
+// de **165**.
+//
+// O FIXTURE IMPORTA, e cústame admitir canto: a primeira versión desta
+// proba usaba `arbore(6, 12)` —seis comarcas de doce pequenos iguais— e
+// daba o MESMO número coa compactación activada e desactivada. Non
+// probaba nada. Con nodos todos do mesmo tamaño o círculo circunscrito é
+// unha boa aproximación da tea e non hai oco que pechar; o defecto
+// nace da DESIGUALDADE de tamaños. Así que aquí repítese seis veces a
+// comarca de `arboreDesigual`, que é a do atlas.
+function atlasMiniatura(): TreeDef {
+  const base = arboreDesigual(3)
+  const nodes: unknown[] = [
+    { id: 'raiz', type: 'root', label: { gl: 'R' }, size: 46, group: 'centro' },
+  ]
+  const edges: unknown[] = []
+  const groups: unknown[] = [{ id: 'centro', label: { gl: 'C' } }]
+  const comarcas = ['c0', 'c1', 'c2', 'c3', 'c4', 'c5']
+  comarcas.forEach((c, k) => {
+    groups.push({ id: c, label: { gl: c } })
+    // Mesma orde de emisión que o orixinal: o mesh sementa por orde.
+    for (const n of base.nodes) {
+      nodes.push({ ...(n as object), id: `${c}-${n.id}`, group: c })
+    }
+    for (const e of base.edges) {
+      edges.push({
+        ...(e as object),
+        id: `${c}-${e.id}`,
+        source: `${c}-${e.source}`,
+        target: `${c}-${e.target}`,
+      })
+    }
+    // Raio desde a raíz e anel entre comarcas: a topoloxía do atlas.
+    edges.push({ id: `raio-${c}`, source: 'raiz', target: `${c}-porta`, type: 'dependency' })
+    const seguinte = comarcas[(k + 1) % comarcas.length]
+    edges.push({
+      id: `anel-${c}`,
+      source: `${c}-p0`,
+      target: `${seguinte}-p6`,
+      type: 'dependency',
+    })
+  })
+  return {
+    id: 'mini-atlas',
+    schemaVersion: '1.0.0',
+    version: '1.0.0',
+    label: { gl: 'Mini' },
+    groups,
+    nodes,
+    edges,
+    layout: { type: 'mesh', spacing: 62, seed: 3, centerGroupId: 'centro' },
+  } as unknown as TreeDef
+}
+
+describe('★ MeshLayout — as comarcas forman unha TEA, non un arquipélago', () => {
+  const ESPAZADO = 62
+
+  /** Folgo bordo a bordo entre o nodo `a` e o máis próximo de `ids`. */
+  const maisPreto = (
+    pos: ReadonlyMap<string, { readonly x: number; readonly y: number }>,
+    raio: (id: string) => number,
+    meus: readonly string[],
+    outros: readonly string[],
+  ): number => {
+    let m = Number.POSITIVE_INFINITY
+    for (const a of meus) {
+      const pa = pos.get(a)
+      if (pa === undefined) continue
+      for (const b of outros) {
+        const pb = pos.get(b)
+        if (pb === undefined) continue
+        m = Math.min(m, Math.hypot(pa.x - pb.x, pa.y - pb.y) - raio(a) - raio(b))
+      }
+    }
+    return m
+  }
+
+  const raioMini = (id: string): number => {
+    if (id === 'raiz') return 46
+    const suf = id.slice(id.indexOf('-') + 1)
+    return radioDe(suf)
+  }
+
+  it('★★ ningunha comarca queda a máis dun espazado da súa veciña máis próxima', () => {
+    const tree = atlasMiniatura()
+    const { nodes } = colocar(tree)
+    const grupo = new Map(tree.nodes.map((n) => [n.id, n.group ?? '']))
+    for (const g of new Set(grupo.values())) {
+      const meus = tree.nodes.filter((n) => grupo.get(n.id) === g).map((n) => n.id)
+      const outros = tree.nodes.filter((n) => grupo.get(n.id) !== g).map((n) => n.id)
+      const preto = maisPreto(nodes, raioMini, meus, outros)
+      // Un espazado é o hueco que hai DENTRO dunha comarca: pedir que a
+      // costura non pase diso é a definición operativa de «tea».
+      expect(preto, `a comarca ${g} queda illada (${preto.toFixed(1)})`).toBeLessThanOrEqual(
+        ESPAZADO,
+      )
+    }
+  })
+
+  it('★★ o grupo central non queda nun oco', () => {
+    // `colocarBlobs` «facía medrar o central para tocar o anel», pero un
+    // blob dun SÓ membro non medra nada: o número inflábase e o burato
+    // quedaba igual. No atlas iso eran 165 unidades de negro arredor da
+    // raíz, xusto no medio da foto.
+    const tree = atlasMiniatura()
+    const { nodes } = colocar(tree)
+    const resto = tree.nodes.filter((n) => n.group !== 'centro').map((n) => n.id)
+    const preto = maisPreto(nodes, raioMini, ['raiz'], resto)
+    expect(preto).toBeLessThanOrEqual(ESPAZADO)
+  })
+
+  it('★ a compactación move comarcas ENTEIRAS: por dentro non deforma nada', () => {
+    // Se isto se rompese, gañaríase densidade estragando o que a
+    // relaxación acaba de compoñer. Compróbase que ningún par de dentro
+    // dunha comarca acaba solapado.
+    const tree = atlasMiniatura()
+    const { nodes } = colocar(tree)
+    for (const g of ['c0', 'c2', 'c4']) {
+      const ids = tree.nodes.filter((n) => n.group === g).map((n) => n.id)
+      let peor = Number.POSITIVE_INFINITY
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          peor = Math.min(peor, maisPreto(nodes, raioMini, [ids[i] ?? ''], [ids[j] ?? '']))
+        }
+      }
+      expect(peor, `a comarca ${g} colapsou`).toBeGreaterThan(-1)
+    }
+  })
+})
+
 // ── FIN: tests MeshLayout ──

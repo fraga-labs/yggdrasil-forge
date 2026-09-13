@@ -181,4 +181,72 @@ describe('★ 19.8 — o marco ornamental', () => {
     expect(container.querySelectorAll('.yf-skill-node__shape')).toHaveLength(1)
   })
 })
+// ── 19.11: o nome da comarca nunha TEA ──
+// Ao xuntar as comarcas para que o atlas se lea como o tecido continuo
+// do mockup, o bordo de arriba dunha comarca deixa de estar libre:
+// pásao a ocupar a comarca de enriba. No atlas tapáronse dous dos seis
+// nomes. O preset `atlas` xa deixa dito que `center` se probou e se
+// rectificou (a malla enche o blob e o nome sae cortado), así que o
+// sitio segue sendo o bordo: o que cambia é CAL dos bordos.
+
+const AZUL = '#4a7fa8'
+
+/** Dúas comarcas pegadas: a de abaixo ten o bordo de arriba ocupado. */
+function duasPegadas() {
+  const rexionsSpec: RegionSpec[] = [
+    { id: 'arriba', label: 'A COSTA', tag: 'costa', color: AZUL },
+    { id: 'abaixo', label: 'O MAR', tag: 'mar', color: AZUL },
+  ]
+  const nodos: NodeDef[] = [
+    { id: 'a1', type: 'small', label: 'a1', tags: ['costa'] } as NodeDef,
+    { id: 'a2', type: 'small', label: 'a2', tags: ['costa'] } as NodeDef,
+    { id: 'b1', type: 'small', label: 'b1', tags: ['mar'] } as NodeDef,
+    { id: 'b2', type: 'small', label: 'b2', tags: ['mar'] } as NodeDef,
+  ]
+  // A comarca de abaixo empeza a y=140, e a de arriba chega a y=120 con
+  // nodos ao longo de todo o ancho: o bordo superior de `mar` está
+  // ocupado polos corpos de `costa`.
+  const pos = new Map([
+    ['a1', { x: 0, y: 0 }],
+    ['a2', { x: 300, y: 120 }],
+    ['b1', { x: 0, y: 140 }],
+    ['b2', { x: 300, y: 320 }],
+  ])
+  return render(
+    <ThemeProvider theme={minimalDark}>
+      <svg role="img" aria-label="proba">
+        <SkillRegions regions={rexionsSpec} nodes={nodos} nodePositions={pos} />
+      </svg>
+    </ThemeProvider>,
+  )
+}
+
+describe('★ 19.11 — o nome da comarca busca onde cabe', () => {
+  it('★★ a comarca de abaixo NON pon o nome no bordo que lle ocupa a veciña', () => {
+    const { container } = duasPegadas()
+    const textos = [...container.querySelectorAll('.yf-skill-region')].map((g) => ({
+      id: g.getAttribute('data-region-id'),
+      y: Number(g.querySelector('text')?.getAttribute('y')),
+    }))
+    const arriba = textos.find((t) => t.id === 'arriba')
+    const abaixo = textos.find((t) => t.id === 'abaixo')
+    expect(arriba).toBeDefined()
+    expect(abaixo).toBeDefined()
+    // A de arriba queda onde sempre (bordo superior, por riba de y=0).
+    expect(arriba?.y ?? 0).toBeLessThan(0)
+    // A de abaixo NON pode quedar no seu bordo superior (y≈108), que é
+    // onde están os corpos de `costa`: ten que baixar.
+    expect(abaixo?.y ?? 0).toBeGreaterThan(200)
+  })
+
+  it('★ os dous nomes non acaban no mesmo sitio', () => {
+    const { container } = duasPegadas()
+    const ys = [...container.querySelectorAll('.yf-skill-region text')].map((t) =>
+      Number(t.getAttribute('y')),
+    )
+    expect(ys).toHaveLength(2)
+    expect(Math.abs((ys[0] ?? 0) - (ys[1] ?? 0))).toBeGreaterThan(40)
+  })
+})
+
 // ── FIN: tests dos ornamentos ──

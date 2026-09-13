@@ -53,10 +53,12 @@ Write `bakery.json`:
 Notice: **no positions**. You don't need them:
 
 ```bash
-npx ygg validate bakery.json            # ✓ valid document (3 nodes, 2 edges)
+npx ygg validate bakery.json            # ✓ documento válido (3 nodos, 2 arestas)
 npx ygg layout bakery.json --algo tree --out bakery.json
 npx ygg render bakery.json --out bakery.svg
 ```
+
+The `ygg` command speaks **Galician**: that first line is the real output, not a translation of it. Exit codes and `--json` are language-neutral, so a script or a model never has to read it.
 
 `layout` bakes the positions (and the framing) into the document; `render` produces a self-contained SVG. Import `bakery.json` into the editor whenever you want to tweak it.
 

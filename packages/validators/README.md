@@ -147,6 +147,30 @@ interface ValidationReport {
 | `getRules()` | Returns `readonly ValidationRule[]` in insertion order. |
 | `size()` | Number of registered rules. |
 
+## Applicability — read this before registering rules
+
+**These rules assume a rooted, acyclic tree.** That assumption is not
+wrong, but it is not universal, and the package never said it out loud.
+Measured over the nine documents of this project's own gold gallery
+(`examples/gallery/`), the nine rules together report **244 issues**,
+including **11 errors** on `atlas-de-fisterra.json` — a document that is
+correct by design.
+
+| What happens | Why |
+|---|---|
+| `noCyclesRule` reports 11 **errors** on the atlas | Each of its regions is built as a *closed weave*. In a mesh document, cycles are the design. |
+| `noRedundantPrerequisitesRule` flags 102 of 174 atlas edges | In a dense weave most edges have an alternative path. Redundancy is the point of a mesh, not a flaw in it. |
+| `noDeadEndsRule` fires on **all nine** documents, `minimal.json` included | It flags every leaf. Every tree has leaves, so this rule can only be satisfied by a graph with no terminal nodes. |
+| `allReachableFromRootRule`, `progressiveDifficultyRule`, `balancedBranchesRule` never fire — on any document | All three `return []` when `treeDef.rootNodeId` is undefined, and **no gallery document declares it**. A clean report from these three means "not checked", not "nothing wrong". |
+
+So: register the rules that match the *shape* of your document. For a
+curriculum or a rooted skill tree, declare `rootNodeId` and the full set
+applies. For a mesh or an atlas, `noCyclesRule` and
+`noRedundantPrerequisitesRule` will describe your design as a defect.
+
+These facts are pinned in `__tests__/aplicabilidade.test.ts`, so a change
+in any of them is deliberate rather than accidental.
+
 ## Notes
 
 - **Dependency edges only**: structural rules use only edges with

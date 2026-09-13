@@ -37,3 +37,12 @@ raíz, nin na «vía do dato» das docs. É o mesmo fallo que xa se corrixira
 no erro de `--algo`: quen buscaba o motor lía que non existía. Ao
 README do `cli` engádenselle tamén `--minimap`, `--grant` e `--unlock`,
 que levaban toda a entrega sen documentar.
+
+**E a mensaxe di cal dos tres accidentes foi.** A primeira versión disto
+contestáballe «`--width` precisa un valor» a quen escribira `--width 100
+--width 200` (unha repetición, onde antes gañaba a primeira en silencio)
+e tamén a quen dera un valor que empeza por `--`. Distínguense polo que
+vén detrás da bandeira sobrante: `«--width» aparece dúas veces`,
+`--label precisa un valor e «--x» non pode selo: empeza por «--»`, ou
+`--width precisa un valor (p.ex. --width 1200)`.
+

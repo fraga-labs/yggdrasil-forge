@@ -345,6 +345,28 @@ describe('★ bandeiras mal escritas ou baleiras — uso incorrecto, nunca saíd
     },
   )
 
+  it('★★ unha bandeira REPETIDA dise repetida, non «sen valor»', async () => {
+    // `takeOption` colle o primeiro par e deixa o segundo tirado. A
+    // primeira versión disto contestaba «--width precisa un valor» a quen
+    // acababa de escribir dous: mandábao buscar onde non había nada.
+    const io = makeIO()
+    const code = await run(
+      ['render', ARBORE, '--out', FORA, '--width', '100', '--width', '200'],
+      io,
+    )
+    expect(code).toBe(2)
+    expect(io.err()).toContain('dúas veces')
+  })
+
+  it('★ un valor que empeza por «--» dise así, e non «falta o valor»', async () => {
+    const io = makeIO()
+    const code = await run(['new', '--label', '--isto-non-é-unha-bandeira'], io)
+    expect(code).toBe(2)
+    expect(io.err()).toContain('--isto-non-é-unha-bandeira')
+    expect(io.err()).toContain('empeza por')
+    expect(io.out()).toBe('')
+  })
+
   it('★ e as bandeiras BOAS seguen pasando todas xuntas', async () => {
     // A outra metade do contrato: se só se cumprise a primeira, a forma
     // barata de «arranxar» isto sería rexeitar todo.

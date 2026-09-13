@@ -85,7 +85,16 @@ const EXEMPLO_DE_BANDEIRA: Readonly<Record<string, string>> = {
  * polo stdout tamén con 0. É o mesmo descarte silencioso que xa se lle
  * negaba a `--grant`/`--unlock`; agora négaselle a todas.
  *
- * @param conValor bandeiras que esixen valor (se seguen aquí, foi sen el)
+ * **A mensaxe ten que dicir a verdade**, e para iso hai que distinguir
+ * tres accidentes distintos. O que segue á bandeira sobrante abonda para
+ * saber cal é: se leva detrás un valor NORMAL é que `takeOption` xa lle
+ * comeu un par antes, logo a bandeira vai repetida (`--width 100 --width
+ * 200`, onde calaba e gañaba a primeira); se detrás vén algo que empeza
+ * por `--`, o valor confúndese cunha bandeira; e se non vén nada, foi
+ * escrita baleira. Dicirlle «precisa un valor» a quen escribiu
+ * `--width 100 --width 200` mándao a buscar onde non hai nada.
+ *
+ * @param conValor bandeiras que esixen valor
  * @param soas bandeiras booleanas válidas
  */
 function sobrasDeOpcions(
@@ -93,13 +102,22 @@ function sobrasDeOpcions(
   conValor: readonly string[],
   soas: readonly string[],
 ): string | undefined {
-  for (const a of rest) {
+  for (const [i, a] of rest.entries()) {
     if (!a.startsWith('--')) continue
-    const exemplo = EXEMPLO_DE_BANDEIRA[a]
-    if (conValor.includes(a)) {
-      return `${a} precisa un valor${exemplo !== undefined ? ` (p.ex. ${exemplo})` : ''}`
+    if (!conValor.includes(a)) {
+      if (!soas.includes(a)) return `opción descoñecida «${a}»`
+      continue
     }
-    if (!soas.includes(a)) return `opción descoñecida «${a}»`
+    const seguinte = rest[i + 1]
+    if (seguinte !== undefined && !seguinte.startsWith('--')) {
+      return `«${a}» aparece dúas veces`
+    }
+    const exemplo = EXEMPLO_DE_BANDEIRA[a]
+    const comoSeUsa = exemplo !== undefined ? ` (p.ex. ${exemplo})` : ''
+    if (seguinte !== undefined) {
+      return `${a} precisa un valor e «${seguinte}» non pode selo: empeza por «--»${comoSeUsa}`
+    }
+    return `${a} precisa un valor${comoSeUsa}`
   }
   return undefined
 }

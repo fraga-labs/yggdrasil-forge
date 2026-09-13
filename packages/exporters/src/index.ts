@@ -4,7 +4,7 @@
 /**
  * Versión actual do paquete.
  */
-export const VERSION = '0.0.0'
+export const VERSION = '0.1.1'
 
 // ── F9.4: serialización ──
 export { exportTreeToJson, exportTreeToYaml } from './serialize.js'

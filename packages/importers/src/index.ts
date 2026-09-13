@@ -4,7 +4,7 @@
 /**
  * Versión actual do paquete.
  */
-export const VERSION = '0.0.0'
+export const VERSION = '0.2.1'
 
 // ── F9.3.a: importador GAIA ──
 export { importGaiaProfession, toI18n } from './gaia.js'

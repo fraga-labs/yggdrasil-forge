@@ -17,5 +17,5 @@ export { ScopedStorage } from './ScopedStorage.js'
 /**
  * Versión actual do paquete.
  */
-export const VERSION = '0.0.0'
+export const VERSION = '0.1.2'
 // ── FIN: @yggdrasil-forge/storage ──
